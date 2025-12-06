@@ -1,0 +1,840 @@
+import React, { useState } from 'react';
+import { Plane, Train, Hotel, MapPin, Camera, ShoppingBag, Home, Clock, ArrowRight, Utensils, X, Map, Ticket, List, ExternalLink, Cloud, Sun, CloudSnow, CloudRain, Info, Shirt, Tag, Compass, BookOpen, Zap, Users } from 'lucide-react';
+
+const TripApp = () => {
+  const [activeDay, setActiveDay] = useState(0);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  // Helper for weather icons
+  const WeatherIcon = ({ type, size = 14, className }) => {
+    switch(type) {
+      case 'sun': return <Sun size={size} className={`text-orange-400 ${className}`} />;
+      case 'cloud': return <Cloud size={size} className={`text-slate-400 ${className}`} />;
+      case 'snow': return <CloudSnow size={size} className={`text-cyan-300 ${className}`} />;
+      case 'rain': return <CloudRain size={size} className={`text-blue-300 ${className}`} />;
+      default: return <Sun size={size} className={`text-orange-400 ${className}`} />;
+    }
+  };
+
+  const schedule = [
+    {
+      date: "12/19",
+      day: "Fri",
+      title: "Arrival",
+      location: "台北 → 東京 → 六本木",
+      theme: "from-slate-600 to-slate-700", 
+      themeBtn: "bg-slate-600",
+      themeLight: "bg-slate-50",
+      events: [
+        { 
+          time: "14:40", 
+          endTime: "19:00", 
+          type: "flight", 
+          title: "飛往東京 (TR874)", 
+          desc: "桃園 TPE → 成田 NRT", 
+          details: "搭乘酷航 TR874。注意：抵達時間為日本時間 (GMT+9)，比台灣快 1 小時。",
+          locationQuery: "Taoyuan International Airport Terminal 1",
+          icon: Plane,
+          weather: { type: 'cloud', temp: '18°C', loc: 'TPE' },
+          keywords: ["夢幻客機787", "高CP值", "準點率"],
+          outfit: "機艙冷氣強且乾燥，建議帶件連帽薄外套，並準備空水瓶過安檢後裝水。",
+          insights: {
+            travel: "酷航這班通常用波音 787 廣體客機執飛，舒適度勝過一般窄體廉航。記得選位避開機翼，起飛後左側可看台灣海岸線，降落前右側有機會看到千葉農田夕陽。",
+            culture: "台日航線不僅是旅遊線，更是情感線。機上那種「要去日本了」的集體興奮感，以及回程時大包小包的戰利品，是台灣人獨有的旅遊儀式感。",
+            tech: "787 機型採用電子變色窗而非傳統遮陽板，且艙壓控制更好，能減輕長途飛行的疲勞感與耳鳴不適，是航空科技的一大進步。",
+            local: "「看到台灣遊客大包小包真的很親切。不過在成田機場搭電車時，請盡量將行李排成一列，不要擋到趕路的日本上班族，這是一種默契喔。」"
+          },
+          flightInfo: {
+            checkIn: "12:10",
+            boarding: "13:55",
+            departure: "14:40 (TW)",
+            arrival: "19:00 (JP)",
+            terminal: "T1"
+          }
+        },
+        { 
+          time: "19:40", 
+          endTime: "20:50", 
+          type: "transport", 
+          title: "前往六本木", 
+          desc: "成田特急 N'EX", 
+          details: "若搭乘 N'EX 請至東京站轉乘。建議買來回套票。",
+          locationQuery: "六本木駅",
+          icon: Train,
+          weather: { type: 'rain', temp: '8°C', loc: 'Tokyo' },
+          keywords: ["全車指定席", "外國人優惠", "直達市區"],
+          outfit: "日本電車暖氣像不用錢一樣熱，進車廂絕對要脫外套，不然會流汗感冒。建議內搭不要穿高領發熱衣。",
+          insights: {
+            travel: "千萬別用西瓜卡直接刷進站！外國人憑護照買『N'EX 東京去回車票 (¥5000)』最划算，比單程買省下近 4000 日圓，且回程有效期長達 14 天。",
+            culture: "N'EX 的清掃效率與準點率是日本「職人精神」的極致展現。到站後的折返清潔時間極短，卻能讓車廂煥然一新，被稱為「7分鐘的奇蹟」。",
+            tech: "車廂內的 LCD 螢幕會顯示詳細的轉乘資訊與新聞，座椅上方的紅綠燈號系統則連線中央訂位系統，清楚顯示座位預約狀況，避免佔位糾紛。",
+            local: "「說實話，我們當地人覺得 N'EX 原價太貴了，通常都搭快速電車或巴士。但你們外國人專用的那個 5000 日圓來回票，便宜到讓我們日本人嫉妒啊！」"
+          },
+          timetableUrl: "https://www.jreast.co.jp/nex/time.html",
+          timetable: [
+            { time: "19:48", label: "N'EX 50號", highlight: true },
+            { time: "20:15", label: "Skyliner (需轉車)" },
+            { time: "20:44", label: "N'EX 52號 (末班)" }
+          ]
+        },
+        { 
+          time: "20:50", 
+          type: "hotel", 
+          title: "Check-in", 
+          desc: "APA 六本木飯店", 
+          price: "$3068", 
+          details: "APA Hotel Roppongi Ekimae。請準備護照。",
+          locationQuery: "APA Hotel Roppongi Ekimae",
+          icon: Hotel,
+          weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
+          keywords: ["空間魔術師", "社長咖哩", "大浴場"],
+          outfit: "飯店提供的浴衣通常只能在房間或去大浴場時穿，千萬別穿去大廳或便利商店。",
+          insights: {
+            travel: "APA 的房間以「極致壓縮」聞名，行李箱可能無法全開。建議入住第一件事是確認床底下的空間，通常設計用來塞大行李箱。",
+            culture: "APA 社長元谷芙美子是日本商界傳奇，房間抽屜裡一定會放她的勵志書或漫畫。這種強烈的個人崇拜與企業形象結合，是日本家族企業的特色。",
+            tech: "APA 引進的「1秒 Check-in」自助機與節能感應系統（人不在即斷電），展現了商務旅館透過科技極大化運營效率與成本控制的商業模式。",
+            local: "「六本木晚上的黑人拉客小哥（Tout）很多，雖然這區治安沒問題，但被搭話時眼神不要對上，直接走過去就好，這是我們在這裡生存的潛規則。」"
+          }
+        },
+        { 
+          time: "21:30", 
+          type: "food", 
+          title: "晚餐：Shabuzen", 
+          desc: "六本木壽喜燒", 
+          details: "黑毛和牛吃到飽。Shabuzen Roppongi。",
+          locationQuery: "Shabuzen Roppongi",
+          icon: Utensils,
+          weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
+          keywords: ["關東風", "A5和牛", "蛋液拌飯"],
+          outfit: "吃火鍋容易沾味，建議穿深色、好洗的衣服，避免穿昂貴的淺色毛衣。",
+          insights: {
+            travel: "日本壽喜燒 (Sukiyaki) 分關東風（醬汁煮）與關西風（先煎後煮）。這裡提供的是適合吃到飽的關東風。記得最後剩下的精華蛋液要拌飯吃，那是老饕的收尾。",
+            culture: "壽喜燒是明治維新後「文明開化」的象徵，代表日本從禁食紅肉轉向接受西方飲食習慣，是近代日本飲食洋風化的起點。",
+            tech: "黑毛和牛的 A5 等級判定依賴嚴格的脂肪交雜率 (BMS) 檢測標準。現代畜牧業透過大數據管理牛隻血統與飼料配方，才能穩定產出這種入口即化的霜降肉。",
+            local: "「這種 A5 和牛吃到飽，對我們來說也是慶祝升遷或接待重要客戶才會去的。這個價格能吃到這種肉質，在物價高漲的東京真的很佛心。」"
+          }
+        }
+      ]
+    },
+    {
+      date: "12/20",
+      day: "Sat",
+      title: "City Walk",
+      location: "銀座・有樂町・六本木",
+      theme: "from-gray-500 to-gray-600",
+      themeBtn: "bg-gray-600",
+      themeLight: "bg-gray-50",
+      events: [
+        { 
+          time: "12:00", 
+          type: "food", 
+          title: "午餐：鮨・Itsumi", 
+          desc: "無菜單壽司 Omakase", 
+          details: "赤坂/六本木區高評價壽司。請準時。",
+          locationQuery: "Sushi Itsumi",
+          icon: Utensils,
+          weather: { type: 'sun', temp: '11°C', loc: 'Tokyo' },
+          keywords: ["江戶前", "赤醋飯", "職人精神"],
+          outfit: "半正式休閒 (Smart Casual)，避免穿短褲、拖鞋或太休閒的棉褲，是對職人的尊重。",
+          insights: {
+            travel: "吃 Omakase 切記「不要噴香水」，這會破壞生食的纖細氣味。薑片是用來清口中餘味的，不要配著壽司吃。師傅上菜後 3 秒內入口，溫度最完美。",
+            culture: "「江戶前」壽司源於江戶時代的快餐，特色是使用醃漬或煮過的魚獲（如鮪魚漬、煮穴子），反映了當時沒有冰箱的保存智慧，如今演變成一種高級料理流派。",
+            tech: "現代高級壽司店高度依賴「冷鏈技術」與「熟成科技」。透過精準控制溫度與濕度，讓魚肉中的 ATP 轉化為鮮味成分 (Inosinate)，讓生魚片比剛捕撈時更好吃。",
+            local: "「午餐吃 Omakase 是東京人的省錢智慧！一樣的魚料，價格只要晚餐的一半。這家店在赤坂的上班族之間也是秘密口袋名單。」"
+          }
+        },
+        { 
+          time: "13:30", 
+          type: "activity", 
+          title: "有樂町二手市集", 
+          desc: "大江戶古董市集", 
+          details: "東京國際論壇大樓。遇雨取消。",
+          locationQuery: "Tokyo International Forum",
+          icon: ShoppingBag,
+          weather: { type: 'sun', temp: '12°C', loc: 'Yurakucho' },
+          keywords: ["現金交易", "昭和復古", "尋寶"],
+          outfit: "戶外風大且要一直走動，建議戴帽子或毛帽，並穿最好走的平底鞋。",
+          insights: {
+            travel: "許多攤位是老爺爺老奶奶擺攤，**只收現金**。看到喜歡的古董錶或餐具要馬上下手，轉一圈回來通常就沒了。可以嘗試用日文客氣地問「能便宜一點嗎？」(Sukoshi yasuku dekimasu ka?)。",
+            culture: "這裡販售的昭和時代舊物，反映了日本經歷戰後經濟奇蹟時的生活美學。這是一種「惜物」文化與現代「懷舊風潮」的結合，吸引了大量年輕人來尋找獨特性。",
+            tech: "雖然是古董市集，但近年來許多店家開始使用 Instagram 預告出攤商品，將最傳統的實體交易與社群行銷結合，形成了線上線下整合的二手經濟圈。",
+            local: "「以前這裡都是老人家在逛，最近外國人變多了，價格也稍微被炒高了。不過仔細翻找，還是能挖到昭和時代的絕版餐具，那個手感是現代量產品做不出來的。」"
+          }
+        },
+        { 
+          time: "15:00", 
+          type: "activity", 
+          title: "午後散策", 
+          desc: "皇居外苑 / 日比谷公園", 
+          details: "享受東京的城市綠洲。",
+          locationQuery: "Hibiya Park",
+          icon: Camera,
+          weather: { type: 'cloud', temp: '11°C', loc: 'Hibiya' },
+          keywords: ["二重橋", "松樹", "都市綠洲"],
+          outfit: "皇居外苑非常空曠，沒有遮蔽物，風會直接灌進來，圍巾是必備神物。",
+          insights: {
+            travel: "皇居外苑鋪設的碎石路（玉砂利）原本是為了防刺客（走動有聲），現在則是觀光客的「腳底殺手」，穿薄底鞋走久了會痛，建議走被踩實的車轍路徑。",
+            culture: "皇居前身是江戶城，是德川幕府權力的中心。從將軍居所轉變為天皇居所，這片綠地見證了日本從封建社會轉向近代國家權力轉移的歷史。",
+            tech: "東京都市計畫將這裡保留為大型風道 (Wind Corridor)，利用皇居的綠地冷卻海風並吹入市中心，是緩解都市熱島效應的關鍵生態工程技術。",
+            local: "「日比谷公園其實是我們週五晚上的啤酒花園。不過冬天真的很冷，我們會躲去東京中城日比谷 (Tokyo Midtown Hibiya) 的地下街喝咖啡，那裡直通地鐵很方便。」"
+          }
+        },
+        { 
+          time: "17:30", 
+          type: "activity", 
+          title: "六本木聖誕燈飾", 
+          desc: "櫸坂通點燈", 
+          details: "拍攝東京鐵塔與燈飾的最佳地點。",
+          locationQuery: "Roppongi Keyakizaka Dori",
+          icon: Camera,
+          weather: { type: 'cloud', temp: '8°C', loc: 'Roppongi' },
+          keywords: ["東京鐵塔", "藍白燈海", "百萬夜景"],
+          outfit: "入夜後氣溫驟降，而且要長時間站著拍照，手套跟暖暖包這時候就派上用場了。",
+          insights: {
+            travel: "別只擠在天橋上！走到 Tiffany 精品店前的路口，由下往上拍，人潮較少且能拍出帶有精品櫥窗與東京鐵塔的時尚街拍感。",
+            culture: "日本的聖誕節雖然不是國定假日，卻發展出獨特的「戀人節」文化。六本木燈飾是東京最強約會聖地，象徵著泡沫經濟時代以來都市戀愛文化的延續。",
+            tech: "這裡的燈飾全面採用特製的「白藍色 LED」，稱為「Snow & Blue」。LED 技術的進步讓大規模都市照明變得節能且低發熱，是現代夜間經濟的重要推手。",
+            local: "「這裡可是東京情侶的『決勝聖地』啊！如果聖誕節前夕被約來這裡看燈，大概就是準備要告白了。不過聖誕夜當天人多到像跨年，我們當地人反而會避開。」"
+          }
+        },
+        { 
+          time: "18:00", 
+          type: "food", 
+          title: "聖誕市集晚餐", 
+          desc: "六本木 Hills", 
+          details: "大屋根廣場。熱紅酒與德式香腸。",
+          locationQuery: "Roppongi Hills Christmas Market",
+          icon: Utensils,
+          weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
+          keywords: ["熱紅酒", "德國香腸", "聖誕雜貨"],
+          outfit: "雖然是半戶外有屋頂，但還是很通風（冷）。穿有口袋的大衣方便放零錢和手機，因為雙手要拿食物。",
+          insights: {
+            travel: "必買熱紅酒 (Glühwein)！每年的馬克杯都有限定圖案，喝完後不想帶走杯子可以退還拿回押金，但大多數人都會帶回家當成免費且有紀念價值的伴手禮。",
+            culture: "這是模仿德國斯圖加特聖誕市集打造的活動，展現了日本人對「洋風節慶」極高的還原度與熱愛，也是日本冬季商業促銷的重要一環。",
+            tech: "市集雖然復古，但後台運作高度數位化。為了應對龐大人流，攤位多已導入非接觸式支付 (Suica/PayPay)，加速結帳流程以消化排隊人潮。",
+            local: "「雖然氣氛很棒，但那裡的熱紅酒和香腸價格真的是『觀光地價格』。我們會建議先在便利商店喝點熱的再去逛，不然荷包會縮水很快。」"
+          }
+        }
+      ]
+    },
+    {
+      date: "12/21",
+      day: "Sun",
+      title: "Nature",
+      location: "高崎 → 輕井澤 → 草津",
+      theme: "from-stone-500 to-stone-600", 
+      themeBtn: "bg-stone-600",
+      themeLight: "bg-stone-50",
+      events: [
+        { 
+          time: "09:00", 
+          type: "transport", 
+          title: "新幹線往高崎", 
+          desc: "東京 → 高崎", 
+          details: "搭乘 Hakutaka 或 Asama。",
+          locationQuery: "Tokyo Station",
+          icon: Train,
+          timetableUrl: "https://www.jreast.co.jp/multi/zh-CHT/",
+          weather: { type: 'sun', temp: '10°C', loc: 'Tokyo' },
+          keywords: ["雙層新幹線", "鐵路便當", "移動效率"],
+          outfit: "洋蔥式穿搭標準場景。車上熱、下車冷，外套要容易穿脫。",
+          insights: {
+            travel: "上車前務必在東京站買「鐵路便當 (Ekiben)」。推薦中央走道的「祭 (Matsuri)」專賣店，這是一場集結全日本 200 種便當的選拔賽，選擇困難症發作請選銷售冠軍「牛肉道場」。",
+            culture: "新幹線不只是交通工具，更是日本戰後復興與「日本第一」的民族驕傲象徵。車廂內的寧靜與秩序，是日本社會「不給他人添麻煩」文化的極致體現。",
+            tech: "新幹線採用了世界領先的地震預警系統。一旦偵測到 P 波（地震前導波），列車會自動切斷電源並啟動緊急煞車，確保在強震到達前減速，保障乘客安全。",
+            local: "「高崎在我們印象中是『達磨之都』也是『麵食之都』。除了便當，車站裡的義大利麵其實很有名，因為群馬縣是日本小麥主產地，這裡的義大利麵份量也是日本第一。」"
+          },
+          timetable: [
+            { time: "09:04", label: "Asama 605", highlight: true },
+            { time: "09:24", label: "Hakutaka 557" }
+          ]
+        },
+        { 
+          time: "10:10", 
+          type: "activity", 
+          title: "少林山達磨寺", 
+          desc: "達磨發源地", 
+          details: "遍地達磨的壯觀景象。",
+          locationQuery: "Shorinzan Daruma-ji",
+          icon: MapPin,
+          weather: { type: 'sun', temp: '9°C', loc: 'Gunma' },
+          keywords: ["七轉八起", "鶴龜松竹梅", "求勝運"],
+          outfit: "這裡要爬長長的階梯！絕對要穿防滑好走的運動鞋，避免穿有跟的鞋子。",
+          insights: {
+            travel: "買達磨時，眉毛代表「鶴」、鬍鬚代表「龜」，象徵長壽。許願時先畫上「左眼」，願望實現後再畫上「右眼」（開眼），這是一種與神明的契約。",
+            culture: "高崎是日本「選舉達磨」的產地。日本政治人物在選舉時必買達磨祈求當選，這種政治與宗教的結合，讓達磨成為日本特有的勝運象徵。",
+            tech: "傳統達磨是手工紙糊，但現代高崎達磨產業面臨人手不足，已導入機械模具與環保再生紙漿技術，在保持傳統外觀的同時，提高了生產效率與環境友善度。",
+            local: "「群馬人每家每戶過年一定會買新的達磨。對我們來說，那不只是裝飾，是一年的精神寄託。舊的達磨我們會在年底帶回神社燒掉，象徵把運氣還給神明。」"
+          }
+        },
+        { 
+          time: "11:30", 
+          type: "transport", 
+          title: "往輕井澤", 
+          desc: "高崎 → 輕井澤", 
+          details: "新幹線約 15 分鐘。",
+          locationQuery: "Takasaki Station",
+          icon: Train,
+          weather: { type: 'cloud', temp: '5°C', loc: 'Takasaki' },
+          keywords: ["穿越山脈", "瞬間溫差", "信州門戶"],
+          outfit: "準備好圍巾，一下車氣溫會直接掉 5 度。",
+          insights: {
+            travel: "這 15 分鐘會穿越長長的隧道，出隧道就是長野縣，耳朵可能會因氣壓變化而耳鳴。窗外景色瞬間從關東平原變成信州高原，是地理景觀劇烈變化的體驗。",
+            culture: "輕井澤自明治時代由傳教士開發以來，就是日本皇室與上流社會的避暑勝地。這裡的西洋建築與教會文化，讓它與傳統日本溫泉鄉有著截然不同的異國氛圍。",
+            tech: "這段路程穿越了碓冰峠，曾是日本鐵路最陡峭的難關。新幹線透過強大的動力系統與隧道工程克服了這個地理障礙，將原本數小時的山路縮短為十幾分鐘。",
+            local: "「去輕井澤的新幹線上，如果看到穿著很時髦、牽著狗的人，大概就是要去別墅度假的東京有錢人。輕井澤是日本唯一像歐洲的地方。」"
+          },
+          timetable: [
+            { time: "11:29", label: "Asama 609", highlight: true }
+          ]
+        },
+        { 
+          time: "15:30", 
+          type: "transport", 
+          title: "巴士前往草津", 
+          desc: "草輕交通巴士", 
+          details: "輕井澤北口搭乘。山區溫差大。",
+          locationQuery: "Karuizawa Station",
+          icon: Train,
+          timetableUrl: "https://www.kkKG.co.jp/bus/rosen-bus.html",
+          weather: { type: 'snow', temp: '1°C', loc: 'Karuizawa' },
+          keywords: ["暈車藥", "雪景", "山路"],
+          outfit: "車程 80 分鐘山路，怕暈車的建議穿寬鬆不勒肚子的褲子。車內暖氣通常很強，別穿高領毛衣。",
+          insights: {
+            travel: "山路蜿蜒 80 分鐘，容易暈車的人務必坐前排並先吃藥。中途可能會停休息站，推薦買當地的「輕井澤牛奶」或優酪乳，味道非常濃郁。",
+            culture: "這條路線連結了「西洋避暑地」輕井澤與「傳統湯治場」草津，是一條穿越日本近代與傳統的文化之路，沿途能看到從別墅區到溫泉街的聚落變化。",
+            tech: "冬季行駛山區巴士極度考驗技術。車輛配備了特製的雪地輪胎與防滑系統，且道路養護單位會即時噴灑防凍劑，確保在零下溫度中依然能安全行駛。",
+            local: "「這條路真的是『暈車地獄』，連我們當地人搭都要深呼吸。不過下雪的時候，看著窗外白茫茫的森林，會有一種與世隔絕的感動。」"
+          },
+          timetable: [
+            { time: "14:20", label: "草輕交通" },
+            { time: "15:40", label: "草輕交通", highlight: true }
+          ]
+        },
+        { 
+          time: "17:00", 
+          type: "hotel", 
+          title: "草津 Check-in", 
+          desc: "Hotel Ichii 一井", 
+          price: "$6681", 
+          details: "湯畑旁。晚餐前可先去泡湯。",
+          locationQuery: "Kusatsu Onsen Hotel Ichii",
+          icon: Hotel,
+          weather: { type: 'snow', temp: '-2°C', loc: 'Kusatsu' },
+          keywords: ["湯畑第一排", "日本三名泉", "強酸性泉"],
+          outfit: "晚上看湯畑點燈『超級冷』，體感通常在零下。務必穿羽絨衣、戴手套、毛帽，全副武裝。",
+          insights: {
+            travel: "草津溫泉是強酸性 (pH 2.1)，殺菌力強但對皮膚刺激大，身上有傷口會很痛。泡完建議稍微沖洗，且銀飾品千萬別戴下水，會瞬間變黑。",
+            culture: "湯畑不僅是源泉，更是草津的信仰中心。周圍的石柱上刻著來訪過的名人，從德川將軍到現代藝人，見證了這裡作為「天下名湯」的歷史地位。",
+            tech: "草津擁有驚人的自然湧出量（每分鐘 3萬公升）。湯畑的木槽設計是為了利用自然冷卻原理降低水溫（源泉約 50-90度），無需加冷水稀釋即可入浴，保留了溫泉的純度。",
+            local: "「草津的水真的很『利』！我們當地人習慣泡完不沖水直接穿衣（讓藥效留著），但皮膚敏感的人可能會癢，還是建議沖一下。還有，溫泉饅頭試吃千萬別客氣，店家是真心想請你吃的。」"
+          }
+        }
+      ]
+    },
+    {
+      date: "12/22",
+      day: "Mon",
+      title: "Port City",
+      location: "草津 → 輕井澤 → 橫濱",
+      theme: "from-slate-500 to-zinc-600",
+      themeBtn: "bg-zinc-600",
+      themeLight: "bg-zinc-50",
+      events: [
+        { 
+          time: "11:30", 
+          type: "shop", 
+          title: "王子 Outlet", 
+          desc: "輕井澤購物", 
+          details: "車站南口直達。",
+          locationQuery: "Karuizawa Prince Shopping Plaza",
+          icon: ShoppingBag,
+          weather: { type: 'cloud', temp: '3°C', loc: 'Karuizawa' },
+          keywords: ["湖畔購物", "名牌折扣", "高原風景"],
+          outfit: "這 Outlet 很大且是戶外開放式，店與店之間要走外面，風很大。建議穿防風大衣，別穿高跟鞋。",
+          insights: {
+            travel: "別只顧著逛街，中間的大湖景色美到像風景區。這裡的 Gucci 和 Nike 庫存通常比市區多。買太多不想提？車站有大型置物櫃，或利用宅急便寄到機場。",
+            culture: "輕井澤 Outlet 的前身是高爾夫球場，這種將休閒設施轉型為大型商業設施的案例，反映了日本泡沫經濟破滅後，休閒產業轉向實用消費的趨勢。",
+            tech: "大型 Outlet 的營運高度依賴數據分析。透過會員卡與 POS 系統，營運方能精準掌握觀光客與本地人的消費熱點，動態調整品牌櫃位與折扣策略。",
+            local: "「輕井澤 Outlet 對我們來說其實是大公園。很多長野縣民週末會全家開車來這裡溜狗、曬太陽，順便買點東西。這裡的狗推車數量可能是全日本最密集的。」"
+          }
+        },
+        { 
+          time: "14:52", 
+          type: "transport", 
+          title: "前往橫濱", 
+          desc: "新幹線 + 轉乘", 
+          details: "輕井澤 → 東京 → 橫濱。",
+          locationQuery: "Karuizawa Station",
+          icon: Train,
+          weather: { type: 'cloud', temp: '10°C', loc: 'Yokohama' },
+          keywords: ["長途移動", "便當", "補眠"],
+          outfit: "從雪國回到平地，進東京後會覺得變熱，記得把厚圍巾收進包包。",
+          insights: {
+            travel: "週日下午回東京的新幹線自由席是戰場！若沒買指定席，請務必提早 20 分鐘去月台排隊，或者乾脆多花錢買指定席，確保能一路睡回東京。",
+            culture: "這段旅程是從「非日常」的度假地回到「日常」的都會區。觀察車上乘客的表情，從輕鬆轉為嚴肅，是日本社會高壓職場文化的一種側面寫照。",
+            tech: "北陸新幹線在山區行駛需要克服急陡坡與大雪。車輛配備了強力的馬達與特殊的剎車系統，是日本鐵道工程應對複雜地形的技術結晶。",
+            local: "「這條路線一次體驗了『山』與『海』。橫濱人其實很自豪，覺得自己比東京更洋氣、更懂生活。你從山上下來直接去港口，這反差很讚。」"
+          },
+          timetable: [
+            { time: "14:55", label: "Asama 618", highlight: true }
+          ]
+        },
+        { 
+          time: "18:00", 
+          type: "activity", 
+          title: "橫濱聖誕市集", 
+          desc: "紅磚倉庫", 
+          details: "海港夜景與聖誕氛圍。",
+          locationQuery: "Yokohama Red Brick Warehouse",
+          icon: Camera,
+          weather: { type: 'sun', temp: '8°C', loc: 'Yokohama' },
+          keywords: ["海風超大", "異國風情", "浪漫聖地"],
+          outfit: "海邊的風是『會吹到頭痛』的那種。一定要戴能蓋住耳朵的帽子或耳罩，穿防風外套比穿厚毛衣有用。",
+          insights: {
+            travel: "紅磚倉庫的地面是百年歷史的硬石板路，推行李箱會震到手麻，輪子也容易壞。千萬先把行李寄放在車站或飯店，輕裝來逛才是上策。",
+            culture: "橫濱是日本開港通商的發源地，紅磚倉庫曾是國家保稅倉庫。這裡充滿異國情調的聖誕市集，是對這座城市「西洋窗口」歷史身分的致敬。",
+            tech: "將百年紅磚古蹟改建為商業設施，需要高超的「耐震補強」技術。在不破壞外觀的前提下，內部結構已置入現代抗震阻尼器，是古蹟活化的工程典範。",
+            local: "「橫濱人很愛紅磚倉庫，但也覺得那是『給觀光客去的』。不過聖誕節例外，那種氣氛真的無敵。記得去海邊看『冰川丸』郵輪的燈飾，那才是老橫濱人的浪漫。」"
+          }
+        }
+      ]
+    },
+    {
+      date: "12/23",
+      day: "Tue",
+      title: "Return",
+      location: "橫濱 → 成田 → 台北",
+      theme: "from-sky-700 to-slate-700",
+      themeBtn: "bg-sky-700",
+      themeLight: "bg-sky-50",
+      events: [
+        { 
+          time: "11:10", 
+          type: "food", 
+          title: "拉麵博物館", 
+          desc: "新橫濱", 
+          details: "復古昭和街道。",
+          locationQuery: "Shin-Yokohama Ramen Museum",
+          icon: Utensils,
+          weather: { type: 'rain', temp: '8°C', loc: 'Yokohama' },
+          keywords: ["昭和夕陽", "迷你碗", "制霸全國"],
+          outfit: "室內復古造景溫暖，穿脫方便的洋蔥式穿搭，避免太厚重在室內熱壞。",
+          insights: {
+            travel: "一定要點「迷你碗 (Mini Size)」！這裡集結了全日本名店，迷你碗讓你一次能吃三家不同口味而不撐死。入口處的昭和雜貨店有賣懷舊零食，很適合作為伴手禮。",
+            culture: "這裡重現了昭和 33 年（1958年）的東京街景，那是全世界第一碗泡麵發明的年份。這不只是美食街，更是一座關於戰後日本飲食與庶民記憶的博物館。",
+            tech: "拉麵博物館開創了「食物主題樂園」的商業模式。透過集中名店與情境式體驗，成功將單價低的拉麵轉化為高附加價值的觀光體驗，被許多國家仿效。",
+            local: "「新橫濱其實是個除了新幹線和體育館什麼都沒有的地方（笑）。但拉麵博物館真的很強，不用跑遍日本就能吃到博多、北海道的味道，對我們這種懶得遠行的吃貨是救贖。」"
+          }
+        },
+        { 
+          time: "14:28", 
+          type: "transport", 
+          title: "前往機場", 
+          desc: "N'EX 33號", 
+          warning: "勿遲到", 
+          details: "橫濱直達成田。全車指定席。",
+          locationQuery: "Yokohama Station",
+          icon: Train,
+          timetableUrl: "https://www.jreast.co.jp/nex/time.html",
+          weather: { type: 'rain', temp: '7°C', loc: 'Tokyo' },
+          keywords: ["準點", "直達", "補眠"],
+          outfit: "輕鬆舒適為主，避免穿太多層，機場過安檢脫脫穿穿很麻煩。",
+          insights: {
+            travel: "橫濱站迷宮等級很高，JR 月台跟其他私鐵容易搞混，請預留 15 分鐘找月台。車上有大型行李鎖，記得設簡單的密碼（如 0000），下車忘記密碼會非常麻煩。",
+            culture: "日本人對「準點」的執著在機場交通上展露無遺。錯過這班車通常被視為個人時間管理不當，而非交通工具的問題。N'EX 的準時是旅客信任的基礎。",
+            tech: "N'EX 運行的成田空港線部分路段採用了與新幹線同等級的路軌標準 (標準軌)，允許列車高速運行（雖然 N'EX 是窄軌車，但在部分共用路段展現了日本鐵路網的兼容性技術）。",
+            local: "「N'EX 雖然貴，但那種『旅程要結束了』的安心感無可替代。橫濱站的月台很長，N'EX 停的位置常常在最邊邊，記得預留體力走路。」"
+          },
+          timetable: [
+            { time: "14:29", label: "N'EX 33號", highlight: true },
+            { time: "15:28", label: "N'EX 37號", isWarning: true }
+          ]
+        },
+        { 
+          time: "16:00", 
+          type: "plane", 
+          title: "機場 Check-in", 
+          desc: "TR875 (T1)", 
+          details: "南翼辦理。起飛前好好逛免稅店。",
+          locationQuery: "Narita Airport Terminal 1",
+          icon: Plane,
+          weather: { type: 'rain', temp: '6°C', loc: 'NRT' },
+          keywords: ["消耗零錢", "免稅店", "最後衝刺"],
+          outfit: "回台灣會變熱，建議裡面穿短袖/薄長袖，外面穿厚外套，抵達桃園機場後脫外套剛好。",
+          insights: {
+            travel: "手邊剩下的日幣銅板，可以去機場設有的整排扭蛋機消耗掉，或是去便利商店買飯糰。成田 T1 的 FaSoLa 免稅店生意極好，薯條三兄弟常缺貨，看到有貨請直接拿。",
+            culture: "日本機場是展現「軟實力」的櫥窗。從動漫角色迎接旅客到免稅店精美的包裝設計，都在最後一刻強化旅客對日本「精緻與好客」的國家印象。",
+            tech: "成田機場已導入 Face Express 臉部辨識系統。辦理登機時註冊臉部資訊，之後掛行李、安檢、登機都可以「刷臉」通過，大幅縮短排隊時間，是智慧機場的最新應用。",
+            local: "「成田機場其實離東京超遠，我們都戲稱是『千葉機場』。不過 T1 南翼那種出發的氛圍真的很棒，那是通往世界的門戶感。」"
+          },
+          flightInfo: {
+            checkIn: "17:25",
+            boarding: "19:10",
+            departure: "19:55 (JP)",
+            arrival: "23:00 (TW)",
+            terminal: "T1 南翼"
+          }
+        }
+      ]
+    }
+  ];
+
+  const currentSchedule = schedule[activeDay];
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-sans text-slate-700 pb-12 relative transition-colors duration-700">
+      
+      {/* Elegant Header */}
+      <div className={`bg-gradient-to-br ${currentSchedule.theme} text-white p-6 pb-12 rounded-b-[40px] shadow-xl relative z-10 transition-colors duration-700`}>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <div className="flex items-center space-x-2 mb-1">
+              <span className="text-[10px] uppercase tracking-widest opacity-70 border border-white/30 px-2 py-0.5 rounded-full">
+                Japan Trip 2025
+              </span>
+              <span className="text-[10px] uppercase tracking-widest opacity-70 bg-white/10 px-2 py-0.5 rounded-full flex items-center">
+                <Clock size={10} className="mr-1"/> GMT+9
+              </span>
+            </div>
+            <h1 className="text-3xl font-light tracking-wide mb-1 drop-shadow-sm font-serif">
+              {currentSchedule.title}
+            </h1>
+            <p className="text-white/80 text-xs flex items-center font-light tracking-wider">
+              <MapPin size={12} className="mr-1" /> {currentSchedule.location}
+            </p>
+          </div>
+          <div className="text-right">
+             <div className="text-3xl font-bold opacity-20 font-serif">{currentSchedule.date}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modern Date Selector */}
+      <div className="px-4 -mt-8 relative z-20">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-1.5 flex justify-between overflow-x-auto no-scrollbar border border-white/50">
+          {schedule.map((day, index) => (
+            <button
+              key={index}
+              onClick={() => setActiveDay(index)}
+              className={`flex flex-col items-center justify-center min-w-[60px] py-3 rounded-xl transition-all duration-300 ${
+                activeDay === index 
+                  ? `${day.themeBtn} text-white shadow-md transform scale-100` 
+                  : 'text-slate-400 hover:bg-gray-50'
+              }`}
+            >
+              <span className={`text-[10px] font-medium tracking-wide ${activeDay === index ? 'opacity-80' : ''}`}>{day.date}</span>
+              <span className="text-sm font-bold mt-0.5">{day.day}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Timeline Content */}
+      <div className="px-5 pt-8 max-w-2xl mx-auto">
+        <div className="space-y-6">
+          {currentSchedule.events.map((event, index) => {
+            const Icon = event.icon;
+            return (
+              <div 
+                key={index} 
+                className="flex gap-4 relative group cursor-pointer"
+                onClick={() => setSelectedEvent(event)}
+              >
+                {/* Elegant Timeline Line */}
+                {index !== currentSchedule.events.length - 1 && (
+                  <div className="absolute left-[19px] top-12 bottom-[-24px] w-[1px] bg-slate-200 z-0"></div>
+                )}
+                
+                {/* Time Column */}
+                <div className="flex flex-col items-center min-w-[40px] pt-1 z-10">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 bg-white border border-slate-100 group-hover:border-slate-300 text-slate-500`}>
+                    <Icon size={16} strokeWidth={1.5} />
+                  </div>
+                </div>
+
+                {/* Content Card */}
+                <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 relative overflow-hidden">
+                  
+                  {/* Subtle Gradient Overlay on Hover */}
+                  <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 bg-gradient-to-r ${currentSchedule.theme}`}></div>
+
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-700 text-lg tracking-tight font-serif">{event.time}</span>
+                        {event.endTime && (
+                          <span className="text-slate-400 text-xs flex items-center font-light">
+                            <ArrowRight size={10} className="mx-1" /> {event.endTime}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Weather & Price Badges */}
+                      <div className="flex gap-2">
+                        {event.weather && (
+                          <div className="flex items-center gap-1 text-[10px] text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+                             <WeatherIcon type={event.weather.type} size={12} />
+                             <span>{event.weather.temp}</span>
+                          </div>
+                        )}
+                        {event.price && (
+                          <span className="text-[10px] font-medium text-slate-500 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+                            {event.price}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <h3 className="font-bold text-slate-800 mb-1 text-base">{event.title}</h3>
+                    <p className="text-xs text-slate-500 leading-relaxed font-light">{event.desc}</p>
+                    
+                    {event.warning && (
+                      <div className="mt-3 text-[10px] text-rose-500 flex items-center font-medium bg-rose-50 inline-block px-2 py-1 rounded">
+                        <Info size={10} className="mr-1" /> {event.warning}
+                      </div>
+                    )}
+                    
+                    {/* Mini Indicators */}
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      {event.keywords && event.keywords.map((k, i) => (
+                        <span key={i} className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                          #{k}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        <div className="mt-12 text-center pb-8 opacity-50">
+           <div className="w-12 h-1 bg-slate-200 mx-auto rounded-full mb-2"></div>
+           <p className="text-[10px] tracking-widest uppercase text-slate-400">Enjoy your trip</p>
+        </div>
+      </div>
+
+      {/* Detail Modal */}
+      {selectedEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+          <div 
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setSelectedEvent(null)}
+          ></div>
+          <div className="bg-white relative z-10 w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-200">
+            
+            {/* Modal Header */}
+            <div className={`p-6 bg-gradient-to-br ${currentSchedule.theme} text-white relative`}>
+              <button 
+                onClick={() => setSelectedEvent(null)}
+                className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 rounded-full p-1.5 transition-colors backdrop-blur-md"
+              >
+                <X size={16} />
+              </button>
+              
+              <div className="flex items-center gap-2 mb-3 opacity-80">
+                <div className="bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
+                   <selectedEvent.icon size={16} />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-widest">
+                  {selectedEvent.type.toUpperCase()}
+                </span>
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-1 font-serif">{selectedEvent.title}</h3>
+              <div className="flex items-center text-white/90 text-sm font-light">
+                <Clock size={14} className="mr-1.5" />
+                {selectedEvent.time}
+                {selectedEvent.weather && (
+                    <span className="ml-4 flex items-center gap-1 border-l border-white/30 pl-4">
+                       <WeatherIcon type={selectedEvent.weather.type} size={14} className="text-white" />
+                       {selectedEvent.weather.temp} {selectedEvent.weather.loc}
+                    </span>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto bg-white">
+              
+              {/* Flight Info Section */}
+              {selectedEvent.flightInfo && (
+                <div className="mb-6 bg-sky-50/50 rounded-2xl p-5 border border-sky-100">
+                    <h4 className="text-sky-800 font-bold mb-4 flex items-center text-xs uppercase tracking-widest">
+                        <Ticket size={14} className="mr-2"/> Flight Schedule
+                    </h4>
+                    <div className="relative pl-2 border-l border-sky-200 space-y-5">
+                         {/* Items... */}
+                         <div className="relative pl-4">
+                            <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-sky-300 ring-4 ring-white"></div>
+                            <p className="text-xs text-slate-400 font-medium">12:10 Check-in</p>
+                         </div>
+                         <div className="relative pl-4">
+                            <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-sky-400 ring-4 ring-white"></div>
+                            <p className="text-xs text-slate-400 font-medium">13:55 Boarding</p>
+                         </div>
+                         <div className="relative pl-4">
+                            <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-sky-600 ring-4 ring-white"></div>
+                            <p className="text-sm text-slate-700 font-bold">{selectedEvent.flightInfo.departure}</p>
+                            <p className="text-xs text-slate-500">Departure (TPE)</p>
+                         </div>
+                         <div className="relative pl-4">
+                            <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-sky-800 ring-4 ring-white"></div>
+                            <p className="text-sm text-slate-700 font-bold">{selectedEvent.flightInfo.arrival}</p>
+                            <p className="text-xs text-slate-500">Arrival (NRT)</p>
+                         </div>
+                    </div>
+                </div>
+              )}
+
+              {/* Timetable Section */}
+              {selectedEvent.timetable && (
+                 <div className="mb-6">
+                    <div className="flex justify-between items-end mb-3">
+                        <h4 className="text-slate-800 font-bold text-sm flex items-center">
+                           <List size={16} className="mr-2 text-slate-400"/> 
+                           建議班次
+                        </h4>
+                        {selectedEvent.timetableUrl && (
+                          <a 
+                            href={selectedEvent.timetableUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-[10px] flex items-center text-blue-500 hover:text-blue-700 font-medium bg-blue-50 px-2 py-1 rounded-full transition-colors"
+                          >
+                             官方時刻表 <ExternalLink size={10} className="ml-1" />
+                          </a>
+                        )}
+                    </div>
+                    <div className="bg-slate-50/50 rounded-2xl overflow-hidden border border-slate-100">
+                       {selectedEvent.timetable.map((t, i) => (
+                         <div key={i} className={`flex items-center justify-between px-4 py-3 border-b border-slate-100 last:border-0 ${t.highlight ? 'bg-white shadow-sm' : ''}`}>
+                            <div className="flex items-center gap-3">
+                               <span className={`font-mono text-base font-medium ${t.highlight ? 'text-slate-800' : 'text-slate-400'}`}>
+                                 {t.time}
+                               </span>
+                               <span className={`text-xs ${t.highlight ? 'text-slate-700 font-medium' : 'text-slate-400'} ${t.isWarning ? 'text-rose-500 font-medium' : ''}`}>
+                                 {t.label}
+                               </span>
+                            </div>
+                            {t.highlight && <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>}
+                         </div>
+                       ))}
+                    </div>
+                 </div>
+              )}
+
+              {/* Outfit Suggestion */}
+              {selectedEvent.outfit && (
+                <div className="mb-6 bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4">
+                  <h4 className="text-indigo-800 font-bold mb-2 text-sm flex items-center">
+                    <Shirt size={14} className="mr-2" />
+                    穿搭指南 (OOTD)
+                  </h4>
+                  <p className="text-indigo-900/80 text-sm leading-relaxed">
+                    {selectedEvent.outfit}
+                  </p>
+                </div>
+              )}
+
+              <div className="mb-6">
+                <h4 className="text-slate-800 font-bold mb-2 text-sm">About</h4>
+                <p className="text-slate-500 leading-relaxed text-sm font-light">
+                  {selectedEvent.details}
+                </p>
+              </div>
+
+              {/* Structured Insight Section */}
+              {selectedEvent.insights && (
+                <div className="mb-6 space-y-3">
+                  <h4 className="text-slate-800 font-bold text-sm flex items-center mb-3">
+                    <Info size={14} className="mr-2 text-amber-500" />
+                    深度情報 Insight
+                  </h4>
+                  
+                  {/* Local Insight */}
+                  {selectedEvent.insights.local && (
+                    <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-3.5">
+                      <div className="flex items-center gap-2 mb-1.5">
+                         <Users size={12} className="text-rose-600"/>
+                         <span className="text-xs font-bold text-rose-700 uppercase tracking-wider">當地人觀點</span>
+                      </div>
+                      <p className="text-slate-700 text-sm leading-relaxed italic">
+                        {selectedEvent.insights.local}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Travel Insight */}
+                  {selectedEvent.insights.travel && (
+                    <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3.5">
+                      <div className="flex items-center gap-2 mb-1.5">
+                         <Compass size={12} className="text-emerald-600"/>
+                         <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">旅遊實戰</span>
+                      </div>
+                      <p className="text-slate-700 text-sm leading-relaxed">
+                        {selectedEvent.insights.travel}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Culture/History Insight */}
+                  {selectedEvent.insights.culture && (
+                    <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-3.5">
+                      <div className="flex items-center gap-2 mb-1.5">
+                         <BookOpen size={12} className="text-amber-600"/>
+                         <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">文化歷史</span>
+                      </div>
+                      <p className="text-slate-700 text-sm leading-relaxed">
+                        {selectedEvent.insights.culture}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Tech/Eco Insight */}
+                  {selectedEvent.insights.tech && (
+                    <div className="bg-sky-50/50 border border-sky-100 rounded-xl p-3.5">
+                      <div className="flex items-center gap-2 mb-1.5">
+                         <Zap size={12} className="text-sky-600"/>
+                         <span className="text-xs font-bold text-sky-700 uppercase tracking-wider">經濟科技</span>
+                      </div>
+                      <p className="text-slate-700 text-sm leading-relaxed">
+                        {selectedEvent.insights.tech}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+               {/* Keywords Tags */}
+               {selectedEvent.keywords && (
+                <div className="mb-6 flex flex-wrap gap-2">
+                   {selectedEvent.keywords.map((k, i) => (
+                      <span key={i} className="text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 flex items-center">
+                        <Tag size={10} className="mr-1 opacity-50"/> {k}
+                      </span>
+                   ))}
+                </div>
+              )}
+
+              {/* Google Maps Button */}
+              <a 
+                href={`https://www.google.com/maps/search/?api=1&query=${selectedEvent.locationQuery}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center w-full py-3.5 text-white rounded-xl font-medium transition-all shadow-lg shadow-slate-200 active:scale-95 bg-gradient-to-r ${currentSchedule.theme}`}
+              >
+                <Map size={16} className="mr-2" />
+                Open in Google Maps
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TripApp;
