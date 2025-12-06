@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>東京五日遊 2025</title>
+    <title>東京五日遊 2025 (品味選物版)</title>
     
-    <!-- 1. 載入 Tailwind CSS (樣式庫) -->
+    <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. 設定瀏覽器 icon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
+    <!-- 2. Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;900&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
 
-    <!-- 3. 載入 React 核心與 Babel (讓瀏覽器看懂 React 程式碼) -->
-    <!-- 注意：這裡使用 ESM 模組方式載入，是現代瀏覽器標準 -->
+    <!-- 3. Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <!-- 4. Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- 5. React & Babel -->
     <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     <script type="importmap">
       {
@@ -26,64 +33,123 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* 隱藏捲軸但保留功能，讓介面更像 App */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        body { font-family: 'Noto Serif JP', serif; }
+        h1, h2, h3, h4, .font-display { font-family: 'Zen Old Mincho', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+        .leaflet-container { font-family: 'Noto Serif JP', serif; z-index: 0; background: #fdfbf7; }
+        .custom-div-icon { background: transparent; border: none; }
+        .map-label {
+            background: transparent; border: none; box-shadow: none;
+            font-family: 'Zen Old Mincho', serif; font-weight: 900; font-size: 13px; color: #1e293b;
+            text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        /* 自定義動畫 */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-in {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
+        .leaflet-tooltip-left:before, .leaflet-tooltip-right:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-top:before { border: none !important; }
+        
+        /* Ruby 樣式優化 */
+        ruby { font-family: 'Zen Old Mincho', serif; }
+        rt { font-family: 'Noto Serif JP', serif; font-size: 0.5em; opacity: 0.8; letter-spacing: 0.05em; }
     </style>
 </head>
-<body class="bg-gray-100 text-slate-700">
+<body class="bg-[#fdfbf7] text-slate-800">
     
-    <!-- React 應用程式掛載點 -->
     <div id="root"></div>
 
-    <!-- React 程式碼邏輯 -->
     <script type="text/babel" data-type="module">
-        import React, { useState } from 'react';
+        import React, { useState, useEffect, useRef } from 'react';
         import { createRoot } from 'react-dom/client';
         import { 
             Plane, Train, Hotel, MapPin, Camera, ShoppingBag, Home, Clock, 
-            ArrowRight, Utensils, X, Map, Ticket, List, ExternalLink, 
+            ArrowRight, Utensils, X, Map as MapIcon, Ticket, List, ExternalLink, 
             Cloud, Sun, CloudSnow, CloudRain, Info, Shirt, Tag, 
-            Compass, BookOpen, Zap, Users, Droplets 
+            Compass, BookOpen, Zap, Users, ListFilter, AlertTriangle, Lightbulb, Briefcase, TrendingUp, Languages, Gift
         } from 'lucide-react';
+
+        // --- 單日地圖組件 ---
+        const DailyMapView = ({ route, dayIndex }) => {
+            const mapRef = useRef(null);
+            const mapInstanceRef = useRef(null);
+
+            useEffect(() => {
+                if (!mapRef.current) return;
+                if (typeof L === 'undefined') return;
+
+                if (!mapInstanceRef.current) {
+                    mapInstanceRef.current = L.map(mapRef.current, {
+                        zoomControl: false, attributionControl: false, scrollWheelZoom: false 
+                    });
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        subdomains: 'abcd', maxZoom: 19
+                    }).addTo(mapInstanceRef.current);
+                }
+
+                const map = mapInstanceRef.current;
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Polyline || layer instanceof L.Marker || layer instanceof L.CircleMarker) { map.removeLayer(layer); }
+                });
+
+                const colors = ['#1e40af', '#475569', '#047857', '#6d28d9', '#0284c7'];
+                const color = colors[dayIndex % colors.length];
+
+                if (route && route.path.length > 0) {
+                    L.polyline(route.path, { color: color, weight: 3, opacity: 0.7, dashArray: '2, 8', lineCap: 'square', lineJoin: 'miter' }).addTo(map);
+                    if (route.stops) {
+                        route.stops.forEach(stop => {
+                            L.circleMarker(stop.coord, { radius: 5, fillColor: '#fff', color: color, weight: 2, fillOpacity: 1 })
+                            .bindTooltip(stop.name, { permanent: true, direction: 'bottom', offset: [0, 5], className: 'map-label' })
+                            .bindPopup(`<div class="text-sm font-serif"><div class="font-bold text-slate-800 mb-1 font-display">${stop.name}</div><div class="text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100">名所: <span class="font-medium text-slate-700">${stop.landmark}</span></div></div>`)
+                            .addTo(map);
+                        });
+                    }
+                    const bounds = L.latLngBounds(route.path);
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                }
+                setTimeout(() => { map.invalidateSize(); }, 100);
+            }, [route]);
+
+            return <div ref={mapRef} className="h-[320px] w-full rounded-xl shadow-sm border border-slate-200 z-0 relative" />;
+        };
 
         const TripApp = () => {
             const [activeDay, setActiveDay] = useState(0);
             const [selectedEvent, setSelectedEvent] = useState(null);
 
-            // Helper for weather icons
+            const coords = {
+                tpe: [25.0797, 121.2342], nrt: [35.7719, 140.3929], roppongi: [35.6628, 139.7314],
+                ginza: [35.6712, 139.7665], hibiya: [35.6736, 139.7562], tokyoSt: [35.6812, 139.7671],
+                takasaki: [36.3220, 139.0125], daruma: [36.3150, 138.9760], karuizawa: [36.3435, 138.6355],
+                kusatsu: [36.6208, 138.5963], yokohama: [35.4596, 139.6433], redbrick: [35.4526, 139.6429],
+                shinyokohama: [35.5098, 139.6176]
+            };
+
+            const mapRoutes = [
+                { id: 'day1', path: [coords.nrt, coords.roppongi], stops: [{ name: "成田空港", coord: coords.nrt, landmark: "新勝寺" }, { name: "六本木", coord: coords.roppongi, landmark: "東京タワー" }] },
+                { id: 'day2', path: [coords.roppongi, coords.ginza, coords.hibiya, coords.roppongi], stops: [{ name: "六本木", coord: coords.roppongi, landmark: "森美術館" }, { name: "銀座", coord: coords.ginza, landmark: "和光時計塔" }, { name: "日比谷", coord: coords.hibiya, landmark: "皇居" }] },
+                { id: 'day3', path: [coords.roppongi, coords.tokyoSt, coords.takasaki, coords.daruma, coords.takasaki, coords.karuizawa, coords.kusatsu], stops: [{ name: "東京", coord: coords.tokyoSt, landmark: "丸の内" }, { name: "高崎", coord: coords.takasaki, landmark: "白衣観音" }, { name: "草津", coord: coords.kusatsu, landmark: "湯畑" }] },
+                { id: 'day4', path: [coords.kusatsu, coords.karuizawa, coords.tokyoSt, coords.yokohama, coords.redbrick], stops: [{ name: "草津", coord: coords.kusatsu, landmark: "西の河原" }, { name: "軽井沢", coord: coords.karuizawa, landmark: "アウトレット" }, { name: "横浜", coord: coords.yokohama, landmark: "みなとみらい" }] },
+                { id: 'day5', path: [coords.yokohama, coords.shinyokohama, coords.nrt], stops: [{ name: "横浜", coord: coords.yokohama, landmark: "中華街" }, { name: "新横浜", coord: coords.shinyokohama, landmark: "ラーメン博物館" }, { name: "成田", coord: coords.nrt, landmark: "出発ロビー" }] }
+            ];
+
             const WeatherIcon = ({ type, size = 14, className }) => {
                 switch(type) {
-                case 'sun': return <Sun size={size} className={`text-orange-400 ${className}`} />;
+                case 'sun': return <Sun size={size} className={`text-amber-500 ${className}`} />;
                 case 'cloud': return <Cloud size={size} className={`text-slate-400 ${className}`} />;
-                case 'snow': return <CloudSnow size={size} className={`text-cyan-300 ${className}`} />;
-                case 'rain': return <CloudRain size={size} className={`text-blue-300 ${className}`} />;
-                default: return <Sun size={size} className={`text-orange-400 ${className}`} />;
+                case 'snow': return <CloudSnow size={size} className={`text-cyan-600 ${className}`} />;
+                case 'rain': return <CloudRain size={size} className={`text-blue-500 ${className}`} />;
+                default: return <Sun size={size} className={`text-amber-500 ${className}`} />;
                 }
             };
 
             const schedule = [
                 {
                 date: "12/19",
-                day: "Fri",
-                title: "Arrival",
+                day: "金曜日(Fri)",
+                title: "光と影の序章 (Prologue of Light and Shadow)",
                 location: "台北 → 東京 → 六本木",
-                theme: "from-slate-600 to-slate-700", 
-                themeBtn: "bg-slate-600",
-                themeLight: "bg-slate-50",
+                theme: "from-slate-800 to-slate-900", 
+                themeBtn: "bg-slate-800",
                 events: [
                     { 
                     time: "14:40", 
@@ -91,25 +157,26 @@
                     type: "flight", 
                     title: "飛往東京 (TR874)", 
                     desc: "桃園 TPE → 成田 NRT", 
-                    details: "搭乘酷航 TR874。注意：抵達時間為日本時間 (GMT+9)，比台灣快 1 小時。",
+                    details: "搭乘酷航 TR874 夢幻客機。舒適的飛行是旅行完美的起點。",
                     locationQuery: "Taoyuan International Airport Terminal 1",
                     icon: Plane,
                     weather: { type: 'cloud', temp: '18°C', loc: 'TPE' },
                     keywords: ["夢幻客機787", "高CP值", "準點率"],
                     outfit: "機艙冷氣強且乾燥，建議帶件連帽薄外套，並準備空水瓶過安檢後裝水。",
                     insights: {
-                        travel: "酷航這班通常用波音 787 廣體客機執飛，舒適度勝過一般窄體廉航。記得選位避開機翼，起飛後左側可看台灣海岸線，降落前右側有機會看到千葉農田夕陽。",
-                        culture: "台日航線不僅是旅遊線，更是情感線。機上那種「要去日本了」的集體興奮感，以及回程時大包小包的戰利品，是台灣人獨有的旅遊儀式感。",
-                        tech: "787 機型採用電子變色窗而非傳統遮陽板，且艙壓控制更好，能減輕長途飛行的疲勞感與耳鳴不適，是航空科技的一大進步。",
-                        local: "「看到台灣遊客大包小包真的很親切。不過在成田機場搭電車時，請盡量將行李排成一列，不要擋到趕路的日本上班族，這是一種默契喔。」"
+                        travel: "酷航這班通常用波音 787 廣體客機執飛，舒適度勝過一般窄體廉航。",
+                        local: "「看到台灣遊客大包小包真的很親切。不過在成田機場搭電車時，請盡量將行李排成一列。」",
+                        trap: "成田機場的 SIM 卡販賣機通常比市區貴很多。建議去B1樓層的便利商店找找。",
+                        creative: "夢幻客機的窗戶調光技術，讓機艙內的光線變化像水彩暈染一樣柔和。",
+                        business: "【第五航權經濟】酷航這條線是新加坡-台北-東京，利用第五航權載客。這條黃金航線的載客率極高。",
+                        history: "【成田抗爭】成田機場的建設史是日本戰後最激烈的警民衝突之一。至今機場內仍有未撤離的「釘子戶」農田。",
+                        shopping: "【機場限定】若在成田看到「New York Perfect Cheese」且不用排隊，請務必掃貨。它是目前東京最夯的伴手禮，市區經常缺貨。"
                     },
-                    flightInfo: {
-                        checkIn: "12:10",
-                        boarding: "13:55",
-                        departure: "14:40 (TW)",
-                        arrival: "19:00 (JP)",
-                        terminal: "T1"
-                    }
+                    vocabulary: [
+                        { term: "搭乗", reading: "とうじょう", meaning: "登機", desc: "「搭」是乘坐，「乗」也是乘坐。雙重的乘坐之意，展現了對交通工具的慎重感。" },
+                        { term: "手荷物", reading: "てにもつ", meaning: "隨身行李", desc: "「手」提的「荷物」（貨物）。如果是託運的行李，則稱為「預け入れ荷物 (あずけいれにもつ)」。" }
+                    ],
+                    flightInfo: { checkIn: "12:10", boarding: "13:55", departure: "14:40", arrival: "19:00", terminal: "T1" }
                     },
                     { 
                     time: "19:40", 
@@ -122,19 +189,21 @@
                     icon: Train,
                     weather: { type: 'rain', temp: '8°C', loc: 'Tokyo' },
                     keywords: ["全車指定席", "外國人優惠", "直達市區"],
-                    outfit: "日本電車暖氣像不用錢一樣熱，進車廂絕對要脫外套，不然會流汗感冒。建議內搭不要穿高領發熱衣。",
+                    outfit: "日本電車暖氣像不用錢一樣熱，進車廂絕對要脫外套。",
                     insights: {
-                        travel: "千萬別用西瓜卡直接刷進站！外國人憑護照買『N'EX 東京去回車票 (¥5000)』最划算，比單程買省下近 4000 日圓，且回程有效期長達 14 天。",
-                        culture: "N'EX 的清掃效率與準點率是日本「職人精神」的極致展現。到站後的折返清潔時間極短，卻能讓車廂煥然一新，被稱為「7分鐘的奇蹟」。",
-                        tech: "車廂內的 LCD 螢幕會顯示詳細的轉乘資訊與新聞，座椅上方的紅綠燈號系統則連線中央訂位系統，清楚顯示座位預約狀況，避免佔位糾紛。",
-                        local: "「說實話，我們當地人覺得 N'EX 原價太貴了，通常都搭快速電車或巴士。但你們外國人專用的那個 5000 日圓來回票，便宜到讓我們日本人嫉妒啊！」"
+                        travel: "外國人憑護照買『N'EX 東京去回車票 (¥5000)』最划算，比單程買省下近 4000 日圓。",
+                        local: "「說實話，我們當地人覺得 N'EX 原價太貴了，通常都搭快速電車或巴士。」",
+                        trap: "N'EX 是「全車指定席」，千萬別拿西瓜卡 (Suica) 直接刷進站！",
+                        creative: "N'EX 車頭的紅黑白配色靈感來自歌舞伎的臉譜與成田機場的跑道意象。",
+                        business: "【差別定價策略】JR 東日本對外國人提供大幅折扣，旨在搶攻入境旅遊市場份額。",
+                        history: "【國鐵民營化】N'EX 的誕生是 1987 年日本國鐵民營化為 JR 後，為了改善「成田機場交通不便」惡名而推出的戰略車種。",
+                        shopping: "【鐵道周邊】N'EX 車上購物型錄有時會有獨家的鐵道模型或聯名商品，是鐵道迷不可錯過的收藏。"
                     },
-                    timetableUrl: "https://www.jreast.co.jp/nex/time.html",
-                    timetable: [
-                        { time: "19:48", label: "N'EX 50號", highlight: true },
-                        { time: "20:15", label: "Skyliner (需轉車)" },
-                        { time: "20:44", label: "N'EX 52號 (末班)" }
-                    ]
+                    vocabulary: [
+                        { term: "指定席", reading: "していせき", meaning: "對號座", desc: "「指」是手指，「定」是決定。明確指出並決定好的位子。沒買這票坐下去會被車掌請起來喔。" },
+                        { term: "改札", reading: "かいさつ", meaning: "剪票口", desc: "「改」是檢查，「札」是票券。雖然現在都用 IC 卡感應，但漢字依然保留了人工剪票時代的動作。" }
+                    ],
+                    timetable: [{ time: "19:48", label: "N'EX 50號", highlight: true }, { time: "20:15", label: "Skyliner" }, { time: "20:44", label: "N'EX 52號" }]
                     },
                     { 
                     time: "20:50", 
@@ -147,13 +216,20 @@
                     icon: Hotel,
                     weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
                     keywords: ["空間魔術師", "社長咖哩", "大浴場"],
-                    outfit: "飯店提供的浴衣通常只能在房間或去大浴場時穿，千萬別穿去大廳或便利商店。",
+                    outfit: "飯店提供的浴衣通常只能在房間或去大浴場時穿，千萬別穿去大廳。",
                     insights: {
-                        travel: "APA 的房間以「極致壓縮」聞名，行李箱可能無法全開。建議入住第一件事是確認床底下的空間，通常設計用來塞大行李箱。",
-                        culture: "APA 社長元谷芙美子是日本商界傳奇，房間抽屜裡一定會放她的勵志書或漫畫。這種強烈的個人崇拜與企業形象結合，是日本家族企業的特色。",
-                        tech: "APA 引進的「1秒 Check-in」自助機與節能感應系統（人不在即斷電），展現了商務旅館透過科技極大化運營效率與成本控制的商業模式。",
-                        local: "「六本木晚上的黑人拉客小哥（Tout）很多，雖然這區治安沒問題，但被搭話時眼神不要對上，直接走過去就好，這是我們在這裡生存的潛規則。」"
-                    }
+                        travel: "APA 的房間以「極致壓縮」聞名。建議入住第一件事是確認床底下的空間。",
+                        local: "「六本木晚上的黑人拉客小哥（Tout）很多，眼神不要對上，直接走過去就好。」",
+                        trap: "浴室水龍頭的水雖然標榜可以直接喝，但味道真的很重。強烈建議買礦泉水。",
+                        creative: "房間雖小，但透過鏡面反射與家具精密計算，創造出「功能齊全」的膠囊式美學。",
+                        business: "【逆勢收購】APA 集團在泡沫經濟崩潰後大量低價收購土地。房間抽屜裡一定有社長的勵志書，這是一種「不需要支付代言費」的高明品牌行銷。",
+                        history: "【防空洞傳說】APA 經常收購畸零地或老建築改建，因此坊間常有關於其選址風水的都市傳說。",
+                        shopping: "【社長咖哩】APA 櫃檯販售的「APA 社長咖哩」其實意外的好吃，是金澤咖哩風味，非常適合買回去當作搞笑又實用的伴手禮。"
+                    },
+                    vocabulary: [
+                        { term: "素泊まり", reading: "すどまり", meaning: "純住宿", desc: "「素」是原本、單純，「泊」是過夜。指不含餐點的純住宿方案。APA 等商務旅館常有此選項。" },
+                        { term: "大浴場", reading: "だいよくじょう", meaning: "公共澡堂", desc: "即使房間有浴室，日本人還是喜歡去大浴場泡澡。記得進去前要先在淋浴區把身體洗乾淨。" }
+                    ]
                     },
                     { 
                     time: "21:30", 
@@ -165,24 +241,30 @@
                     icon: Utensils,
                     weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
                     keywords: ["關東風", "A5和牛", "蛋液拌飯"],
-                    outfit: "吃火鍋容易沾味，建議穿深色、好洗的衣服，避免穿昂貴的淺色毛衣。",
+                    outfit: "吃火鍋容易沾味，建議穿深色、好洗的衣服。",
                     insights: {
-                        travel: "日本壽喜燒 (Sukiyaki) 分關東風（醬汁煮）與關西風（先煎後煮）。這裡提供的是適合吃到飽的關東風。記得最後剩下的精華蛋液要拌飯吃，那是老饕的收尾。",
-                        culture: "壽喜燒是明治維新後「文明開化」的象徵，代表日本從禁食紅肉轉向接受西方飲食習慣，是近代日本飲食洋風化的起點。",
-                        tech: "黑毛和牛的 A5 等級判定依賴嚴格的脂肪交雜率 (BMS) 檢測標準。現代畜牧業透過大數據管理牛隻血統與飼料配方，才能穩定產出這種入口即化的霜降肉。",
-                        local: "「這種 A5 和牛吃到飽，對我們來說也是慶祝升遷或接待重要客戶才會去的。這個價格能吃到這種肉質，在物價高漲的東京真的很佛心。」"
-                    }
+                        travel: "日本壽喜燒分關東風與關西風。這裡提供的是適合吃到飽的關東風（醬汁煮）。",
+                        local: "「這種 A5 和牛吃到飽，對我們來說也是慶祝升遷或接待重要客戶才會去的。」",
+                        trap: "吃到飽雖然爽，但和牛油脂非常豐富，吃太多片真的會膩到反胃。",
+                        creative: "觀察和牛切片上如同大理石般的油花紋路，那是一種天然的藝術品。",
+                        business: "【和牛期貨】A5 等級不僅是口感標準，更是金融般的定價依據。Shabuzen 透過長期的供應鏈合約鎖定價格。",
+                        history: "【文明開化】明治天皇在 1872 年解除肉食禁令，壽喜燒（牛鍋）成為當時最潮的「文明開化」象徵。",
+                        shopping: "【芝麻醬】Shabuzen 自家的「特製芝麻醬 (Gomadare)」非常香濃，店內有時會販售瓶裝版，是家裡燙青菜的神級醬料。"
+                    },
+                    vocabulary: [
+                        { term: "食べ放題", reading: "たべほうだい", meaning: "吃到飽", desc: "「放」是釋放，「題」在此指範圍。同理「飲み放題 (のみほうだい)」是喝到飽。" },
+                        { term: "霜降り", reading: "しもふり", meaning: "霜降", desc: "形容牛肉油脂分佈像初冬的白霜一樣細緻均勻，是高級肉的代名詞。" }
+                    ]
                     }
                 ]
                 },
                 {
                 date: "12/20",
-                day: "Sat",
-                title: "City Walk",
+                day: "土曜日(Sat)",
+                title: "昭和と未来の狭間 (Between Showa and Future)",
                 location: "銀座・有樂町・六本木",
-                theme: "from-gray-500 to-gray-600",
-                themeBtn: "bg-gray-600",
-                themeLight: "bg-gray-50",
+                theme: "from-neutral-800 to-stone-800",
+                themeBtn: "bg-neutral-700",
                 events: [
                     { 
                     time: "12:00", 
@@ -194,13 +276,20 @@
                     icon: Utensils,
                     weather: { type: 'sun', temp: '11°C', loc: 'Tokyo' },
                     keywords: ["江戶前", "赤醋飯", "職人精神"],
-                    outfit: "半正式休閒 (Smart Casual)，避免穿短褲、拖鞋或太休閒的棉褲，是對職人的尊重。",
+                    outfit: "半正式休閒 (Smart Casual)，避免穿短褲、拖鞋。",
                     insights: {
-                        travel: "吃 Omakase 切記「不要噴香水」，這會破壞生食的纖細氣味。薑片是用來清口中餘味的，不要配著壽司吃。師傅上菜後 3 秒內入口，溫度最完美。",
-                        culture: "「江戶前」壽司源於江戶時代的快餐，特色是使用醃漬或煮過的魚獲（如鮪魚漬、煮穴子），反映了當時沒有冰箱的保存智慧，如今演變成一種高級料理流派。",
-                        tech: "現代高級壽司店高度依賴「冷鏈技術」與「熟成科技」。透過精準控制溫度與濕度，讓魚肉中的 ATP 轉化為鮮味成分 (Inosinate)，讓生魚片比剛捕撈時更好吃。",
-                        local: "「午餐吃 Omakase 是東京人的省錢智慧！一樣的魚料，價格只要晚餐的一半。這家店在赤坂的上班族之間也是秘密口袋名單。」"
-                    }
+                        travel: "吃 Omakase 切記「不要噴香水」。師傅上菜後 3 秒內入口，溫度最完美。",
+                        local: "「午餐吃 Omakase 是東京人的省錢智慧！一樣的魚料，價格只要晚餐的一半。」",
+                        trap: "如果你不吃芥末或有任何過敏，務必在「訂位時」就告知。",
+                        creative: "壽司師傅捏製壽司的手勢如同舞蹈，追求的是「空氣感」。",
+                        business: "【坪效極大化】板前壽司店僅有約 10 個座位，卻能創造驚人營收。秘訣在於「無菜單」模式讓庫存耗損降至最低。",
+                        history: "【江戶速食】壽司最初是江戶時代的「路邊攤速食」。為了在沒有冰箱的年代保存魚貨，才發展出醋漬、醬漬等「江戶前」技法。",
+                        shopping: "【高級茶葉】許多壽司店使用的「粉茶」或「綠茶」品質極佳，部分店家會販售自家使用的茶葉包，適合配甜點。"
+                    },
+                    vocabulary: [
+                        { term: "お任せ", reading: "おまかせ", meaning: "信任主廚", desc: "源自「任せる (Makaseru)」，意思是「委託您了」。代表信任師傅的專業，讓他決定當天最好的食材。" },
+                        { term: "旬", reading: "しゅん", meaning: "當季", desc: "指食材最美味的時節。吃「旬」之物，是日本飲食文化對四季變化的極致追求。" }
+                    ]
                     },
                     { 
                     time: "13:30", 
@@ -212,13 +301,20 @@
                     icon: ShoppingBag,
                     weather: { type: 'sun', temp: '12°C', loc: 'Yurakucho' },
                     keywords: ["現金交易", "昭和復古", "尋寶"],
-                    outfit: "戶外風大且要一直走動，建議戴帽子或毛帽，並穿最好走的平底鞋。",
+                    outfit: "戶外風大且要一直走動，建議戴帽子或毛帽。",
                     insights: {
-                        travel: "許多攤位是老爺爺老奶奶擺攤，**只收現金**。看到喜歡的古董錶或餐具要馬上下手，轉一圈回來通常就沒了。可以嘗試用日文客氣地問「能便宜一點嗎？」(Sukoshi yasuku dekimasu ka?)。",
-                        culture: "這裡販售的昭和時代舊物，反映了日本經歷戰後經濟奇蹟時的生活美學。這是一種「惜物」文化與現代「懷舊風潮」的結合，吸引了大量年輕人來尋找獨特性。",
-                        tech: "雖然是古董市集，但近年來許多店家開始使用 Instagram 預告出攤商品，將最傳統的實體交易與社群行銷結合，形成了線上線下整合的二手經濟圈。",
-                        local: "「以前這裡都是老人家在逛，最近外國人變多了，價格也稍微被炒高了。不過仔細翻找，還是能挖到昭和時代的絕版餐具，那個手感是現代量產品做不出來的。」"
-                    }
+                        travel: "許多攤位是老爺爺老奶奶擺攤，**只收現金**。看到喜歡的要馬上下手。",
+                        local: "「以前這裡都是老人家在逛，最近外國人變多了，價格也稍微被炒高了。」",
+                        trap: "買易碎品時，請務必確認店家是否有包裝妥當。",
+                        creative: "觀察昭和時代的廣告字體與包裝設計，那種手繪的溫度是現代設計找不到的。",
+                        business: "【生前整理商機】日本進入超高齡社會，大量的「生前整理」與「遺品整理」讓高品質的古董物流入二手市場。",
+                        history: "【黑市起源】有樂町一帶在戰後曾是著名的黑市，如今搖身一變成為國際論壇大樓，這個古董市集延續了這種「庶民交易」的記憶。",
+                        shopping: "【Old Noritake】這裡常能挖到日本瓷器名牌「Noritake」早期的外銷款式，設計非常西化且精緻，價格往往只有古董店的一半。"
+                    },
+                    vocabulary: [
+                        { term: "掘り出し物", reading: "ほりだしもの", meaning: "挖到的寶", desc: "「掘」是挖掘，「出」是出來。指在雜亂的東西中意外發現的珍品，是逛市集的最大樂趣。" },
+                        { term: "おまけ", reading: "おまけ", meaning: "殺必死/贈品", desc: "原本是「附加、添頭」的意思。在市集講價時，老闆可能會送你個小東西當作「Omake」。" }
+                    ]
                     },
                     { 
                     time: "15:00", 
@@ -230,13 +326,20 @@
                     icon: Camera,
                     weather: { type: 'cloud', temp: '11°C', loc: 'Hibiya' },
                     keywords: ["二重橋", "松樹", "都市綠洲"],
-                    outfit: "皇居外苑非常空曠，沒有遮蔽物，風會直接灌進來，圍巾是必備神物。",
+                    outfit: "皇居外苑非常空曠，風會直接灌進來，圍巾是必備神物。",
                     insights: {
-                        travel: "皇居外苑鋪設的碎石路（玉砂利）原本是為了防刺客（走動有聲），現在則是觀光客的「腳底殺手」，穿薄底鞋走久了會痛，建議走被踩實的車轍路徑。",
-                        culture: "皇居前身是江戶城，是德川幕府權力的中心。從將軍居所轉變為天皇居所，這片綠地見證了日本從封建社會轉向近代國家權力轉移的歷史。",
-                        tech: "東京都市計畫將這裡保留為大型風道 (Wind Corridor)，利用皇居的綠地冷卻海風並吹入市中心，是緩解都市熱島效應的關鍵生態工程技術。",
-                        local: "「日比谷公園其實是我們週五晚上的啤酒花園。不過冬天真的很冷，我們會躲去東京中城日比谷 (Tokyo Midtown Hibiya) 的地下街喝咖啡，那裡直通地鐵很方便。」"
-                    }
+                        travel: "皇居外苑鋪設的碎石路是觀光客的「腳底殺手」，建議走被踩實的車轍路徑。",
+                        local: "「日比谷公園其實是我們週五晚上的啤酒花園。不過冬天真的很冷。」",
+                        trap: "皇居外苑的廁所很少且距離很遠。建議在有樂町先上好廁所。",
+                        creative: "皇居的松樹修剪是一種極致的園藝造型藝術，與江戶城的石垣形成視覺平衡。",
+                        business: "【三菱村】丸之內一帶被稱為「三菱村」，三菱地所擁有這裡大部分的土地與大樓。這裡是全日本地價最高昂的區域。",
+                        history: "【鹿鳴館】日比谷公園旁曾是明治時代著名的「鹿鳴館」所在地，當時日本為了向西方展示文明而夜夜舉辦舞會。",
+                        shopping: "【菊之御紋】皇居東御苑的販賣部有賣印有皇家家徽「十六瓣八重表菊紋」的錢包與皮革製品，是只有進皇居才買得到的限定品。"
+                    },
+                    vocabulary: [
+                        { term: "散策", reading: "さんさく", meaning: "散步", desc: "比普通的「散步」更有詩意，帶有邊走邊欣賞風景、享受悠閒時光的意味。" },
+                        { term: "木漏れ日", reading: "こもれび", meaning: "樹葉間灑落的陽光", desc: "這是一個無法翻譯的絕美日文單字。指陽光穿過樹葉縫隙，在地上形成的光斑。" }
+                    ]
                     },
                     { 
                     time: "17:30", 
@@ -248,42 +351,30 @@
                     icon: Camera,
                     weather: { type: 'cloud', temp: '8°C', loc: 'Roppongi' },
                     keywords: ["東京鐵塔", "藍白燈海", "百萬夜景"],
-                    outfit: "入夜後氣溫驟降，而且要長時間站著拍照，手套跟暖暖包這時候就派上用場了。",
+                    outfit: "入夜後氣溫驟降，手套跟暖暖包這時候就派上用場了。",
                     insights: {
-                        travel: "別只擠在天橋上！走到 Tiffany 精品店前的路口，由下往上拍，人潮較少且能拍出帶有精品櫥窗與東京鐵塔的時尚街拍感。",
-                        culture: "日本的聖誕節雖然不是國定假日，卻發展出獨特的「戀人節」文化。六本木燈飾是東京最強約會聖地，象徵著泡沫經濟時代以來都市戀愛文化的延續。",
-                        tech: "這裡的燈飾全面採用特製的「白藍色 LED」，稱為「Snow & Blue」。LED 技術的進步讓大規模都市照明變得節能且低發熱，是現代夜間經濟的重要推手。",
-                        local: "「這裡可是東京情侶的『決勝聖地』啊！如果聖誕節前夕被約來這裡看燈，大概就是準備要告白了。不過聖誕夜當天人多到像跨年，我們當地人反而會避開。」"
-                    }
+                        travel: "別只擠在天橋上！走到 Tiffany 精品店前的路口，由下往上拍，人潮較少。",
+                        local: "「這裡可是東京情侶的『決勝聖地』啊！不過聖誕夜當天人多到像跨年。」",
+                        trap: "在天橋上拍照時請小心手機！每年都有人手機直接掉到橋下的車道上。",
+                        creative: "「Snow & Blue」的冷色調燈光與東京鐵塔的暖橘色形成強烈對比。",
+                        business: "【都市再生】六本木 Hills 是森大廈 (Mori Building) 集團花費 17 年整合 400 多位地主才完成的「都市再生」代表作。",
+                        history: "【軍事基地】六本木在二戰後曾是美軍設施集中的區域，因此這裡長期聚集了外國人與酒吧。",
+                        shopping: "【美術館商店】森美術館 (Mori Art Museum) 的商店常有草間彌生或村上隆的聯名商品，設計感極強，不容易撞款。"
                     },
-                    { 
-                    time: "18:00", 
-                    type: "food", 
-                    title: "聖誕市集晚餐", 
-                    desc: "六本木 Hills", 
-                    details: "大屋根廣場。熱紅酒與德式香腸。",
-                    locationQuery: "Roppongi Hills Christmas Market",
-                    icon: Utensils,
-                    weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
-                    keywords: ["熱紅酒", "德國香腸", "聖誕雜貨"],
-                    outfit: "雖然是半戶外有屋頂，但還是很通風（冷）。穿有口袋的大衣方便放零錢和手機，因為雙手要拿食物。",
-                    insights: {
-                        travel: "必買熱紅酒 (Glühwein)！每年的馬克杯都有限定圖案，喝完後不想帶走杯子可以退還拿回押金，但大多數人都會帶回家當成免費且有紀念價值的伴手禮。",
-                        culture: "這是模仿德國斯圖加特聖誕市集打造的活動，展現了日本人對「洋風節慶」極高的還原度與熱愛，也是日本冬季商業促銷的重要一環。",
-                        tech: "市集雖然復古，但後台運作高度數位化。為了應對龐大人流，攤位多已導入非接觸式支付 (Suica/PayPay)，加速結帳流程以消化排隊人潮。",
-                        local: "「雖然氣氛很棒，但那裡的熱紅酒和香腸價格真的是『觀光地價格』。我們會建議先在便利商店喝點熱的再去逛，不然荷包會縮水很快。」"
-                    }
+                    vocabulary: [
+                        { term: "夜景", reading: "やけい", meaning: "夜景", desc: "日本人非常熱愛「夜景」，甚至有「日本夜景遺產」認證。六本木 Hills 的夜景被稱為「都會的寶石箱」。" },
+                        { term: "イルミネーション", reading: "illumination", meaning: "燈飾", desc: "簡稱「イルミ (Irumi)」。日本人冬天最愛的活動就是看「Irumi」，象徵浪漫與溫馨。" }
+                    ]
                     }
                 ]
                 },
                 {
                 date: "12/21",
-                day: "Sun",
-                title: "Nature",
+                day: "日曜日(Sun)",
+                title: "湯けむりの彼方 (Beyond the Steam)",
                 location: "高崎 → 輕井澤 → 草津",
-                theme: "from-stone-500 to-stone-600", 
-                themeBtn: "bg-stone-600",
-                themeLight: "bg-stone-50",
+                theme: "from-emerald-800 to-emerald-900", 
+                themeBtn: "bg-emerald-700",
                 events: [
                     { 
                     time: "09:00", 
@@ -296,17 +387,21 @@
                     timetableUrl: "https://www.jreast.co.jp/multi/zh-CHT/",
                     weather: { type: 'sun', temp: '10°C', loc: 'Tokyo' },
                     keywords: ["雙層新幹線", "鐵路便當", "移動效率"],
-                    outfit: "洋蔥式穿搭標準場景。車上熱、下車冷，外套要容易穿脫。",
+                    outfit: "洋蔥式穿搭標準場景。車上熱、下車冷。",
                     insights: {
-                        travel: "上車前務必在東京站買「鐵路便當 (Ekiben)」。推薦中央走道的「祭 (Matsuri)」專賣店，這是一場集結全日本 200 種便當的選拔賽，選擇困難症發作請選銷售冠軍「牛肉道場」。",
-                        culture: "新幹線不只是交通工具，更是日本戰後復興與「日本第一」的民族驕傲象徵。車廂內的寧靜與秩序，是日本社會「不給他人添麻煩」文化的極致體現。",
-                        tech: "新幹線採用了世界領先的地震預警系統。一旦偵測到 P 波（地震前導波），列車會自動切斷電源並啟動緊急煞車，確保在強震到達前減速，保障乘客安全。",
-                        local: "「高崎在我們印象中是『達磨之都』也是『麵食之都』。除了便當，車站裡的義大利麵其實很有名，因為群馬縣是日本小麥主產地，這裡的義大利麵份量也是日本第一。」"
+                        travel: "上車前務必在東京站買「鐵路便當 (Ekiben)」。推薦中央走道的「祭 (Matsuri)」專賣店。",
+                        local: "「高崎在我們印象中是『達磨之都』也是『麵食之都』。」",
+                        trap: "東京車站內非常大且像迷宮。如果要買便當，請至少預留 30 分鐘以上的時間。",
+                        creative: "新幹線車頭的流線型設計是「仿生學」的經典案例，模仿翠鳥的喙。",
+                        business: "【便當經濟學】JR 東日本的鐵路便當業務年營收數百億日圓。透過中央廚房與車站內的黃金店面，將地方特色美食轉化為高毛利的流通商品。",
+                        history: "【田中角榮】上越新幹線的建設與前首相田中角榮的「日本列島改造論」息息相關。",
+                        shopping: "【牛肉道場】如果看到「米沢牛どまん中 (Domannaka)」便當，請毫不猶豫買下它。這是日本鐵路便當的常勝冠軍。"
                     },
-                    timetable: [
-                        { time: "09:04", label: "Asama 605", highlight: true },
-                        { time: "09:24", label: "Hakutaka 557" }
-                    ]
+                    vocabulary: [
+                        { term: "切符", reading: "きっぷ", meaning: "車票", desc: "「切」是剪切，「符」是憑證。古代票券是木竹製的符節，使用時要切開驗證，故稱切符。" },
+                        { term: "駅弁", reading: "えきべん", meaning: "鐵路便當", desc: "「駅 (車站)」+「弁当 (便當)」。是日本鐵道旅行不可或缺的靈魂，各地都有特色食材限定款。" }
+                    ],
+                    timetable: [{ time: "09:04", label: "Asama 605", highlight: true }, { time: "09:24", label: "Hakutaka 557" }]
                     },
                     { 
                     time: "10:10", 
@@ -318,13 +413,20 @@
                     icon: MapPin,
                     weather: { type: 'sun', temp: '9°C', loc: 'Gunma' },
                     keywords: ["七轉八起", "鶴龜松竹梅", "求勝運"],
-                    outfit: "這裡要爬長長的階梯！絕對要穿防滑好走的運動鞋，避免穿有跟的鞋子。",
+                    outfit: "這裡要爬長長的階梯！絕對要穿防滑好走的運動鞋。",
                     insights: {
-                        travel: "買達磨時，眉毛代表「鶴」、鬍鬚代表「龜」，象徵長壽。許願時先畫上「左眼」，願望實現後再畫上「右眼」（開眼），這是一種與神明的契約。",
-                        culture: "高崎是日本「選舉達磨」的產地。日本政治人物在選舉時必買達磨祈求當選，這種政治與宗教的結合，讓達磨成為日本特有的勝運象徵。",
-                        tech: "傳統達磨是手工紙糊，但現代高崎達磨產業面臨人手不足，已導入機械模具與環保再生紙漿技術，在保持傳統外觀的同時，提高了生產效率與環境友善度。",
-                        local: "「群馬人每家每戶過年一定會買新的達磨。對我們來說，那不只是裝飾，是一年的精神寄託。舊的達磨我們會在年底帶回神社燒掉，象徵把運氣還給神明。」"
-                    }
+                        travel: "買達磨時，眉毛代表「鶴」、鬍鬚代表「龜」。許願時先畫上「左眼」。",
+                        local: "「群馬人每家每戶過年一定會買新的達磨。舊的達磨我們會在年底帶回神社燒掉。」",
+                        trap: "回程的公車班次非常少。下車時務必先拍下回程時刻表，並設好鬧鐘。",
+                        creative: "達磨不倒翁的設計重心在底部，象徵「七轉八起」的韌性精神。",
+                        business: "【勝運壟斷】高崎市生產了全日本 80% 的達磨。每逢日本大選，政治人物必買高崎達磨祈求當選。",
+                        history: "【飢荒對策】達磨製作最早是天明大飢荒時，寺院住持為了救濟貧困農民，教導他們用紙漿製作副業產品販售。",
+                        shopping: "【色彩學】紅色是基本款（家內安全），金色求財運，黑色擋煞（生意興隆），粉色求戀愛。可以根據當下的願望挑選顏色。"
+                    },
+                    vocabulary: [
+                        { term: "縁起物", reading: "えんぎもの", meaning: "吉祥物", desc: "「縁起」原本是佛教用語「因緣生起」，後來轉指運氣的由來。達磨、招財貓都是常見的緣起物。" },
+                        { term: "七転八起", reading: "ななころびやおき", meaning: "百折不撓", desc: "跌倒七次，第八次還是會站起來。這是達磨不倒翁的核心精神，象徵人生的韌性。" }
+                    ]
                     },
                     { 
                     time: "11:30", 
@@ -338,14 +440,15 @@
                     keywords: ["穿越山脈", "瞬間溫差", "信州門戶"],
                     outfit: "準備好圍巾，一下車氣溫會直接掉 5 度。",
                     insights: {
-                        travel: "這 15 分鐘會穿越長長的隧道，出隧道就是長野縣，耳朵可能會因氣壓變化而耳鳴。窗外景色瞬間從關東平原變成信州高原，是地理景觀劇烈變化的體驗。",
-                        culture: "輕井澤自明治時代由傳教士開發以來，就是日本皇室與上流社會的避暑勝地。這裡的西洋建築與教會文化，讓它與傳統日本溫泉鄉有著截然不同的異國氛圍。",
-                        tech: "這段路程穿越了碓冰峠，曾是日本鐵路最陡峭的難關。新幹線透過強大的動力系統與隧道工程克服了這個地理障礙，將原本數小時的山路縮短為十幾分鐘。",
-                        local: "「去輕井澤的新幹線上，如果看到穿著很時髦、牽著狗的人，大概就是要去別墅度假的東京有錢人。輕井澤是日本唯一像歐洲的地方。」"
+                        travel: "這 15 分鐘會穿越長長的隧道，窗外景色瞬間從關東平原變成信州高原。",
+                        local: "「去輕井澤的新幹線上，如果看到穿著很時髦、牽著狗的人，大概就是要去別墅度假的東京有錢人。」",
+                        trap: "高崎站轉乘時間雖然夠，但別在站內商店街逛太久。",
+                        creative: "從隧道出來的瞬間，植被從闊葉林變成針葉林，是地理景觀的蒙太奇切換。",
+                        business: "【西武王國】輕井澤的發展與西武集團的經營密不可分。透過「交通+地產」TOD 開發模式，成功打造了東京後花園。",
+                        history: "【皇室羅曼史】現在的上皇明仁與上皇后美智子就是在輕井澤的網球場相遇的。",
+                        shopping: "【澤屋果醬】在車站就能買到「澤屋 (Sawaya)」的果醬。推薦「整顆草莓」口味，裡面真的有一顆顆完整的草莓，視覺與味覺雙重享受。"
                     },
-                    timetable: [
-                        { time: "11:29", label: "Asama 609", highlight: true }
-                    ]
+                    timetable: [{ time: "11:29", label: "Asama 609", highlight: true }]
                     },
                     { 
                     time: "15:30", 
@@ -358,17 +461,19 @@
                     timetableUrl: "https://www.kkKG.co.jp/bus/rosen-bus.html",
                     weather: { type: 'snow', temp: '1°C', loc: 'Karuizawa' },
                     keywords: ["暈車藥", "雪景", "山路"],
-                    outfit: "車程 80 分鐘山路，怕暈車的建議穿寬鬆不勒肚子的褲子。車內暖氣通常很強，別穿高領毛衣。",
+                    outfit: "車程 80 分鐘山路，怕暈車的建議穿寬鬆不勒肚子的褲子。",
                     insights: {
-                        travel: "山路蜿蜒 80 分鐘，容易暈車的人務必坐前排並先吃藥。中途可能會停休息站，推薦買當地的「輕井澤牛奶」或優酪乳，味道非常濃郁。",
-                        culture: "這條路線連結了「西洋避暑地」輕井澤與「傳統湯治場」草津，是一條穿越日本近代與傳統的文化之路，沿途能看到從別墅區到溫泉街的聚落變化。",
-                        tech: "冬季行駛山區巴士極度考驗技術。車輛配備了特製的雪地輪胎與防滑系統，且道路養護單位會即時噴灑防凍劑，確保在零下溫度中依然能安全行駛。",
-                        local: "「這條路真的是『暈車地獄』，連我們當地人搭都要深呼吸。不過下雪的時候，看著窗外白茫茫的森林，會有一種與世隔絕的感動。」"
+                        travel: "山路蜿蜒 80 分鐘，容易暈車的人務必坐前排並先吃藥。中途可能會停休息站，推薦買當地的「輕井澤牛奶」或優酪乳。",
+                        culture: "這條路線連結了「西洋避暑地」輕井澤與「傳統湯治場」草津，是一條穿越日本近代與傳統的文化之路。",
+                        tech: "冬季行駛山區巴士極度考驗技術。車輛配備了特製的雪地輪胎與防滑系統，且道路養護單位會即時噴灑防凍劑。",
+                        local: "「這條路真的是『暈車地獄』，連我們當地人搭都要深呼吸。不過下雪的時候，看著窗外白茫茫的森林很美。」",
+                        trap: "巴士上沒有廁所。上車前請務必在輕井澤車站先上好廁所。",
+                        creative: "巴士在雪壁中穿行的景象，是冬季限定的極簡主義風景畫。",
+                        business: "【虧損補貼】這類山區路線通常難以盈利，往往仰賴地方政府補貼或觀光旺季的高票價來交叉補貼。",
+                        history: "【輕井澤鐵道】這條路以前其實是有火車的（草輕電氣鐵道），後來因為颱風破壞與汽車普及而廢線。",
+                        shopping: "【牛奶】中途如果停「北輕井澤」休息站，請務必買當地的牛奶或優酪乳，濃郁程度是便利商店的兩倍。"
                     },
-                    timetable: [
-                        { time: "14:20", label: "草輕交通" },
-                        { time: "15:40", label: "草輕交通", highlight: true }
-                    ]
+                    timetable: [{ time: "14:20", label: "草輕交通" }, { time: "15:40", label: "草輕交通", highlight: true }]
                     },
                     { 
                     time: "17:00", 
@@ -381,24 +486,30 @@
                     icon: Hotel,
                     weather: { type: 'snow', temp: '-2°C', loc: 'Kusatsu' },
                     keywords: ["湯畑第一排", "日本三名泉", "強酸性泉"],
-                    outfit: "晚上看湯畑點燈『超級冷』，體感通常在零下。務必穿羽絨衣、戴手套、毛帽，全副武裝。",
+                    outfit: "晚上看湯畑點燈『超級冷』，體感通常在零下。務必全副武裝。",
                     insights: {
-                        travel: "草津溫泉是強酸性 (pH 2.1)，殺菌力強但對皮膚刺激大，身上有傷口會很痛。泡完建議稍微沖洗，且銀飾品千萬別戴下水，會瞬間變黑。",
-                        culture: "湯畑不僅是源泉，更是草津的信仰中心。周圍的石柱上刻著來訪過的名人，從德川將軍到現代藝人，見證了這裡作為「天下名湯」的歷史地位。",
-                        tech: "草津擁有驚人的自然湧出量（每分鐘 3萬公升）。湯畑的木槽設計是為了利用自然冷卻原理降低水溫（源泉約 50-90度），無需加冷水稀釋即可入浴，保留了溫泉的純度。",
-                        local: "「草津的水真的很『利』！我們當地人習慣泡完不沖水直接穿衣（讓藥效留著），但皮膚敏感的人可能會癢，還是建議沖一下。還有，溫泉饅頭試吃千萬別客氣，店家是真心想請你吃的。」"
-                    }
+                        travel: "草津溫泉是強酸性 (pH 2.1)，殺菌力強但對皮膚刺激大。**銀飾品千萬別戴下水**。",
+                        local: "「草津的水真的很『利』！皮膚敏感的人可能會癢。還有，溫泉饅頭試吃千萬別客氣。」",
+                        trap: "泡湯時絕對不要揉眼睛！草津的溫泉水進眼睛會非常痛。",
+                        creative: "湯畑湧出的蒸氣在夜間點燈下，形成千變萬化的雲霧光影秀。",
+                        business: "【No.1 品牌學】草津連續 19 年蟬聯「日本溫泉 100 選」第一名。這種壓倒性的品牌地位，讓它即使交通不便，依然能維持極高的旅館房價。",
+                        history: "【德川將軍御汲湯】江戶時代的德川將軍曾命人將草津的溫泉水裝在木桶裡，一路運回江戶（東京）給他泡澡。",
+                        shopping: "【湯之花】草津名產「湯之花 (Yunohana)」是溫泉結晶粉，回家泡澡就像在草津一樣。請認明黃色包裝的天然採取版，不是化學合成的。"
+                    },
+                    vocabulary: [
+                        { term: "湯畑", reading: "ゆばたけ", meaning: "熱水田", desc: "「湯」是熱水，「畑」是田地。指利用像田地一樣的木槽，讓滾燙的泉水與空氣接觸自然降溫，同時採集湯花（溫泉結晶）。" },
+                        { term: "源泉", reading: "げんせん", meaning: "泉源", desc: "溫泉湧出的源頭。草津的源泉溫度高達 50-90 度，直接泡會燙傷，所以才需要「湯畑」降溫。" }
+                    ]
                     }
                 ]
                 },
                 {
                 date: "12/22",
-                day: "Mon",
-                title: "Port City",
+                day: "月曜日(Mon)",
+                title: "港の物語 (Tale of the Port)",
                 location: "草津 → 輕井澤 → 橫濱",
-                theme: "from-slate-500 to-zinc-600",
-                themeBtn: "bg-zinc-600",
-                themeLight: "bg-zinc-50",
+                theme: "from-purple-900 to-violet-900",
+                themeBtn: "bg-purple-800",
                 events: [
                     { 
                     time: "11:30", 
@@ -410,13 +521,20 @@
                     icon: ShoppingBag,
                     weather: { type: 'cloud', temp: '3°C', loc: 'Karuizawa' },
                     keywords: ["湖畔購物", "名牌折扣", "高原風景"],
-                    outfit: "這 Outlet 很大且是戶外開放式，店與店之間要走外面，風很大。建議穿防風大衣，別穿高跟鞋。",
+                    outfit: "這 Outlet 很大且是戶外開放式，風很大。建議穿防風大衣。",
                     insights: {
-                        travel: "別只顧著逛街，中間的大湖景色美到像風景區。這裡的 Gucci 和 Nike 庫存通常比市區多。買太多不想提？車站有大型置物櫃，或利用宅急便寄到機場。",
-                        culture: "輕井澤 Outlet 的前身是高爾夫球場，這種將休閒設施轉型為大型商業設施的案例，反映了日本泡沫經濟破滅後，休閒產業轉向實用消費的趨勢。",
-                        tech: "大型 Outlet 的營運高度依賴數據分析。透過會員卡與 POS 系統，營運方能精準掌握觀光客與本地人的消費熱點，動態調整品牌櫃位與折扣策略。",
-                        local: "「輕井澤 Outlet 對我們來說其實是大公園。很多長野縣民週末會全家開車來這裡溜狗、曬太陽，順便買點東西。這裡的狗推車數量可能是全日本最密集的。」"
-                    }
+                        travel: "別只顧著逛街，中間的大湖景色美到像風景區。這裡的 Gucci 和 Nike 庫存通常比市區多。",
+                        local: "「輕井澤 Outlet 對我們來說其實是大公園。很多長野縣民週末會全家開車來這裡溜狗。」",
+                        trap: "Outlet 美食街中午 12:00-13:30 是尖峰時刻。建議 11:30 前就先吃午餐。",
+                        creative: "將大自然湖景與商業空間無縫融合，創造了「滯留型」的消費體驗。",
+                        business: "【淡季平衡術】西武集團透過 Outlet 成功將淡季（春秋甚至冬季）也轉化為購物旺季，平衡了地區全年的經濟波動。",
+                        history: "【高爾夫球場】這裡的前身其實是高爾夫球場。將維護成本高昂的球場改建為 Outlet，是適應日本泡沫經濟破滅後消費降級的成功轉型。",
+                        shopping: "【鑄鐵鍋】這裡的 Le Creuset 鑄鐵鍋常有「日本限定色」或「B級品 (些微瑕疵但超便宜)」，是主婦們的秘密戰場。"
+                    },
+                    vocabulary: [
+                        { term: "免税", reading: "めんぜい", meaning: "免稅", desc: "購買消耗品或一般物品滿 5000 日圓（不含稅）即可退稅。記得隨身攜帶護照。" },
+                        { term: "試着", reading: "しちゃく", meaning: "試穿", desc: "「試」是嘗試，「着」是穿著。要試穿前請先跟店員說「Shichaku OK?」。進更衣室請脫鞋。" }
+                    ]
                     },
                     { 
                     time: "14:52", 
@@ -430,14 +548,15 @@
                     keywords: ["長途移動", "便當", "補眠"],
                     outfit: "從雪國回到平地，進東京後會覺得變熱，記得把厚圍巾收進包包。",
                     insights: {
-                        travel: "週日下午回東京的新幹線自由席是戰場！若沒買指定席，請務必提早 20 分鐘去月台排隊，或者乾脆多花錢買指定席，確保能一路睡回東京。",
-                        culture: "這段旅程是從「非日常」的度假地回到「日常」的都會區。觀察車上乘客的表情，從輕鬆轉為嚴肅，是日本社會高壓職場文化的一種側面寫照。",
-                        tech: "北陸新幹線在山區行駛需要克服急陡坡與大雪。車輛配備了強力的馬達與特殊的剎車系統，是日本鐵道工程應對複雜地形的技術結晶。",
-                        local: "「這條路線一次體驗了『山』與『海』。橫濱人其實很自豪，覺得自己比東京更洋氣、更懂生活。你從山上下來直接去港口，這反差很讚。」"
+                        travel: "週日下午回東京的新幹線自由席是戰場！若沒買指定席，請務必提早 20 分鐘去月台排隊。",
+                        local: "「這條路線一次體驗了『山』與『海』。橫濱人其實很自豪，覺得自己比東京更洋氣。」",
+                        trap: "東京站轉乘到橫濱線 (JR 東海道線或橫須賀線) 時，月台距離很遠，轉乘時間別抓太緊。",
+                        creative: "從車窗看出去，景色從雪山過渡到混凝土叢林，再到橫濱的開闊海港。",
+                        business: "【通勤新幹線】這條路線支撐了「新幹線通勤族」的生活方式。雖然月票昂貴，但對於追求生活品質的高薪族群來說，是用金錢換取空間的合理交易。",
+                        history: "【日本第一條鐵路】橫濱到東京的新橋是日本第一條鐵路開通的路段（1872年），你正在搭乘的是日本鐵道史的原點路線。",
+                        shopping: "【崎陽軒】到了橫濱站，一定要買「崎陽軒 (Kiyoken)」的燒賣便當。它是橫濱人的靈魂食物，冷掉也很好吃。"
                     },
-                    timetable: [
-                        { time: "14:55", label: "Asama 618", highlight: true }
-                    ]
+                    timetable: [{ time: "14:55", label: "Asama 618", highlight: true }]
                     },
                     { 
                     time: "18:00", 
@@ -449,24 +568,26 @@
                     icon: Camera,
                     weather: { type: 'sun', temp: '8°C', loc: 'Yokohama' },
                     keywords: ["海風超大", "異國風情", "浪漫聖地"],
-                    outfit: "海邊的風是『會吹到頭痛』的那種。一定要戴能蓋住耳朵的帽子或耳罩，穿防風外套比穿厚毛衣有用。",
+                    outfit: "海邊的風是『會吹到頭痛』的那種。一定要戴能蓋住耳朵的帽子。",
                     insights: {
-                        travel: "紅磚倉庫的地面是百年歷史的硬石板路，推行李箱會震到手麻，輪子也容易壞。千萬先把行李寄放在車站或飯店，輕裝來逛才是上策。",
-                        culture: "橫濱是日本開港通商的發源地，紅磚倉庫曾是國家保稅倉庫。這裡充滿異國情調的聖誕市集，是對這座城市「西洋窗口」歷史身分的致敬。",
-                        tech: "將百年紅磚古蹟改建為商業設施，需要高超的「耐震補強」技術。在不破壞外觀的前提下，內部結構已置入現代抗震阻尼器，是古蹟活化的工程典範。",
-                        local: "「橫濱人很愛紅磚倉庫，但也覺得那是『給觀光客去的』。不過聖誕節例外，那種氣氛真的無敵。記得去海邊看『冰川丸』郵輪的燈飾，那才是老橫濱人的浪漫。」"
+                        travel: "紅磚倉庫的地面是百年歷史的硬石板路，推行李箱會震到手麻。千萬先把行李寄放。",
+                        local: "「橫濱人很愛紅磚倉庫，但也覺得那是『給觀光客去的』。不過聖誕節例外，那種氣氛真的無敵。」",
+                        trap: "聖誕市集入場通常需要買票。如果不想排隊買票，其實倉庫外圍的免費區域就很美了。",
+                        creative: "紅磚的質感與聖誕裝飾的暖光非常契合，這種復古工業風 (Industrial Chic) 是現代商業空間爭相模仿的風格。",
+                        business: "【古蹟活化】橫濱市將紅磚倉庫從廢棄物流設施轉型為文化商業地標，成功帶動了整個「港未來21」地區的土地價值與觀光產值。",
+                        history: "【保稅倉庫】這裡曾是明治時代日本國家的保稅倉庫，見證了日本近代貿易的興衰。建築上的鐵門與升降機遺跡都保留了當年的工業記憶。",
+                        shopping: "【紅鞋巧克力】橫濱有名謠「穿紅鞋的女孩」，這裡賣的「紅色高跟鞋巧克力」非常精緻可愛，適合送給女生朋友。"
                     }
                     }
                 ]
                 },
                 {
                 date: "12/23",
-                day: "Tue",
-                title: "Return",
+                day: "火曜日(Tue)",
+                title: "思い出を詰めた帰路 (Homeward Bound with Memories)",
                 location: "橫濱 → 成田 → 台北",
-                theme: "from-sky-700 to-slate-700",
+                theme: "from-sky-800 to-sky-900",
                 themeBtn: "bg-sky-700",
-                themeLight: "bg-sky-50",
                 events: [
                     { 
                     time: "11:10", 
@@ -478,13 +599,20 @@
                     icon: Utensils,
                     weather: { type: 'rain', temp: '8°C', loc: 'Yokohama' },
                     keywords: ["昭和夕陽", "迷你碗", "制霸全國"],
-                    outfit: "室內復古造景溫暖，穿脫方便的洋蔥式穿搭，避免太厚重在室內熱壞。",
+                    outfit: "室內復古造景溫暖，穿脫方便的洋蔥式穿搭。",
                     insights: {
-                        travel: "一定要點「迷你碗 (Mini Size)」！這裡集結了全日本名店，迷你碗讓你一次能吃三家不同口味而不撐死。入口處的昭和雜貨店有賣懷舊零食，很適合作為伴手禮。",
-                        culture: "這裡重現了昭和 33 年（1958年）的東京街景，那是全世界第一碗泡麵發明的年份。這不只是美食街，更是一座關於戰後日本飲食與庶民記憶的博物館。",
-                        tech: "拉麵博物館開創了「食物主題樂園」的商業模式。透過集中名店與情境式體驗，成功將單價低的拉麵轉化為高附加價值的觀光體驗，被許多國家仿效。",
-                        local: "「新橫濱其實是個除了新幹線和體育館什麼都沒有的地方（笑）。但拉麵博物館真的很強，不用跑遍日本就能吃到博多、北海道的味道，對我們這種懶得遠行的吃貨是救贖。」"
-                    }
+                        travel: "一定要點「迷你碗 (Mini Size)」！這裡集結了全日本名店，迷你碗讓你一次能吃三家。",
+                        local: "「新橫濱其實是個除了新幹線和體育館什麼都沒有的地方（笑）。但拉麵博物館真的很強。」",
+                        trap: "博物館內樓梯很多且走道狹窄，如果有大行李箱，務必寄放在入口處或車站。",
+                        creative: "這裡的昭和佈景連海報、燈光色溫都經過考證，營造出一種「黃昏的鄉愁感」。",
+                        business: "【IP經濟】拉麵博物館開創了「食物主題樂園」模式，證明了即使是低單價的庶民美食，透過策展與體驗包裝，也能創造高附加價值的觀光收入。",
+                        history: "【昭和33年】館內設定在昭和 33 年（1958年），那是東京鐵塔完工、日清泡麵發明的年份，被日本人視為戰後經濟復甦與美好舊時光的代名詞。",
+                        shopping: "【自製拉麵】一樓商店可以買到各家名店的拉麵調理包，甚至可以自己組合麵條與湯頭，做出獨一無二的伴手禮。"
+                    },
+                    vocabulary: [
+                        { term: "替玉", reading: "かえだま", meaning: "加麵", desc: "博多拉麵特有的文化。湯要留著，只加麵條。記得要在吃完前一點點就喊「Kaedama」，才不會讓湯冷掉。" },
+                        { term: "硬め", reading: "かため", meaning: "麵條偏硬", desc: "點拉麵時常被問「麵的硬度」。內行人都點「Katame (硬)」或「Barikata (超硬)」，比較有嚼勁。" }
+                    ]
                     },
                     { 
                     time: "14:28", 
@@ -500,15 +628,15 @@
                     keywords: ["準點", "直達", "補眠"],
                     outfit: "輕鬆舒適為主，避免穿太多層，機場過安檢脫脫穿穿很麻煩。",
                     insights: {
-                        travel: "橫濱站迷宮等級很高，JR 月台跟其他私鐵容易搞混，請預留 15 分鐘找月台。車上有大型行李鎖，記得設簡單的密碼（如 0000），下車忘記密碼會非常麻煩。",
-                        culture: "日本人對「準點」的執著在機場交通上展露無遺。錯過這班車通常被視為個人時間管理不當，而非交通工具的問題。N'EX 的準時是旅客信任的基礎。",
-                        tech: "N'EX 運行的成田空港線部分路段採用了與新幹線同等級的路軌標準 (標準軌)，允許列車高速運行（雖然 N'EX 是窄軌車，但在部分共用路段展現了日本鐵路網的兼容性技術）。",
-                        local: "「N'EX 雖然貴，但那種『旅程要結束了』的安心感無可替代。橫濱站的月台很長，N'EX 停的位置常常在最邊邊，記得預留體力走路。」"
+                        travel: "橫濱站迷宮等級很高，請預留 15 分鐘找月台。車上有大型行李鎖，記得設簡單的密碼。",
+                        local: "「N'EX 雖然貴，但那種『旅程要結束了』的安心感無可替代。橫濱站的月台很長，記得預留體力走路。」",
+                        trap: "橫濱站的 N'EX 月台跟一般電車月台是同一個，但停靠位置可能不同。請看電子跑馬燈。",
+                        creative: "成田特急的紅黑配色在月台上非常顯眼，是為了讓旅客能一眼識別出「機場專車」。",
+                        business: "【機場聯外競爭】N'EX 雖然速度輸給京成 Skyliner，但憑藉著 JR 龐大的路網，依然掌握了重視「一車直達」的商務與家庭客群。",
+                        history: "【軌距兼容】N'EX 運行的路線部分路段展示了日本鐵路技術如何讓不同軌距與電壓的列車共存。",
+                        shopping: "【最後補給】如果還沒買夠，橫濱站的 JOINUS 地下街或高島屋百貨是最後衝刺的好地方，比機場選擇更多。"
                     },
-                    timetable: [
-                        { time: "14:29", label: "N'EX 33號", highlight: true },
-                        { time: "15:28", label: "N'EX 37號", isWarning: true }
-                    ]
+                    timetable: [{ time: "14:29", label: "N'EX 33號", highlight: true }, { time: "15:28", label: "N'EX 37號", isWarning: true }]
                     },
                     { 
                     time: "16:00", 
@@ -520,167 +648,158 @@
                     icon: Plane,
                     weather: { type: 'rain', temp: '6°C', loc: 'NRT' },
                     keywords: ["消耗零錢", "免稅店", "最後衝刺"],
-                    outfit: "回台灣會變熱，建議裡面穿短袖/薄長袖，外面穿厚外套，抵達桃園機場後脫外套剛好。",
+                    outfit: "回台灣會變熱，建議裡面穿短袖/薄長袖，外面穿厚外套。",
                     insights: {
-                        travel: "手邊剩下的日幣銅板，可以去機場設有的整排扭蛋機消耗掉，或是去便利商店買飯糰。成田 T1 的 FaSoLa 免稅店生意極好，薯條三兄弟常缺貨，看到有貨請直接拿。",
-                        culture: "日本機場是展現「軟實力」的櫥窗。從動漫角色迎接旅客到免稅店精美的包裝設計，都在最後一刻強化旅客對日本「精緻與好客」的國家印象。",
-                        tech: "成田機場已導入 Face Express 臉部辨識系統。辦理登機時註冊臉部資訊，之後掛行李、安檢、登機都可以「刷臉」通過，大幅縮短排隊時間，是智慧機場的最新應用。",
-                        local: "「成田機場其實離東京超遠，我們都戲稱是『千葉機場』。不過 T1 南翼那種出發的氛圍真的很棒，那是通往世界的門戶感。」"
+                        travel: "手邊剩下的日幣銅板，可以去機場設有的整排扭蛋機消耗掉。FaSoLa 免稅店生意極好，看到有貨請直接拿。",
+                        local: "「成田機場其實離東京超遠，我們都戲稱是『千葉機場』。不過 T1 南翼那種出發的氛圍真的很棒。」",
+                        trap: "成田機場 T1 南翼的安檢排隊隊伍有時會非常長。建議 Check-in 完盡快過安檢。",
+                        creative: "機場內的導視系統 (Wayfinding) 採用了通用的圖標與色彩編碼，即使不懂日文也能直覺找到登機口。",
+                        business: "【免稅店經濟】機場零售營收往往佔機場總營收的一半以上。成田機場透過大數據分析旅客國籍，精準投放高單價美妝與伴手禮。",
+                        history: "【釘子戶】成田機場是日本唯一有「釘子戶」還住在跑道旁的國際機場。為了避開這些農田，計程車滑行道必須繞路。",
+                        shopping: "【威士忌】日本威士忌（響、山崎）在市區很難買，機場免稅店偶爾會有少量釋出。如果有看到，請不要猶豫，那是稀有寶物。"
                     },
-                    flightInfo: {
-                        checkIn: "17:25",
-                        boarding: "19:10",
-                        departure: "19:55 (JP)",
-                        arrival: "23:00 (TW)",
-                        terminal: "T1 南翼"
-                    }
+                    flightInfo: { checkIn: "17:25", boarding: "19:10", departure: "19:55", arrival: "23:00", terminal: "T1 南翼" }
                     }
                 ]
                 }
             ];
 
             const currentSchedule = schedule[activeDay];
+            const currentRoute = mapRoutes[activeDay]; 
+            
+            if (!currentSchedule) return null;
 
-            const getTypeColor = (type, themeText) => {
+            const getTypeColor = (type) => {
                 switch (type) {
-                case 'flight': return 'bg-blue-500 text-white';
-                case 'transport': return 'bg-gray-700 text-white';
-                case 'hotel': return 'bg-emerald-500 text-white';
-                case 'food': return 'bg-orange-400 text-white';
-                case 'shop': return 'bg-pink-500 text-white';
-                case 'warning': return 'bg-red-500 text-white';
-                default: return 'bg-gray-400 text-white';
+                case 'flight': return 'bg-blue-600 text-white';
+                case 'transport': return 'bg-slate-700 text-white';
+                case 'hotel': return 'bg-emerald-600 text-white';
+                case 'food': return 'bg-amber-600 text-white';
+                case 'shop': return 'bg-pink-600 text-white';
+                case 'warning': return 'bg-rose-600 text-white';
+                default: return 'bg-slate-500 text-white';
                 }
             };
 
             const getTypeBg = (type) => {
                 switch (type) {
                 case 'flight': return 'bg-blue-50 border-blue-200 hover:bg-blue-100';
-                case 'transport': return 'bg-gray-50 border-gray-200 hover:bg-gray-100';
+                case 'transport': return 'bg-slate-50 border-slate-200 hover:bg-slate-100';
                 case 'hotel': return 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100';
-                case 'food': return 'bg-orange-50 border-orange-200 hover:bg-orange-100';
+                case 'food': return 'bg-amber-50 border-amber-200 hover:bg-amber-100';
                 case 'shop': return 'bg-pink-50 border-pink-200 hover:bg-pink-100';
-                default: return 'bg-white border-gray-100 hover:bg-gray-50';
+                default: return 'bg-white border-slate-200 hover:bg-slate-50';
                 }
             };
 
             return (
-                <div className="min-h-screen bg-gray-100 font-sans text-slate-700 pb-12 relative transition-colors duration-700">
+                <div className="min-h-screen bg-[#fdfbf7] font-sans text-slate-800 pb-12 relative transition-colors duration-700">
                 
-                {/* Elegant Header */}
-                <div className={`bg-gradient-to-br ${currentSchedule.theme} text-white p-6 pb-12 rounded-b-[40px] shadow-xl relative z-10 transition-colors duration-700`}>
+                {/* Header */}
+                <div className={`bg-gradient-to-br ${currentSchedule.theme} backdrop-blur-xl text-white p-6 pb-12 rounded-b-[3rem] shadow-2xl relative z-10 transition-all duration-700 border-b border-white/10`}>
                     <div className="flex justify-between items-start mb-6">
                     <div>
-                        <div className="flex items-center space-x-2 mb-1">
-                        <span className="text-[10px] uppercase tracking-widest opacity-70 border border-white/30 px-2 py-0.5 rounded-full">
-                            Japan Trip 2025
-                        </span>
-                        <span className="text-[10px] uppercase tracking-widest opacity-70 bg-white/10 px-2 py-0.5 rounded-full flex items-center">
-                            <Clock size={10} className="mr-1"/> GMT+9
+                        <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] border border-white/20 bg-white/10 px-3 py-1 rounded-full backdrop-blur-md font-sans">
+                            TOKYO 2025
                         </span>
                         </div>
-                        <h1 className="text-3xl font-light tracking-wide mb-1 drop-shadow-sm font-serif">
+                        <h1 className="text-3xl font-bold tracking-tight mb-2 drop-shadow-lg leading-tight font-display">
                         {currentSchedule.title}
                         </h1>
-                        <p className="text-white/80 text-xs flex items-center font-light tracking-wider">
-                        <MapPin size={12} className="mr-1" /> {currentSchedule.location}
+                        <p className="text-white/70 text-xs flex items-center font-medium tracking-wider font-sans">
+                        <MapPin size={12} className="mr-1.5" /> {currentSchedule.location}
                         </p>
                     </div>
-                    <div className="text-right">
-                        <div className="text-3xl font-bold opacity-20 font-serif">{currentSchedule.date}</div>
+                    <div className="text-right pt-2">
+                        <div className="text-2xl font-black opacity-10 font-display tracking-tighter text-right leading-tight">
+                            {currentSchedule.date}
+                            <br/>
+                            <span className="text-lg">{currentSchedule.day}</span>
+                        </div>
                     </div>
                     </div>
                 </div>
 
-                {/* Modern Date Selector */}
-                <div className="px-4 -mt-8 relative z-20">
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-1.5 flex justify-between overflow-x-auto no-scrollbar border border-white/50">
+                {/* Date Selector */}
+                <div className="px-4 -mt-8 mb-6 relative z-20 animate-in">
+                    <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-lg p-2 flex justify-between overflow-x-auto no-scrollbar border border-white/60">
                     {schedule.map((day, index) => (
                         <button
                         key={index}
                         onClick={() => setActiveDay(index)}
-                        className={`flex flex-col items-center justify-center min-w-[60px] py-3 rounded-xl transition-all duration-300 ${
+                        className={`flex flex-col items-center justify-center min-w-[64px] py-3 rounded-2xl transition-all duration-300 ${
                             activeDay === index 
-                            ? `${day.themeBtn} text-white shadow-md transform scale-100` 
-                            : 'text-slate-400 hover:bg-gray-50'
+                            ? `${day.themeBtn} text-white shadow-lg transform scale-105 ring-2 ring-white ring-opacity-50` 
+                            : 'text-slate-400 hover:bg-white'
                         }`}
                         >
-                        <span className={`text-[10px] font-medium tracking-wide ${activeDay === index ? 'opacity-80' : ''}`}>{day.date}</span>
-                        <span className="text-sm font-bold mt-0.5">{day.day}</span>
+                        <span className={`text-[10px] font-bold tracking-wider mb-0.5 ${activeDay === index ? 'opacity-80' : ''}`}>{day.date}</span>
+                        <span className="text-sm font-black font-display">{day.day.split('(')[0]}</span>
                         </button>
                     ))}
                     </div>
                 </div>
 
-                {/* Timeline Content */}
-                <div className="px-5 pt-8 max-w-2xl mx-auto">
-                    <div className="space-y-6">
+                {/* Main List Content */}
+                <div className="px-5 max-w-2xl mx-auto min-h-[50vh]">
+                    <div className="space-y-6 animate-in pb-10">
                     {currentSchedule.events.map((event, index) => {
                         const Icon = event.icon;
                         return (
                         <div 
                             key={index} 
-                            className="flex gap-4 relative group cursor-pointer"
+                            className="flex gap-5 relative group cursor-pointer"
                             onClick={() => setSelectedEvent(event)}
                         >
                             {/* Elegant Timeline Line */}
                             {index !== currentSchedule.events.length - 1 && (
-                            <div className="absolute left-[19px] top-12 bottom-[-24px] w-[1px] bg-slate-200 z-0"></div>
+                            <div className="absolute left-[21px] top-14 bottom-[-24px] w-[2px] bg-slate-200 z-0 group-hover:bg-slate-300 transition-colors"></div>
                             )}
                             
                             {/* Time Column */}
-                            <div className="flex flex-col items-center min-w-[40px] pt-1 z-10">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 bg-white border border-slate-100 group-hover:border-slate-300 text-slate-500`}>
-                                <Icon size={16} strokeWidth={1.5} />
+                            <div className="flex flex-col items-center min-w-[42px] pt-1 z-10">
+                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm transition-all duration-300 bg-white border-2 border-slate-100 group-hover:scale-110 group-hover:border-slate-300 text-slate-400`}>
+                                <Icon size={18} strokeWidth={2} />
                             </div>
                             </div>
 
                             {/* Content Card */}
-                            <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 relative overflow-hidden">
+                            <div className="flex-1 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1 relative overflow-hidden">
                             
-                            {/* Subtle Gradient Overlay on Hover */}
-                            <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 bg-gradient-to-r ${currentSchedule.theme}`}></div>
-
                             <div className="relative z-10">
-                                <div className="flex justify-between items-start mb-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-medium text-slate-700 text-lg tracking-tight font-serif">{event.time}</span>
+                                <div className="flex justify-between items-start mb-2.5">
+                                <div className="flex items-center gap-2.5">
+                                    <span className="font-bold text-slate-800 text-lg tracking-tight font-display">{event.time}</span>
                                     {event.endTime && (
-                                    <span className="text-slate-400 text-xs flex items-center font-light">
-                                        <ArrowRight size={10} className="mx-1" /> {event.endTime}
+                                    <span className="text-slate-400 text-xs flex items-center font-bold bg-slate-50 px-2 py-1 rounded-md font-sans">
+                                        <ArrowRight size={10} className="mr-1" /> {event.endTime}
                                     </span>
                                     )}
                                 </div>
                                 
-                                {/* Weather & Price Badges */}
                                 <div className="flex gap-2">
                                     {event.weather && (
-                                    <div className="flex items-center gap-1 text-[10px] text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+                                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
                                         <WeatherIcon type={event.weather.type} size={12} />
                                         <span>{event.weather.temp}</span>
                                     </div>
                                     )}
                                     {event.price && (
-                                    <span className="text-[10px] font-medium text-slate-500 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+                                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
                                         {event.price}
                                     </span>
                                     )}
                                 </div>
                                 </div>
                                 
-                                <h3 className="font-bold text-slate-800 mb-1 text-base">{event.title}</h3>
-                                <p className="text-xs text-slate-500 leading-relaxed font-light">{event.desc}</p>
+                                <h3 className="font-bold text-slate-800 mb-1.5 text-[17px] font-display">{event.title}</h3>
+                                <p className="text-sm text-slate-500 leading-relaxed font-medium mb-3 font-sans">{event.desc}</p>
                                 
-                                {event.warning && (
-                                <div className="mt-3 text-[10px] text-rose-500 flex items-center font-medium bg-rose-50 inline-block px-2 py-1 rounded">
-                                    <Info size={10} className="mr-1" /> {event.warning}
-                                </div>
-                                )}
-                                
-                                {/* Mini Indicators */}
-                                <div className="flex gap-2 mt-3 flex-wrap">
+                                {/* Keywords */}
+                                <div className="flex gap-2 flex-wrap">
                                 {event.keywords && event.keywords.map((k, i) => (
-                                    <span key={i} className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                    <span key={i} className="text-[10px] font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 font-sans">
                                     #{k}
                                     </span>
                                 ))}
@@ -691,47 +810,57 @@
                         );
                     })}
                     </div>
+
+                    {/* Daily Map Section */}
+                    <div className="mb-12 animate-in fade-in zoom-in duration-500">
+                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 font-display">
+                            <MapIcon size={14}/> 當日移動軌跡
+                        </h4>
+                        <div className="bg-white p-1 rounded-[1.5rem] shadow-lg border border-slate-100">
+                            <DailyMapView route={currentRoute} dayIndex={activeDay} />
+                        </div>
+                    </div>
                     
-                    <div className="mt-12 text-center pb-8 opacity-50">
+                    <div className="mt-8 text-center pb-8 opacity-50 font-display">
                     <div className="w-12 h-1 bg-slate-200 mx-auto rounded-full mb-2"></div>
-                    <p className="text-[10px] tracking-widest uppercase text-slate-400">Enjoy your trip</p>
+                    <p className="text-[10px] tracking-widest uppercase text-slate-400">Designed for Travelers</p>
                     </div>
                 </div>
 
                 {/* Detail Modal */}
                 {selectedEvent && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6">
                     <div 
-                        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
                         onClick={() => setSelectedEvent(null)}
                     ></div>
-                    <div className="bg-white relative z-10 w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-200">
+                    <div className="bg-white relative z-10 w-full sm:max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
                         
                         {/* Modal Header */}
-                        <div className={`p-6 bg-gradient-to-br ${currentSchedule.theme} text-white relative`}>
+                        <div className={`p-8 bg-gradient-to-br ${currentSchedule.theme} text-white relative`}>
                         <button 
                             onClick={() => setSelectedEvent(null)}
-                            className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 rounded-full p-1.5 transition-colors backdrop-blur-md"
+                            className="absolute top-6 right-6 bg-black/20 hover:bg-black/40 rounded-full p-2 transition-colors backdrop-blur-md z-50"
                         >
-                            <X size={16} />
+                            <X size={18} />
                         </button>
                         
-                        <div className="flex items-center gap-2 mb-3 opacity-80">
-                            <div className="bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
-                            <selectedEvent.icon size={16} />
+                        <div className="flex items-center gap-3 mb-4 opacity-90">
+                            <div className="bg-white/20 p-2 rounded-xl backdrop-blur-sm shadow-inner border border-white/20">
+                            <selectedEvent.icon size={20} />
                             </div>
-                            <span className="text-xs font-bold uppercase tracking-widest">
+                            <span className="text-xs font-black uppercase tracking-[0.15em] font-sans">
                             {selectedEvent.type.toUpperCase()}
                             </span>
                         </div>
                         
-                        <h3 className="text-2xl font-bold mb-1 font-serif">{selectedEvent.title}</h3>
-                        <div className="flex items-center text-white/90 text-sm font-light">
-                            <Clock size={14} className="mr-1.5" />
+                        <h3 className="text-3xl font-bold mb-2 leading-tight font-display">{selectedEvent.title}</h3>
+                        <div className="flex items-center text-white/80 text-sm font-medium font-sans">
+                            <Clock size={16} className="mr-2" />
                             {selectedEvent.time}
                             {selectedEvent.weather && (
-                                <span className="ml-4 flex items-center gap-1 border-l border-white/30 pl-4">
-                                <WeatherIcon type={selectedEvent.weather.type} size={14} className="text-white" />
+                                <span className="ml-4 flex items-center gap-1.5 pl-4 border-l border-white/20">
+                                <WeatherIcon type={selectedEvent.weather.type} size={16} className="text-white" />
                                 {selectedEvent.weather.temp} {selectedEvent.weather.loc}
                                 </span>
                             )}
@@ -739,69 +868,96 @@
                         </div>
 
                         {/* Modal Content */}
-                        <div className="p-6 overflow-y-auto bg-white">
+                        <div className="p-8 overflow-y-auto bg-[#fdfbf7]">
                         
-                        {/* Flight Info Section */}
+                        {/* Trap Insight */}
+                        {selectedEvent.insights?.trap && (
+                            <div className="mb-6 bg-rose-50 border border-rose-100 rounded-2xl p-5 shadow-sm">
+                                <h4 className="text-rose-700 font-bold text-xs flex items-center mb-2 uppercase tracking-wider font-display">
+                                    <AlertTriangle size={14} className="mr-2" />
+                                    雷區注意 Trap Warning
+                                </h4>
+                                <p className="text-rose-900/80 text-sm leading-relaxed font-medium">
+                                    {selectedEvent.insights.trap}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Japanese Vocabulary (New!) */}
+                        {selectedEvent.vocabulary && (
+                            <div className="mb-8">
+                                <h4 className="text-slate-400 font-black mb-4 text-xs flex items-center uppercase tracking-widest px-1 font-display">
+                                    <Languages size={14} className="mr-2" />
+                                    說文解字 Japanese
+                                </h4>
+                                <div className="grid gap-3">
+                                    {selectedEvent.vocabulary.map((vocab, i) => (
+                                        <div key={i} className="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+                                            <div className="flex items-baseline gap-3 mb-2">
+                                                <ruby className="text-2xl font-black text-stone-800 font-display tracking-tight">
+                                                    {vocab.term}
+                                                    <rt className="text-sm font-normal text-stone-500 font-sans">{vocab.reading}</rt>
+                                                </ruby>
+                                                <span className="text-xs font-bold text-stone-500 bg-stone-50 px-2 py-0.5 rounded-full border border-stone-100">{vocab.meaning}</span>
+                                            </div>
+                                            <p className="text-stone-600 text-sm leading-relaxed font-serif text-justify opacity-90 pl-1 border-l-2 border-stone-200">
+                                                {vocab.desc}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Flight Info */}
                         {selectedEvent.flightInfo && (
-                            <div className="mb-6 bg-sky-50/50 rounded-2xl p-5 border border-sky-100">
-                                <h4 className="text-sky-800 font-bold mb-4 flex items-center text-xs uppercase tracking-widest">
+                            <div className="mb-6 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                                <h4 className="text-sky-600 font-black mb-5 flex items-center text-xs uppercase tracking-widest font-display">
                                     <Ticket size={14} className="mr-2"/> Flight Schedule
                                 </h4>
-                                <div className="relative pl-2 border-l border-sky-200 space-y-5">
-                                    {/* Items... */}
-                                    <div className="relative pl-4">
-                                        <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-sky-300 ring-4 ring-white"></div>
-                                        <p className="text-xs text-slate-400 font-medium">12:10 Check-in</p>
+                                <div className="relative pl-3 border-l-2 border-sky-100 space-y-6">
+                                    <div className="relative pl-5">
+                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-sky-200 ring-4 ring-white"></div>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Check-in</p>
+                                        <p className="text-sm font-bold text-slate-700">12:10</p>
                                     </div>
-                                    <div className="relative pl-4">
-                                        <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-sky-400 ring-4 ring-white"></div>
-                                        <p className="text-xs text-slate-400 font-medium">13:55 Boarding</p>
+                                    <div className="relative pl-5">
+                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-sky-400 ring-4 ring-white"></div>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Boarding</p>
+                                        <p className="text-sm font-bold text-slate-700">13:55</p>
                                     </div>
-                                    <div className="relative pl-4">
-                                        <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-sky-600 ring-4 ring-white"></div>
-                                        <p className="text-sm text-slate-700 font-bold">{selectedEvent.flightInfo.departure}</p>
-                                        <p className="text-xs text-slate-500">Departure (TPE)</p>
+                                    <div className="relative pl-5">
+                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-sky-600 ring-4 ring-white"></div>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Departure</p>
+                                        <p className="text-base font-black text-slate-800">{selectedEvent.flightInfo.departure}</p>
                                     </div>
-                                    <div className="relative pl-4">
-                                        <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-sky-800 ring-4 ring-white"></div>
-                                        <p className="text-sm text-slate-700 font-bold">{selectedEvent.flightInfo.arrival}</p>
-                                        <p className="text-xs text-slate-500">Arrival (NRT)</p>
+                                    <div className="relative pl-5">
+                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-sky-800 ring-4 ring-white"></div>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Arrival</p>
+                                        <p className="text-base font-black text-slate-800">{selectedEvent.flightInfo.arrival}</p>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Timetable Section */}
+                        {/* Timetable */}
                         {selectedEvent.timetable && (
                             <div className="mb-6">
-                                <div className="flex justify-between items-end mb-3">
-                                    <h4 className="text-slate-800 font-bold text-sm flex items-center">
-                                    <List size={16} className="mr-2 text-slate-400"/> 
-                                    建議班次
-                                    </h4>
-                                    {selectedEvent.timetableUrl && (
-                                    <a 
-                                        href={selectedEvent.timetableUrl} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="text-[10px] flex items-center text-blue-500 hover:text-blue-700 font-medium bg-blue-50 px-2 py-1 rounded-full transition-colors"
-                                    >
-                                        官方時刻表 <ExternalLink size={10} className="ml-1" />
-                                    </a>
-                                    )}
-                                </div>
-                                <div className="bg-slate-50/50 rounded-2xl overflow-hidden border border-slate-100">
+                                <h4 className="text-slate-400 font-black text-xs uppercase tracking-widest flex items-center mb-3 px-1 font-display">
+                                    <List size={14} className="mr-2"/> 建議班次
+                                </h4>
+                                <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
                                 {selectedEvent.timetable.map((t, i) => (
-                                    <div key={i} className={`flex items-center justify-between px-4 py-3 border-b border-slate-100 last:border-0 ${t.highlight ? 'bg-white shadow-sm' : ''}`}>
-                                        <div className="flex items-center gap-3">
-                                        <span className={`font-mono text-base font-medium ${t.highlight ? 'text-slate-800' : 'text-slate-400'}`}>
+                                    <div key={i} className={`flex items-center justify-between px-5 py-3.5 border-b border-slate-50 last:border-0 ${t.highlight ? 'bg-emerald-50/30' : ''}`}>
+                                        <div className="flex items-center gap-4">
+                                        <span className={`font-mono text-base font-bold ${t.highlight ? 'text-emerald-700' : 'text-slate-400'}`}>
                                             {t.time}
                                         </span>
-                                        <span className={`text-xs ${t.highlight ? 'text-slate-700 font-medium' : 'text-slate-400'} ${t.isWarning ? 'text-rose-500 font-medium' : ''}`}>
+                                        <span className={`text-sm font-medium ${t.highlight ? 'text-slate-700' : 'text-slate-400'}`}>
                                             {t.label}
                                         </span>
                                         </div>
-                                        {t.highlight && <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>}
+                                        {t.highlight && <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shadow-sm shadow-emerald-200"></div>}
                                     </div>
                                 ))}
                                 </div>
@@ -810,94 +966,160 @@
 
                         {/* Outfit Suggestion */}
                         {selectedEvent.outfit && (
-                            <div className="mb-6 bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4">
-                            <h4 className="text-indigo-800 font-bold mb-2 text-sm flex items-center">
-                                <Shirt size={14} className="mr-2" />
-                                穿搭指南 (OOTD)
-                            </h4>
-                            <p className="text-indigo-900/80 text-sm leading-relaxed">
-                                {selectedEvent.outfit}
-                            </p>
+                            <div className="mb-6 bg-white border border-indigo-100 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-50 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+                                <div className="relative z-10">
+                                    <h4 className="text-indigo-600 font-bold mb-3 text-xs flex items-center uppercase tracking-widest font-display">
+                                        <Shirt size={14} className="mr-2" />
+                                        穿搭指南 OOTD
+                                    </h4>
+                                    <p className="text-slate-600 text-sm leading-relaxed font-medium">
+                                        {selectedEvent.outfit}
+                                    </p>
+                                </div>
                             </div>
                         )}
 
-                        <div className="mb-6">
-                            <h4 className="text-slate-800 font-bold mb-2 text-sm">About</h4>
-                            <p className="text-slate-500 leading-relaxed text-sm font-light">
+                        <div className="mb-8">
+                            <h4 className="text-slate-400 font-black mb-3 text-xs uppercase tracking-widest px-1 font-display">About</h4>
+                            <p className="text-slate-600 leading-relaxed text-sm font-medium bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                             {selectedEvent.details}
                             </p>
                         </div>
 
-                        {/* Structured Insight Section */}
+                        {/* Insights (7 Dimensions) */}
                         {selectedEvent.insights && (
-                            <div className="mb-6 space-y-3">
-                            <h4 className="text-slate-800 font-bold text-sm flex items-center mb-3">
-                                <Info size={14} className="mr-2 text-amber-500" />
+                            <div className="mb-8 space-y-4">
+                            <h4 className="text-slate-400 font-black text-xs flex items-center px-1 uppercase tracking-widest font-display">
+                                <Info size={14} className="mr-2" />
                                 深度情報 Insight
                             </h4>
                             
+                            {/* Shopping Insight */}
+                            {selectedEvent.insights.shopping && (
+                                <div className="bg-white border border-pink-100 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-pink-400 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Gift size={14} className="text-pink-500"/>
+                                        <span className="text-xs font-bold text-pink-600 uppercase tracking-wider font-display">選品指南</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
+                                        {selectedEvent.insights.shopping}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Economy Insight */}
+                            {selectedEvent.insights.economy && (
+                                <div className="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-blue-500 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <TrendingUp size={14} className="text-blue-600"/>
+                                        <span className="text-xs font-bold text-blue-700 uppercase tracking-wider font-display">財經觀察</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
+                                        {selectedEvent.insights.economy}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Business Insight */}
+                            {selectedEvent.insights.business && (
+                                <div className="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-blue-500 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Briefcase size={14} className="text-blue-600"/>
+                                        <span className="text-xs font-bold text-blue-700 uppercase tracking-wider font-display">商業模式</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
+                                        {selectedEvent.insights.business}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Creative Insight */}
+                            {selectedEvent.insights.creative && (
+                                <div className="bg-white border border-purple-100 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-purple-400 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Lightbulb size={14} className="text-purple-500"/>
+                                        <span className="text-xs font-bold text-purple-600 uppercase tracking-wider font-display">創意視角</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
+                                        {selectedEvent.insights.creative}
+                                    </p>
+                                </div>
+                            )}
+
                             {/* Local Insight */}
                             {selectedEvent.insights.local && (
-                                <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-3.5">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                    <Users size={12} className="text-rose-600"/>
-                                    <span className="text-xs font-bold text-rose-700 uppercase tracking-wider">當地人觀點</span>
-                                </div>
-                                <p className="text-slate-700 text-sm leading-relaxed italic">
-                                    {selectedEvent.insights.local}
-                                </p>
+                                <div className="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-rose-400 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Users size={14} className="text-rose-500"/>
+                                        <span className="text-xs font-bold text-rose-600 uppercase tracking-wider font-display">當地人觀點</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed italic font-medium pl-1">
+                                        {selectedEvent.insights.local}
+                                    </p>
                                 </div>
                             )}
 
                             {/* Travel Insight */}
                             {selectedEvent.insights.travel && (
-                                <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3.5">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                    <Compass size={12} className="text-emerald-600"/>
-                                    <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">旅遊實戰</span>
-                                </div>
-                                <p className="text-slate-700 text-sm leading-relaxed">
-                                    {selectedEvent.insights.travel}
-                                </p>
+                                <div className="bg-white border border-emerald-100 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-emerald-400 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Compass size={14} className="text-emerald-500"/>
+                                        <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider font-display">旅遊實戰</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
+                                        {selectedEvent.insights.travel}
+                                    </p>
                                 </div>
                             )}
 
-                            {/* Culture/History Insight */}
+                            {/* Culture Insight */}
                             {selectedEvent.insights.culture && (
-                                <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-3.5">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                    <BookOpen size={12} className="text-amber-600"/>
-                                    <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">文化歷史</span>
-                                </div>
-                                <p className="text-slate-700 text-sm leading-relaxed">
-                                    {selectedEvent.insights.culture}
-                                </p>
+                                <div className="bg-white border border-amber-100 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-amber-400 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <BookOpen size={14} className="text-amber-500"/>
+                                        <span className="text-xs font-bold text-amber-600 uppercase tracking-wider font-display">文化歷史</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
+                                        {selectedEvent.insights.culture}
+                                    </p>
                                 </div>
                             )}
 
-                            {/* Tech/Eco Insight */}
-                            {selectedEvent.insights.tech && (
-                                <div className="bg-sky-50/50 border border-sky-100 rounded-xl p-3.5">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                    <Zap size={12} className="text-sky-600"/>
-                                    <span className="text-xs font-bold text-sky-700 uppercase tracking-wider">經濟科技</span>
-                                </div>
-                                <p className="text-slate-700 text-sm leading-relaxed">
-                                    {selectedEvent.insights.tech}
-                                </p>
+                            {/* History Insight */}
+                            {selectedEvent.insights.history && (
+                                <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-stone-500 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <BookOpen size={14} className="text-stone-600"/>
+                                        <span className="text-xs font-bold text-stone-700 uppercase tracking-wider font-display">歷史脈絡</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
+                                        {selectedEvent.insights.history}
+                                    </p>
                                 </div>
                             )}
-                            </div>
-                        )}
-                        
-                        {/* Keywords Tags */}
-                        {selectedEvent.keywords && (
-                            <div className="mb-6 flex flex-wrap gap-2">
-                            {selectedEvent.keywords.map((k, i) => (
-                                <span key={i} className="text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 flex items-center">
-                                    <Tag size={10} className="mr-1 opacity-50"/> {k}
-                                </span>
-                            ))}
+
+                            {/* Tech Insight */}
+                            {selectedEvent.insights.tech && (
+                                <div className="bg-white border border-sky-100 rounded-2xl p-5 shadow-sm relative">
+                                    <div className="absolute left-0 top-6 w-1 h-8 bg-sky-400 rounded-r-full"></div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Zap size={14} className="text-sky-500"/>
+                                        <span className="text-xs font-bold text-sky-600 uppercase tracking-wider font-display">經濟科技</span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
+                                        {selectedEvent.insights.tech}
+                                    </p>
+                                </div>
+                            )}
                             </div>
                         )}
 
@@ -906,10 +1128,10 @@
                             href={`https://www.google.com/maps/search/?api=1&query=${selectedEvent.locationQuery}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className={`flex items-center justify-center w-full py-3.5 text-white rounded-xl font-medium transition-all shadow-lg shadow-slate-200 active:scale-95 bg-gradient-to-r ${currentSchedule.theme}`}
+                            className={`flex items-center justify-center w-full py-4 text-white rounded-2xl font-bold tracking-wide transition-all shadow-xl shadow-blue-200/50 active:scale-95 bg-gradient-to-r ${currentSchedule.theme}`}
                         >
-                            <Map size={16} className="mr-2" />
-                            Open in Google Maps
+                            <MapIcon size={18} className="mr-2" />
+                            開啟 Google Maps
                         </a>
                         </div>
                     </div>
