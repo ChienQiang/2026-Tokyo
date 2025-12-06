@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOKYO TRIP</title>
+    <title>東京紀行 2025 (風格大亂鬥版)</title>
     
     <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,7 +11,7 @@
     <!-- 2. Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;900&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;500;700;900&family=Shippori+Mincho:wght@400;600;800&family=Yomogi&family=Rye&family=Courier+Prime&family=Michroma&family=Potta+One&family=Dela+Gothic+One&family=Share+Tech+Mono&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Shippori+Mincho+B1:wght@700&display=swap" rel="stylesheet">
 
     <!-- 3. Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -33,27 +33,208 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        body { font-family: 'Noto Serif JP', serif; }
-        h1, h2, h3, h4, .font-display { font-family: 'Zen Old Mincho', serif; }
+        /* 基礎風格 */
+        body { 
+            font-family: 'Shippori Mincho', 'Noto Serif JP', serif; 
+            background-color: #f9f8f6;
+            color: #2c2c2c;
+            background-image: radial-gradient(#e5e5e5 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        h1, h2, h3, .font-display { font-family: 'Zen Old Mincho', serif; }
+
+        /* --- STYLES --- */
+
+        /* 🎬 今敏 (Kon) */
+        .style-kon {
+            font-family: 'Noto Sans JP', sans-serif !important;
+            background-color: #050505 !important; color: #e0e0e0 !important; border: 1px solid #333;
+        }
+        .style-kon h3 { font-weight: 900; letter-spacing: 0.1em; text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; }
+        .style-kon .kon-border::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #ff0000 0%, #0000ff 50%, #ff0000 100%);
+            animation: kon-glitch 2s infinite linear;
+        }
+        @keyframes kon-glitch { 0% { background-position: 0% 0%; } 100% { background-position: 100% 0%; } }
+
+        /* 🟡 草間彌生 (Kusama) */
+        .style-kusama {
+            background-color: #fbbf24 !important;
+            background-image: radial-gradient(black 30%, transparent 31%), radial-gradient(black 30%, transparent 31%) !important;
+            background-size: 20px 20px !important; background-position: 0 0, 10px 10px !important;
+            color: black !important; font-family: 'Noto Sans JP', sans-serif; font-weight: 900;
+            border: 4px solid black !important; border-radius: 0 !important;
+        }
+        .style-kusama .inner-card { background: white; border: 2px solid black; padding: 15px; box-shadow: 5px 5px 0 black; color: black; }
+
+        /* 🍃 吉卜力 (Ghibli) */
+        .style-ghibli {
+            background-color: #f0fdf4 !important; color: #14532d !important;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E") !important;
+            font-family: 'Zen Old Mincho', serif; border: none !important; border-radius: 24px !important;
+            box-shadow: 0 10px 30px -10px rgba(22, 101, 52, 0.3) !important;
+        }
+        .style-ghibli h3 { font-family: 'Yomogi', cursive; }
+
+        /* 📰 東京日日 (Retro) */
+        .style-retro {
+            background-color: #f5f5dc !important; color: #262626 !important; font-family: 'Shippori Mincho', serif;
+            border: 1px solid #444 !important; box-shadow: 10px 10px 0 rgba(0,0,0,0.1) !important; border-radius: 2px !important;
+        }
+        .style-retro h3 { border-bottom: 3px double #262626; padding-bottom: 5px; margin-bottom: 15px; font-weight: 900; }
+
+        /* 👧 奈良美智 (Nara) */
+        .style-nara {
+            background-color: #fffbeb !important; color: #57534e !important; font-family: 'Yomogi', cursive !important;
+            border: 2px dashed #d6d3d1 !important; border-radius: 30px !important; padding: 20px !important;
+        }
+        .style-nara h3 { color: #0ea5e9; font-size: 2rem; }
+
+        /* 🏴‍☠️ 航海王 (One Piece) */
+        .style-onepiece {
+            background-color: #f3e5ab !important; color: #4a3b2a !important; font-family: 'Rye', serif !important;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4c596' fill-opacity='0.4'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/g%3E%3C/svg%3E") !important;
+            border: 8px double #4a3b2a !important; border-radius: 4px !important;
+        }
+        .style-onepiece h3 { font-size: 2.5rem; text-transform: uppercase; text-align: center; border-bottom: 2px solid #4a3b2a; margin-bottom: 20px; }
+
+        /* ⚔️ Style 7: 銀魂 (Gintama) - 萬事屋 */
+        .style-gintama {
+            background-color: #fff !important; color: #0f172a !important; font-family: 'Potta One', cursive !important;
+            background-image: repeating-linear-gradient(45deg, #e0f2fe 25%, transparent 25%, transparent 75%, #e0f2fe 75%, #e0f2fe), repeating-linear-gradient(45deg, #e0f2fe 25%, #fff 25%, #fff 75%, #e0f2fe 75%, #e0f2fe) !important;
+            background-size: 20px 20px !important; border: 4px solid #000 !important;
+        }
+        .style-gintama h3 { font-size: 2rem; transform: rotate(-2deg); background: white; border: 2px solid black; padding: 5px; box-shadow: 4px 4px 0 #0ea5e9; }
+
+        /* 🧪 Style 8: GAIAC 10 (Le Labo) - 工業極簡 */
+        .style-gaiac {
+            background-color: #e5e5e5 !important; color: #111 !important; font-family: 'Courier Prime', monospace !important;
+            border: 1px solid #111 !important; border-radius: 0 !important; padding: 40px !important; box-shadow: none !important;
+        }
+        .style-gaiac h3 { text-transform: uppercase; font-weight: 400; letter-spacing: 2px; font-size: 1.5rem; border-bottom: 1px solid #111; padding-bottom: 10px; margin-bottom: 20px; }
+
+        /* 📐 Style 9: 三宅一生 (Miyake) - 幾何摺疊 */
+        .style-miyake {
+            background: #fff !important; color: #000 !important; font-family: 'Michroma', sans-serif !important;
+            border: none !important; box-shadow: 0 20px 50px rgba(0,0,0,0.1) !important;
+            background-image: linear-gradient(90deg, transparent 50%, rgba(0,0,0,0.05) 50%) !important; background-size: 10px 100% !important;
+        }
+        .style-miyake h3 { font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; }
+
+        /* 💿 Style 10: 東京威力科創 (TEL) - 科技精密 */
+        .style-tel {
+            background-color: #001f3f !important; color: #00aaff !important; font-family: 'Share Tech Mono', monospace !important;
+            border: 1px solid #00aaff !important; box-shadow: 0 0 15px rgba(0, 170, 255, 0.4) !important;
+            background-image: linear-gradient(0deg, transparent 24%, rgba(0, 170, 255, .3) 25%, rgba(0, 170, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 170, 255, .3) 75%, rgba(0, 170, 255, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 170, 255, .3) 25%, rgba(0, 170, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 170, 255, .3) 75%, rgba(0, 170, 255, .3) 76%, transparent 77%, transparent) !important;
+            background-size: 50px 50px !important;
+        }
+        .style-tel h3 { text-shadow: 0 0 5px #00aaff; letter-spacing: 2px; }
+
+        /* 📖 Style 11: 石黑一雄 (Ishiguro) - 記憶與遺憾 */
+        .style-ishiguro {
+            background-color: #f3f0e9 !important; color: #5c5548 !important; font-family: 'Cormorant Garamond', serif !important;
+            border: 1px solid #d4cbb8 !important; padding: 40px !important;
+        }
+        .style-ishiguro h3 { font-style: italic; font-weight: 400; font-size: 2.2rem; border-bottom: 1px solid #d4cbb8; margin-bottom: 20px; padding-bottom: 10px; }
+
+        /* 🌈 Style 12: 原宿 (Harajuku) - KAWAII MONSTER */
+        .style-harajuku {
+            background-color: #ffccff !important; color: #6600cc !important; font-family: 'Dela Gothic One', cursive !important;
+            border: 6px dashed #00ffff !important; border-radius: 20px !important;
+            box-shadow: 8px 8px 0 #ff00cc !important;
+        }
+        .style-harajuku h3 { text-shadow: 2px 2px 0 #fff; transform: rotate(-3deg); background: #ffff00; padding: 5px; display: inline-block; }
+
+        /* 🌲 Style 13: 大江建三郎 (Oe) - 森林與存在 */
+        .style-oe {
+            background-color: #2c3328 !important; color: #e2e8d8 !important; font-family: 'Shippori Mincho B1', serif !important;
+            border-left: 10px solid #5f6b55 !important; border-radius: 0 !important;
+        }
+        .style-oe h3 { font-weight: 900; letter-spacing: 0.1em; border-bottom: 1px solid #5f6b55; padding-bottom: 15px; margin-bottom: 20px; }
+
+        /* 🎓 Style 14: 東京大學 (Todai) - 學術與赤門 */
+        .style-todai {
+            background-color: #fffbeb !important; /* 象牙白 */
+            color: #1a1a1a !important; 
+            font-family: 'Zen Old Mincho', serif !important;
+            border: 4px solid #7f1d1d !important; /* 赤門紅 */
+            box-shadow: 10px 10px 0 #eab308 !important; /* 銀杏黃 */
+            border-radius: 4px !important;
+        }
+        .style-todai h3 { 
+            font-weight: 900; 
+            border-bottom: 2px solid #7f1d1d; 
+            padding-bottom: 10px; 
+            margin-bottom: 20px;
+            color: #7f1d1d;
+        }
+
+        /* 🦅 Style 15: 高市早苗 (Sanae) - 鐵娘子戰略 */
+        .style-sanae {
+            background-color: #1e3a8a !important; /* Navy Blue */
+            color: #ffffff !important; /* Ensure white text for contrast */
+            font-family: 'Noto Sans JP', sans-serif !important;
+            border: 2px solid #fcd34d !important; /* Gold */
+            border-radius: 0 !important;
+            background-image: linear-gradient(45deg, #172554 25%, transparent 25%, transparent 75%, #172554 75%, #172554), linear-gradient(45deg, #172554 25%, transparent 25%, transparent 75%, #172554 75%, #172554) !important;
+            background-size: 20px 20px !important;
+            background-position: 0 0, 10px 10px !important;
+        }
+        .style-sanae h3 { 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            letter-spacing: 0.2em; 
+            color: #fcd34d !important;
+            border-bottom: 4px solid #fcd34d;
+        }
+
+        /* 🌉 Style 16: 勝鬨橋 (Kachidoki) - 工業結構 */
+        .style-kachidoki {
+            background-color: #334155 !important; /* Slate 700 */
+            color: #e2e8f0 !important;
+            font-family: 'Share Tech Mono', monospace !important;
+            border: 4px dashed #94a3b8 !important; /* Rivet look */
+            border-radius: 10px !important;
+            box-shadow: inset 0 0 20px #0f172a !important;
+        }
+        .style-kachidoki h3 { 
+            text-shadow: 0 0 10px #38bdf8; 
+            color: #38bdf8 !important;
+            font-weight: 400;
+        }
+
+        /* 🏢 Style 17: 住友商事 (Sumitomo) - 財閥與信用 */
+        .style-sumitomo {
+            background-color: #064e3b !important; /* Deep Green */
+            color: #ffffff !important;
+            font-family: 'Noto Serif JP', serif !important;
+            border: 3px solid #f59e0b !important; /* Gold border */
+            border-radius: 2px !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3) !important;
+        }
+        .style-sumitomo h3 {
+            font-weight: 700;
+            border-bottom: 1px solid #f59e0b;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            color: #f59e0b !important;
+            letter-spacing: 0.1em;
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
-        .leaflet-container { font-family: 'Noto Serif JP', serif; z-index: 0; background: #fdfbf7; }
+        .animate-in { animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .leaflet-container { font-family: 'Shippori Mincho', serif; z-index: 0; background: #f6f5f3; filter: contrast(0.95) sepia(0.05); }
         .custom-div-icon { background: transparent; border: none; }
-        .map-label {
-            background: transparent; border: none; box-shadow: none;
-            font-family: 'Zen Old Mincho', serif; font-weight: 900; font-size: 13px; color: #1e293b;
-            text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
-        }
+        .map-label { background: rgba(255, 255, 255, 0.95); border: 1px solid #d1d5db; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-family: 'Zen Old Mincho', serif; font-weight: 700; font-size: 13px; color: #374151; padding: 4px 8px; border-radius: 2px; }
         .leaflet-tooltip-left:before, .leaflet-tooltip-right:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-top:before { border: none !important; }
-        
-        /* Ruby 樣式優化 */
         ruby { font-family: 'Zen Old Mincho', serif; }
-        rt { font-family: 'Noto Serif JP', serif; font-size: 0.5em; opacity: 0.8; letter-spacing: 0.05em; }
+        rt { font-family: 'Shippori Mincho', serif; font-size: 0.55em; opacity: 0.7; letter-spacing: 0.05em; color: inherit; }
     </style>
 </head>
-<body class="bg-[#fdfbf7] text-slate-800">
+<body>
     
     <div id="root"></div>
 
@@ -64,10 +245,10 @@
             Plane, Train, Hotel, MapPin, Camera, ShoppingBag, Home, Clock, 
             ArrowRight, Utensils, X, Map as MapIcon, Ticket, List, ExternalLink, 
             Cloud, Sun, CloudSnow, CloudRain, Info, Shirt, Tag, 
-            Compass, BookOpen, Zap, Users, ListFilter, AlertTriangle, Lightbulb, Briefcase, TrendingUp, Languages, Gift, Landmark
+            Compass, BookOpen, Zap, Users, ListFilter, AlertTriangle, Lightbulb, Briefcase, TrendingUp, Languages, Gift, Landmark, Moon, Palette, Anchor, Skull
         } from 'lucide-react';
 
-        // --- 單日地圖組件 ---
+        // --- 地圖組件 ---
         const DailyMapView = ({ route, dayIndex }) => {
             const mapRef = useRef(null);
             const mapInstanceRef = useRef(null);
@@ -80,7 +261,7 @@
                     mapInstanceRef.current = L.map(mapRef.current, {
                         zoomControl: false, attributionControl: false, scrollWheelZoom: false 
                     });
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                         subdomains: 'abcd', maxZoom: 19
                     }).addTo(mapInstanceRef.current);
                 }
@@ -90,26 +271,25 @@
                     if (layer instanceof L.Polyline || layer instanceof L.Marker || layer instanceof L.CircleMarker) { map.removeLayer(layer); }
                 });
 
-                const colors = ['#1e40af', '#475569', '#047857', '#6d28d9', '#0284c7'];
+                const colors = ['#0f172a', '#44403c', '#064e3b', '#4c1d95', '#0c4a6e'];
                 const color = colors[dayIndex % colors.length];
 
                 if (route && route.path.length > 0) {
-                    L.polyline(route.path, { color: color, weight: 3, opacity: 0.7, dashArray: '2, 8', lineCap: 'square', lineJoin: 'miter' }).addTo(map);
+                    L.polyline(route.path, { color: color, weight: 2.5, opacity: 0.8, dashArray: '6, 8', lineCap: 'square' }).addTo(map);
                     if (route.stops) {
                         route.stops.forEach(stop => {
-                            L.circleMarker(stop.coord, { radius: 5, fillColor: '#fff', color: color, weight: 2, fillOpacity: 1 })
-                            .bindTooltip(stop.name, { permanent: true, direction: 'bottom', offset: [0, 5], className: 'map-label' })
-                            .bindPopup(`<div class="text-sm font-serif"><div class="font-bold text-slate-800 mb-1 font-display">${stop.name}</div><div class="text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100">名所: <span class="font-medium text-slate-700">${stop.landmark}</span></div></div>`)
+                            L.circleMarker(stop.coord, { radius: 4, fillColor: '#fff', color: color, weight: 2, fillOpacity: 1 })
+                            .bindTooltip(stop.name, { permanent: true, direction: 'bottom', offset: [0, 6], className: 'map-label' })
                             .addTo(map);
                         });
                     }
                     const bounds = L.latLngBounds(route.path);
-                    map.fitBounds(bounds, { padding: [50, 50] });
+                    map.fitBounds(bounds, { padding: [60, 60] });
                 }
                 setTimeout(() => { map.invalidateSize(); }, 100);
             }, [route]);
 
-            return <div ref={mapRef} className="h-[320px] w-full rounded-xl shadow-sm border border-slate-200 z-0 relative" />;
+            return <div ref={mapRef} className="h-[350px] w-full rounded-md border border-stone-200 z-0 relative shadow-sm" />;
         };
 
         const TripApp = () => {
@@ -125,20 +305,20 @@
             };
 
             const mapRoutes = [
-                { id: 'day1', path: [coords.nrt, coords.roppongi], stops: [{ name: "成田空港", coord: coords.nrt, landmark: "新勝寺" }, { name: "六本木", coord: coords.roppongi, landmark: "東京タワー" }] },
-                { id: 'day2', path: [coords.roppongi, coords.ginza, coords.hibiya, coords.roppongi], stops: [{ name: "六本木", coord: coords.roppongi, landmark: "森美術館" }, { name: "銀座", coord: coords.ginza, landmark: "和光時計塔" }, { name: "日比谷", coord: coords.hibiya, landmark: "皇居" }] },
-                { id: 'day3', path: [coords.roppongi, coords.tokyoSt, coords.takasaki, coords.daruma, coords.takasaki, coords.karuizawa, coords.kusatsu], stops: [{ name: "東京", coord: coords.tokyoSt, landmark: "丸の内" }, { name: "高崎", coord: coords.takasaki, landmark: "白衣観音" }, { name: "草津", coord: coords.kusatsu, landmark: "湯畑" }] },
-                { id: 'day4', path: [coords.kusatsu, coords.karuizawa, coords.tokyoSt, coords.yokohama, coords.redbrick], stops: [{ name: "草津", coord: coords.kusatsu, landmark: "西の河原" }, { name: "軽井沢", coord: coords.karuizawa, landmark: "アウトレット" }, { name: "横浜", coord: coords.yokohama, landmark: "みなとみらい" }] },
-                { id: 'day5', path: [coords.yokohama, coords.shinyokohama, coords.nrt], stops: [{ name: "横浜", coord: coords.yokohama, landmark: "中華街" }, { name: "新横浜", coord: coords.shinyokohama, landmark: "ラーメン博物館" }, { name: "成田", coord: coords.nrt, landmark: "出発ロビー" }] }
+                { id: 'day1', path: [coords.nrt, coords.roppongi], stops: [{ name: "成田", coord: coords.nrt, landmark: "" }, { name: "六本木", coord: coords.roppongi, landmark: "" }] },
+                { id: 'day2', path: [coords.roppongi, coords.ginza, coords.hibiya, coords.roppongi], stops: [{ name: "六本木", coord: coords.roppongi, landmark: "" }, { name: "銀座", coord: coords.ginza, landmark: "" }, { name: "日比谷", coord: coords.hibiya, landmark: "" }] },
+                { id: 'day3', path: [coords.roppongi, coords.tokyoSt, coords.takasaki, coords.daruma, coords.takasaki, coords.karuizawa, coords.kusatsu], stops: [{ name: "東京", coord: coords.tokyoSt, landmark: "" }, { name: "高崎", coord: coords.takasaki, landmark: "" }, { name: "草津", coord: coords.kusatsu, landmark: "" }] },
+                { id: 'day4', path: [coords.kusatsu, coords.karuizawa, coords.tokyoSt, coords.yokohama, coords.redbrick], stops: [{ name: "草津", coord: coords.kusatsu, landmark: "" }, { name: "軽井沢", coord: coords.karuizawa, landmark: "" }, { name: "横浜", coord: coords.yokohama, landmark: "" }] },
+                { id: 'day5', path: [coords.yokohama, coords.shinyokohama, coords.nrt], stops: [{ name: "横浜", coord: coords.yokohama, landmark: "" }, { name: "新横浜", coord: coords.shinyokohama, landmark: "" }, { name: "成田", coord: coords.nrt, landmark: "" }] }
             ];
 
             const WeatherIcon = ({ type, size = 14, className }) => {
                 switch(type) {
-                case 'sun': return <Sun size={size} className={`text-amber-500 ${className}`} />;
-                case 'cloud': return <Cloud size={size} className={`text-slate-400 ${className}`} />;
+                case 'sun': return <Sun size={size} className={`text-amber-600 ${className}`} />;
+                case 'cloud': return <Cloud size={size} className={`text-stone-400 ${className}`} />;
                 case 'snow': return <CloudSnow size={size} className={`text-cyan-600 ${className}`} />;
-                case 'rain': return <CloudRain size={size} className={`text-blue-500 ${className}`} />;
-                default: return <Sun size={size} className={`text-amber-500 ${className}`} />;
+                case 'rain': return <CloudRain size={size} className={`text-blue-600 ${className}`} />;
+                default: return <Sun size={size} className={`text-amber-600 ${className}`} />;
                 }
             };
 
@@ -146,36 +326,33 @@
                 {
                 date: "12/19",
                 day: "金曜日(Fri)",
-                title: "光と影の序章 (Prologue of Light and Shadow)",
+                title: "光と影の序章",
+                subtitle: "Prologue of Light and Shadow",
                 location: "台北 → 東京 → 六本木",
-                theme: "from-slate-800 to-slate-900", 
-                themeBtn: "bg-slate-800",
+                theme: { main: "text-slate-900", sub: "text-slate-600", btn: "bg-slate-800" },
                 events: [
                     { 
                     time: "14:40", 
                     endTime: "19:00", 
                     type: "flight", 
-                    title: "飛往東京 (TR874)", 
-                    desc: "桃園 TPE → 成田 NRT", 
-                    details: "搭乘酷航 TR874 夢幻客機。舒適的飛行是旅行完美的起點。",
+                    title: "飛往東京：啟程", 
+                    desc: "搭乘酷航 TR874 夢幻客機。", 
+                    details: "LABORATORY: GAIAC 10 // TOKYO \n\n成分：檜木、麝香、癒創木、乳香。\n\n狀態：飛行中。\n\n這不僅是一次移動，而是一場嗅覺的淨化。脫離地面的瞬間，如同噴灑在試紙上的前調，清冽而充滿期待。艙內的乾燥空氣混合著淡淡的皮革味，這是旅行專屬的氣息。",
                     locationQuery: "Taoyuan International Airport Terminal 1",
                     icon: Plane,
+                    style: 'gaiac', // GAIAC 10 Style
                     weather: { type: 'cloud', temp: '18°C', loc: 'TPE' },
-                    keywords: ["夢幻客機787", "高CP值", "準點率"],
-                    outfit: "機艙冷氣強且乾燥，建議帶件連帽薄外套，並準備空水瓶過安檢後裝水。",
+                    keywords: ["Le Labo", "Woody", "Musk"],
+                    outfit: "機艙內氣壓較低且乾燥。建議穿著純棉材質，保持極簡。",
                     insights: {
-                        travel: "酷航這班通常用波音 787 廣體客機執飛，舒適度勝過一般窄體廉航。",
-                        local: "「看到台灣遊客大包小包真的很親切。不過在成田機場搭電車時，請盡量將行李排成一列。」",
-                        trap: "成田機場的 SIM 卡販賣機通常比市區貴很多。建議去B1樓層的便利商店找找。",
+                        travel: "酷航這班通常用波音 787 廣體客機執飛。",
                         creative: "夢幻客機的窗戶調光技術，讓機艙內的光線變化像水彩暈染一樣柔和。",
-                        business: "【第五航權經濟】酷航這條線是新加坡-台北-東京，利用第五航權載客。這條黃金航線的載客率極高。",
-                        history: "【成田抗爭】成田機場的建設史是日本戰後最激烈的警民衝突之一。至今機場內仍有未撤離的「釘子戶」農田。",
-                        politics: "【天空的國界】成田機場的選址與建設曾引發著名的「三里塚鬥爭」，這場政府與農民的長期對抗，深刻影響了日本公共建設的土地徵收政策，使其變得極度謹慎。",
-                        shopping: "【機場限定】若在成田看到「New York Perfect Cheese」且不用排隊，請務必掃貨。它是目前東京最夯的伴手禮，市區經常缺貨。"
+                        history: "【成田抗爭】成田機場的建設史是日本戰後最激烈的警民衝突之一。",
+                        shopping: "【機場限定】若在成田看到「New York Perfect Cheese」且不用排隊，請務必掃貨。"
                     },
                     vocabulary: [
-                        { term: "搭乗", reading: "とうじょう", meaning: "登機", desc: "「搭」是乘坐，「乗」也是乘坐。雙重的乘坐之意，展現了對交通工具的慎重感。" },
-                        { term: "手荷物", reading: "てにもつ", meaning: "隨身行李", desc: "「手」提的「荷物」（貨物）。如果是託運的行李，則稱為「預け入れ荷物 (あずけいれにもつ)」。" }
+                        { term: "搭乗", reading: "とうじょう", meaning: "登機", desc: "「搭」是乘坐，「乗」也是乘坐。雙重的乘坐之意。" },
+                        { term: "手荷物", reading: "てにもつ", meaning: "隨身行李", desc: "「手」提的「荷物」（貨物）。" }
                     ],
                     flightInfo: { checkIn: "12:10", boarding: "13:55", departure: "14:40", arrival: "19:00", terminal: "T1" }
                     },
@@ -183,79 +360,73 @@
                     time: "19:40", 
                     endTime: "20:50", 
                     type: "transport", 
-                    title: "前往六本木", 
-                    desc: "成田特急 N'EX", 
-                    details: "若搭乘 N'EX 請至東京站轉乘。建議買來回套票。",
+                    title: "成田特急 N'EX", 
+                    desc: "前往六本木的紅色閃電", 
+                    details: "降落後，我們將搭乘 JR 的招牌列車「成田特急 (Narita Express)」。車窗外的景色從黑暗的田野瞬間切換到刺眼的都市霓虹，這不僅是物理上的移動，更像是一場意識流的剪接。紅黑配色的車體，如同警告信號般劃破夜空。",
                     locationQuery: "六本木駅",
                     icon: Train,
+                    style: 'kon', // Kon Style
                     weather: { type: 'rain', temp: '8°C', loc: 'Tokyo' },
-                    keywords: ["全車指定席", "外國人優惠", "直達市區"],
-                    outfit: "日本電車暖氣像不用錢一樣熱，進車廂絕對要脫外套。",
+                    keywords: ["現實的邊界", "紅色閃電", "都市進入"],
+                    outfit: "日本電車暖氣通常開得非常強（約25度以上）。進車廂後建議立刻脫下厚外套。",
                     insights: {
                         travel: "外國人憑護照買『N'EX 東京去回車票 (¥5000)』最划算，比單程買省下近 4000 日圓。",
                         local: "「說實話，我們當地人覺得 N'EX 原價太貴了，通常都搭快速電車或巴士。」",
-                        trap: "N'EX 是「全車指定席」，千萬別拿西瓜卡 (Suica) 直接刷進站！",
-                        creative: "N'EX 車頭的紅黑白配色靈感來自歌舞伎的臉譜與成田機場的跑道意象。",
-                        business: "【差別定價策略】JR 東日本對外國人提供大幅折扣，旨在搶攻入境旅遊市場份額。",
-                        history: "【國鐵民營化】N'EX 的誕生是 1987 年日本國鐵民營化為 JR 後，為了改善「成田機場交通不便」惡名而推出的戰略車種。",
-                        shopping: "【鐵道周邊】N'EX 車上購物型錄有時會有獨家的鐵道模型或聯名商品，是鐵道迷不可錯過的收藏。"
+                        creative: "車窗外的景色從黑暗的田野瞬間切換到刺眼的都市霓虹，這不僅是物理上的移動，更像是一場意識流的剪接。",
+                        business: "【差別定價策略】JR 東日本對外國人提供大幅折扣，旨在搶攻入境旅遊市場份額，對抗京成電鐵 Skyliner 的速度優勢。"
                     },
                     vocabulary: [
-                        { term: "指定席", reading: "していせき", meaning: "對號座", desc: "「指」是手指，「定」是決定。明確指出並決定好的位子。沒買這票坐下去會被車掌請起來喔。" },
-                        { term: "改札", reading: "かいさつ", meaning: "剪票口", desc: "「改」是檢查，「札」是票券。雖然現在都用 IC 卡感應，但漢字依然保留了人工剪票時代的動作。" }
+                        { term: "指定席", reading: "していせき", meaning: "對號座", desc: "明確指出並決定好的位子。" },
+                        { term: "境界線", reading: "きょうかいせん", meaning: "邊界線", desc: "成田與東京之間，是夢境與現實的邊界。" }
                     ],
                     timetable: [{ time: "19:48", label: "N'EX 50號", highlight: true }, { time: "20:15", label: "Skyliner" }, { time: "20:44", label: "N'EX 52號" }]
                     },
                     { 
                     time: "20:50", 
                     type: "hotel", 
-                    title: "Check-in", 
-                    desc: "APA 六本木飯店", 
+                    title: "APA 六本木飯店", 
+                    desc: "都市叢林中的棲身之所", 
                     price: "$3068", 
-                    details: "APA Hotel Roppongi Ekimae。請準備護照。",
+                    details: "歡迎來到原宿...啊不，是六本木！APA 飯店就是都市裡的怪獸大廈。這裡混雜著商務客、觀光客與夜生活的人群。極度狹窄的空間與極度鮮豔的社長看板，構成了一種強烈的視覺衝擊。這就是東京，擁擠、混亂，卻充滿能量。",
                     locationQuery: "APA Hotel Roppongi Ekimae",
                     icon: Hotel,
+                    style: 'harajuku', // Harajuku Style
                     weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
-                    keywords: ["空間魔術師", "社長咖哩", "大浴場"],
-                    outfit: "飯店提供的浴衣通常只能在房間或去大浴場時穿，千萬別穿去大廳。",
+                    keywords: ["KAWAII", "CHAOS", "TOKYO POP"],
+                    outfit: "在這裡，你想穿什麼就穿什麼！越誇張越好！把所有顏色都穿在身上吧！",
                     insights: {
                         travel: "APA 的房間以「極致壓縮」聞名。建議入住第一件事是確認床底下的空間。",
                         local: "「六本木晚上的黑人拉客小哥（Tout）很多，眼神不要對上，直接走過去就好。」",
-                        trap: "浴室水龍頭的水雖然標榜可以直接喝，但味道真的很重。強烈建議買礦泉水。",
-                        creative: "房間雖小，但透過鏡面反射與家具精密計算，創造出「功能齊全」的膠囊式美學。",
-                        business: "【逆勢收購】APA 集團在泡沫經濟崩潰後大量低價收購土地。房間抽屜裡一定有社長的勵志書，這是一種「不需要支付代言費」的高明品牌行銷。",
-                        history: "【防空洞傳說】APA 經常收購畸零地或老建築改建，因此坊間常有關於其選址風水的都市傳說。",
-                        politics: "【右翼色彩】APA 集團創辦人元谷外志雄以極右翼政治立場聞名，這也是為什麼房間裡會放置否認南京大屠殺的書籍，曾引發中日外交風波。",
-                        shopping: "【社長咖哩】APA 櫃檯販售的「APA 社長咖哩」其實意外的好吃，是金澤咖哩風味，非常適合買回去當作搞笑又實用的伴手禮。"
+                        business: "【逆勢收購】APA 集團在泡沫經濟崩潰後大量低價收購土地。房間抽屜裡一定有社長的勵志書。",
+                        politics: "【右翼色彩】APA 集團創辦人元谷外志雄以極右翼政治立場聞名。",
+                        shopping: "【社長咖哩】APA 櫃檯販售的「APA 社長咖哩」其實意外的好吃，是金澤咖哩風味。"
                     },
                     vocabulary: [
-                        { term: "素泊まり", reading: "すどまり", meaning: "純住宿", desc: "「素」是原本、單純，「泊」是過夜。指不含餐點的純住宿方案。APA 等商務旅館常有此選項。" },
-                        { term: "大浴場", reading: "だいよくじょう", meaning: "公共澡堂", desc: "即使房間有浴室，日本人還是喜歡去大浴場泡澡。記得進去前要先在淋浴區把身體洗乾淨。" }
+                        { term: "素泊まり", reading: "すどまり", meaning: "純住宿", desc: "指不含餐點的純住宿方案。" },
+                        { term: "大浴場", reading: "だいよくじょう", meaning: "公共澡堂", desc: "即使房間有浴室，日本人還是喜歡去大浴場泡澡。" }
                     ]
                     },
                     { 
                     time: "21:30", 
                     type: "food", 
-                    title: "晚餐：Shabuzen", 
-                    desc: "六本木壽喜燒", 
-                    details: "黑毛和牛吃到飽。Shabuzen Roppongi。",
+                    title: "Shabuzen 六本木", 
+                    desc: "黑毛和牛的味覺饗宴", 
+                    details: "進入「赤門」，迎接您的是東京大學（Todai）般的學術氛圍...不，是壽喜燒的香氣。在這裡，每一片 A5 和牛都經過嚴格的「論文審查」。霜降的比例、醬汁的甜度、蛋液的黏稠度，都是一場精密的化學實驗。這是一場關於味覺的研討會，請帶著敬畏之心品嚐。",
                     locationQuery: "Shabuzen Roppongi",
                     icon: Utensils,
+                    style: 'todai', // Todai Style
                     weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
-                    keywords: ["關東風", "A5和牛", "蛋液拌飯"],
-                    outfit: "吃火鍋容易沾味，建議穿深色、好洗的衣服。",
+                    keywords: ["學術研究", "赤門", "精英晚宴"],
+                    outfit: "建議穿著正式或半正式服裝。想像自己是要去參加學術發表的教授。",
                     insights: {
                         travel: "日本壽喜燒分關東風與關西風。這裡提供的是適合吃到飽的關東風（醬汁煮）。",
-                        local: "「這種 A5 和牛吃到飽，對我們來說也是慶祝升遷或接待重要客戶才會去的。」",
-                        trap: "吃到飽雖然爽，但和牛油脂非常豐富，吃太多片真的會膩到反胃。",
                         creative: "觀察和牛切片上如同大理石般的油花紋路，那是一種天然的藝術品。",
-                        business: "【和牛期貨】A5 等級不僅是口感標準，更是金融般的定價依據。Shabuzen 透過長期的供應鏈合約鎖定價格。",
-                        history: "【文明開化】明治天皇在 1872 年解除肉食禁令，壽喜燒（牛鍋）成為當時最潮的「文明開化」象徵。",
-                        shopping: "【芝麻醬】Shabuzen 自家的「特製芝麻醬 (Gomadare)」非常香濃，店內有時會販售瓶裝版，是家裡燙青菜的神級醬料。"
+                        business: "【和牛期貨】A5 等級不僅是口感標準，更是金融般的定價依據。",
+                        history: "【文明開化】明治天皇在 1872 年解除肉食禁令，壽喜燒（牛鍋）成為當時最潮的象徵。"
                     },
                     vocabulary: [
-                        { term: "食べ放題", reading: "たべほうだい", meaning: "吃到飽", desc: "「放」是釋放，「題」在此指範圍。同理「飲み放題 (のみほうだい)」是喝到飽。" },
-                        { term: "霜降り", reading: "しもふり", meaning: "霜降", desc: "形容牛肉油脂分佈像初冬的白霜一樣細緻均勻，是高級肉的代名詞。" }
+                        { term: "食べ放題", reading: "たべほうだい", meaning: "吃到飽", desc: "「放」是釋放，「題」在此指範圍。" },
+                        { term: "霜降り", reading: "しもふり", meaning: "霜降", desc: "形容牛肉油脂分佈像初冬的白霜一樣細緻均勻。" }
                     ]
                     }
                 ]
@@ -263,110 +434,105 @@
                 {
                 date: "12/20",
                 day: "土曜日(Sat)",
-                title: "昭和と未来の狭間 (Between Showa and Future)",
+                title: "昭和と未来の狭間",
+                subtitle: "Between Showa and Future",
                 location: "銀座・有樂町・六本木",
-                theme: "from-neutral-800 to-stone-800",
-                themeBtn: "bg-neutral-700",
+                theme: { main: "text-stone-800", sub: "text-stone-500", btn: "bg-stone-700" },
                 events: [
                     { 
                     time: "12:00", 
                     type: "food", 
-                    title: "午餐：鮨・Itsumi", 
-                    desc: "無菜單壽司 Omakase", 
-                    details: "赤坂/六本木區高評價壽司。請準時。",
+                    title: "鮨・Itsumi", 
+                    desc: "赤坂的隱藏版 Omakase", 
+                    details: "「記憶，就像這貫壽司的餘韻，模糊卻真實。」在石黑一雄的筆下，每一口食物都是通往過去的鑰匙。赤坂這間隱密的壽司店，師傅安靜地捏製著壽司，彷彿在修復著某段失落的時光。醋飯的溫度、魚料的熟成，都是為了那一瞬間的完美而存在，然後消逝，只留下回憶。",
                     locationQuery: "Sushi Itsumi",
                     icon: Utensils,
+                    style: 'ishiguro', // Ishiguro Style
                     weather: { type: 'sun', temp: '11°C', loc: 'Tokyo' },
-                    keywords: ["江戶前", "赤醋飯", "職人精神"],
-                    outfit: "半正式休閒 (Smart Casual)，避免穿短褲、拖鞋。",
+                    keywords: ["不可靠的敘事者", "黃昏的赤坂", "記憶的餘燼"],
+                    outfit: "建議穿著「半正式休閒 (Smart Casual)」。一件剪裁合宜的大衣，或許能掩蓋內心的波瀾。",
                     insights: {
-                        travel: "吃 Omakase 切記「不要噴香水」。師傅上菜後 3 秒內入口，溫度最完美。",
+                        travel: "吃 Omakase 切記「不要噴香水」。師傅上菜後建議 3 秒內入口，溫度最完美。",
                         local: "「午餐吃 Omakase 是東京人的省錢智慧！一樣的魚料，價格只要晚餐的一半。」",
-                        trap: "如果你不吃芥末或有任何過敏，務必在「訂位時」就告知。",
                         creative: "壽司師傅捏製壽司的手勢如同舞蹈，追求的是「空氣感」。",
                         business: "【坪效極大化】板前壽司店僅有約 10 個座位，卻能創造驚人營收。秘訣在於「無菜單」模式讓庫存耗損降至最低。",
-                        history: "【江戶速食】壽司最初是江戶時代的「路邊攤速食」。為了在沒有冰箱的年代保存魚貨，才發展出醋漬、醬漬等「江戶前」技法。",
-                        shopping: "【高級茶葉】許多壽司店使用的「粉茶」或「綠茶」品質極佳，部分店家會販售自家使用的茶葉包，適合配甜點。"
+                        shopping: "【高級茶葉】許多壽司店使用的「粉茶」或「綠茶」品質極佳，部分店家會販售自家使用的茶葉包。"
                     },
                     vocabulary: [
-                        { term: "お任せ", reading: "おまかせ", meaning: "信任主廚", desc: "源自「任せる (Makaseru)」，意思是「委託您了」。代表信任師傅的專業，讓他決定當天最好的食材。" },
-                        { term: "旬", reading: "しゅん", meaning: "當季", desc: "指食材最美味的時節。吃「旬」之物，是日本飲食文化對四季變化的極致追求。" }
+                        { term: "お任せ", reading: "おまかせ", meaning: "信任主廚", desc: "源自「任せる」，代表信任師傅的專業。" },
+                        { term: "名残", reading: "なごり", meaning: "餘韻", desc: "事物離去後留下的痕跡或氣氛。壽司入口後的餘韻，是品嚐的重點。" }
                     ]
                     },
                     { 
                     time: "13:30", 
                     type: "activity", 
-                    title: "有樂町二手市集", 
-                    desc: "大江戶古董市集", 
-                    details: "東京國際論壇大樓。遇雨取消。",
+                    title: "有樂町大江戶古董市集", 
+                    desc: "萬事屋的尋寶委託", 
+                    details: "喂喂，新八！聽說這裡有賣阿通小姐的絕版唱片？這裡可是有樂町啊，不是歌舞伎町！在現代化的東京國際論壇大樓廣場，每月舉辦兩次的「大江戶古董市集」。雖然沒有天人，但這裡有昭和時代的破銅爛鐵...啊不，是珍貴的古董。在摩天大樓的陰影下，充滿了吐槽點與寶物。",
                     locationQuery: "Tokyo International Forum",
                     icon: ShoppingBag,
+                    style: 'gintama', // Gintama Style
                     weather: { type: 'sun', temp: '12°C', loc: 'Yurakucho' },
-                    keywords: ["現金交易", "昭和復古", "尋寶"],
-                    outfit: "戶外風大且要一直走動，建議戴帽子或毛帽。",
+                    keywords: ["萬事屋", "糖分攝取", "昭和復古"],
+                    outfit: "只要不是穿著那件寫著「糖分」的T恤，穿什麼都可以。記得穿好走的鞋子，不然腳會斷掉阿魯。",
                     insights: {
                         travel: "許多攤位是老爺爺老奶奶擺攤，**只收現金**。看到喜歡的要馬上下手。",
                         local: "「以前這裡都是老人家在逛，最近外國人變多了，價格也稍微被炒高了。」",
-                        trap: "買易碎品時，請務必確認店家是否有包裝妥當。",
                         creative: "觀察昭和時代的廣告字體與包裝設計，那種手繪的溫度是現代設計找不到的。",
-                        business: "【生前整理商機】日本進入超高齡社會，大量的「生前整理」與「遺品整理」讓高品質的古董物流入二手市場。",
-                        history: "【黑市起源】有樂町一帶在戰後曾是著名的黑市，如今搖身一變成為國際論壇大樓，這個古董市集延續了這種「庶民交易」的記憶。",
-                        shopping: "【Old Noritake】這裡常能挖到日本瓷器名牌「Noritake」早期的外銷款式，設計非常西化且精緻，價格往往只有古董店的一半。"
+                        business: "【生前整理商機】日本進入超高齡社會，大量的「生前整理」物流入二手市場。",
+                        shopping: "【Old Noritake】這裡常能挖到日本瓷器名牌「Noritake」早期的外銷款式。"
                     },
                     vocabulary: [
-                        { term: "掘り出し物", reading: "ほりだしもの", meaning: "挖到的寶", desc: "「掘」是挖掘，「出」是出來。指在雜亂的東西中意外發現的珍品，是逛市集的最大樂趣。" },
-                        { term: "おまけ", reading: "おまけ", meaning: "殺必死/贈品", desc: "原本是「附加、添頭」的意思。在市集講價時，老闆可能會送你個小東西當作「Omake」。" }
+                        { term: "掘り出し物", reading: "ほりだしもの", meaning: "挖到的寶", desc: "指在雜亂的東西中意外發現的珍品。" },
+                        { term: "おまけ", reading: "おまけ", meaning: "殺必死/贈品", desc: "原本是「附加、添頭」的意思。" }
                     ]
                     },
                     { 
                     time: "15:00", 
                     type: "activity", 
-                    title: "午後散策", 
-                    desc: "皇居外苑 / 日比谷公園", 
-                    details: "享受東京的城市綠洲。",
+                    title: "皇居外苑 / 日比谷公園", 
+                    desc: "權力與綠地的交響曲", 
+                    details: "這裡是東京的心臟，也是權力的象徵。住友商事（Sumitomo Corporation）風格的穩重與信用，瀰漫在丸之內與日比谷的空氣中。從皇居外苑的莊嚴松林，到日比谷公園的近代洋風設計，每一步都踏在日本現代化的歷史基石上。這是一場關於「信用」與「傳統」的散策。",
                     locationQuery: "Hibiya Park",
                     icon: Camera,
+                    style: 'sumitomo', // Sumitomo Style
                     weather: { type: 'cloud', temp: '11°C', loc: 'Hibiya' },
-                    keywords: ["二重橋", "松樹", "都市綠洲"],
-                    outfit: "皇居外苑非常空曠，風會直接灌進來，圍巾是必備神物。",
+                    keywords: ["舊財閥", "丸之內", "信用第一"],
+                    outfit: "建議穿著整齊清潔的服裝。這裡周圍都是頂級企業總部，休閒但不要隨便。",
                     insights: {
-                        travel: "皇居外苑鋪設的碎石路是觀光客的「腳底殺手」，建議走被踩實的車轍路徑。",
-                        local: "「日比谷公園其實是我們週五晚上的啤酒花園。不過冬天真的很冷。」",
-                        trap: "皇居外苑的廁所很少且距離很遠。建議在有樂町先上好廁所。",
+                        travel: "皇居外苑鋪設的碎石路（玉砂利）原本是為了防刺客，現在則是觀光客的「腳底殺手」。",
                         creative: "皇居的松樹修剪是一種極致的園藝造型藝術，與江戶城的石垣形成視覺平衡。",
-                        business: "【三菱村】丸之內一帶被稱為「三菱村」，三菱地所擁有這裡大部分的土地與大樓。這裡是全日本地價最高昂的區域。",
-                        history: "【鹿鳴館】日比谷公園旁曾是明治時代著名的「鹿鳴館」所在地，當時日本為了向西方展示文明而夜夜舉辦舞會。",
-                        politics: "【權力中樞】日比谷公園緊鄰「霞關」（官僚機構）與「永田町」（國會），這裡是日本政治的心臟地帶，也是許多政治抗爭（如日比谷燒打事件）的歷史現場。",
-                        shopping: "【菊之御紋】皇居東御苑的販賣部有賣印有皇家家徽「十六瓣八重表菊紋」的錢包與皮革製品，是只有進皇居才買得到的限定品。"
+                        business: "【財閥系譜】住友集團以「浮利を追わず（不追逐浮利）」為家訓，象徵著日本企業穩健經營的哲學。這一帶的辦公大樓多為三菱、三井、住友等財閥系所有。",
+                        politics: "【權力中樞】日比谷公園緊鄰「霞關」與「永田町」，這裡是日本政治的心臟地帶。",
+                        shopping: "【菊之御紋】皇居東御苑的販賣部有賣印有皇家家徽的錢包與皮革製品。"
                     },
                     vocabulary: [
-                        { term: "散策", reading: "さんさく", meaning: "散步", desc: "比普通的「散步」更有詩意，帶有邊走邊欣賞風景、享受悠閒時光的意味。" },
-                        { term: "木漏れ日", reading: "こもれび", meaning: "樹葉間灑落的陽光", desc: "這是一個無法翻譯的絕美日文單字。指陽光穿過樹葉縫隙，在地上形成的光斑。" }
+                        { term: "散策", reading: "さんさく", meaning: "散步", desc: "比普通的「散步」更有詩意。" },
+                        { term: "信用", reading: "しんよう", meaning: "信用", desc: "商社最重視的資產，也是日本商業社會的基石。" }
                     ]
                     },
                     { 
                     time: "17:30", 
                     type: "activity", 
                     title: "六本木聖誕燈飾", 
-                    desc: "櫸坂通點燈", 
-                    details: "拍攝東京鐵塔與燈飾的最佳地點。",
+                    desc: "無限增殖的光點", 
+                    details: "傍晚回到六本木，欣賞著名的「櫸坂通」聖誕點燈。在草間彌生的眼中，這些冷白與藍色的光點不斷增殖、擴散，直到吞沒了整條街道與行人的自我。這不是浪漫，而是一種對於「無限」的恐懼與迷戀。我是光，光是我，我們都消融在宇宙的網中。",
                     locationQuery: "Roppongi Keyakizaka Dori",
                     icon: Camera,
+                    style: 'kusama', // Kusama Style
                     weather: { type: 'cloud', temp: '8°C', loc: 'Roppongi' },
-                    keywords: ["東京鐵塔", "藍白燈海", "百萬夜景"],
+                    keywords: ["東京鐵塔", "無限網", "圓點幻覺"],
                     outfit: "入夜後氣溫驟降，手套跟暖暖包這時候就派上用場了。",
                     insights: {
                         travel: "別只擠在天橋上！走到 Tiffany 精品店前的路口，由下往上拍，人潮較少。",
                         local: "「這裡可是東京情侶的『決勝聖地』啊！不過聖誕夜當天人多到像跨年。」",
-                        trap: "在天橋上拍照時請小心手機！每年都有人手機直接掉到橋下的車道上。",
-                        creative: "「Snow & Blue」的冷色調燈光與東京鐵塔的暖橘色形成強烈對比。",
-                        business: "【都市再生】六本木 Hills 是森大廈 (Mori Building) 集團花費 17 年整合 400 多位地主才完成的「都市再生」代表作。",
-                        history: "【軍事基地】六本木在二戰後曾是美軍設施集中的區域，因此這裡長期聚集了外國人與酒吧。",
-                        shopping: "【美術館商店】森美術館 (Mori Art Museum) 的商店常有草間彌生或村上隆的聯名商品，設計感極強，不容易撞款。"
+                        creative: "無數的光點像圓點一樣覆蓋了世界。你被光包圍，無處可逃，最後你自己也變成了一個光點。",
+                        business: "【都市再生】六本木 Hills 是森大廈集團花費 17 年整合 400 多位地主才完成的「都市再生」代表作。",
+                        shopping: "【美術館商店】森美術館 (Mori Art Museum) 的商店常有草間彌生或村上隆的聯名商品。"
                     },
                     vocabulary: [
-                        { term: "夜景", reading: "やけい", meaning: "夜景", desc: "日本人非常熱愛「夜景」，甚至有「日本夜景遺產」認證。六本木 Hills 的夜景被稱為「都會的寶石箱」。" },
-                        { term: "イルミネーション", reading: "illumination", meaning: "燈飾", desc: "簡稱「イルミ (Irumi)」。日本人冬天最愛的活動就是看「Irumi」，象徵浪漫與溫馨。" }
+                        { term: "水玉", reading: "みずたま", meaning: "圓點", desc: "草間彌生創作的核心元素。" },
+                        { term: "無限", reading: "むげん", meaning: "無限", desc: "沒有盡頭的增殖與擴散。" }
                     ]
                     }
                 ]
@@ -374,35 +540,34 @@
                 {
                 date: "12/21",
                 day: "日曜日(Sun)",
-                title: "湯けむりの彼方 (Beyond the Steam)",
+                title: "湯けむりの彼方",
+                subtitle: "Beyond the Steam",
                 location: "高崎 → 輕井澤 → 草津",
-                theme: "from-emerald-800 to-emerald-900", 
-                themeBtn: "bg-emerald-700",
+                theme: { main: "text-emerald-800", sub: "text-emerald-600", btn: "bg-emerald-700" },
                 events: [
                     { 
                     time: "09:00", 
                     type: "transport", 
-                    title: "新幹線往高崎", 
-                    desc: "東京 → 高崎", 
-                    details: "搭乘 Hakutaka 或 Asama。",
+                    title: "北陸新幹線", 
+                    desc: "精密製程的移動", 
+                    details: "System Status: NORMAL. Velocity: 260 km/h. \n搭乘北陸新幹線如同進入一個巨大的半導體製程。所有的時間表精確到秒，所有的動作都被標準化。藍白相間的車體在軌道上滑行，沒有多餘的震動，沒有誤差。這是東京威力科創 (Tokyo Electron) 級別的精密移動體驗。",
                     locationQuery: "Tokyo Station",
                     icon: Train,
+                    style: 'tel', // Tokyo Electron Style
                     timetableUrl: "https://www.jreast.co.jp/multi/zh-CHT/",
                     weather: { type: 'sun', temp: '10°C', loc: 'Tokyo' },
-                    keywords: ["雙層新幹線", "鐵路便當", "移動效率"],
-                    outfit: "洋蔥式穿搭標準場景。車上熱、下車冷。",
+                    keywords: ["Precision", "Efficiency", "Clean"],
+                    outfit: "建議穿著剪裁俐落的機能性服裝。保持清潔，減少微塵。",
                     insights: {
-                        travel: "上車前務必在東京站買「鐵路便當 (Ekiben)」。推薦中央走道的「祭 (Matsuri)」專賣店。",
+                        travel: "上車前務必在東京站買「鐵路便當 (Ekiben)」。",
                         local: "「高崎在我們印象中是『達磨之都』也是『麵食之都』。」",
-                        trap: "東京車站內非常大且像迷宮。如果要買便當，請至少預留 30 分鐘以上的時間。",
-                        creative: "新幹線車頭的流線型設計是「仿生學」的經典案例，模仿翠鳥的喙。",
-                        business: "【便當經濟學】JR 東日本的鐵路便當業務年營收數百億日圓。透過中央廚房與車站內的黃金店面，將地方特色美食轉化為高毛利的流通商品。",
-                        history: "【田中角榮】上越新幹線的建設與前首相田中角榮的「日本列島改造論」息息相關。",
-                        shopping: "【牛肉道場】如果看到「米沢牛どまん中 (Domannaka)」便當，請毫不猶豫買下它。這是日本鐵路便當的常勝冠軍。"
+                        creative: "新幹線車頭的流線型設計是「仿生學」的經典案例。",
+                        business: "【便當經濟學】JR 東日本的鐵路便當業務年營收數百億日圓。",
+                        shopping: "【牛肉道場】如果看到「米沢牛どまん中」便當，請毫不猶豫買下它。"
                     },
                     vocabulary: [
-                        { term: "切符", reading: "きっぷ", meaning: "車票", desc: "「切」是剪切，「符」是憑證。古代票券是木竹製的符節，使用時要切開驗證，故稱切符。" },
-                        { term: "駅弁", reading: "えきべん", meaning: "鐵路便當", desc: "「駅 (車站)」+「弁当 (便當)」。是日本鐵道旅行不可或缺的靈魂，各地都有特色食材限定款。" }
+                        { term: "定刻", reading: "ていこく", meaning: "準點", desc: "日本鐵路的靈魂。誤差通常以秒計算。" },
+                        { term: "効率", reading: "こうりつ", meaning: "效率", desc: "在最短時間內移動最長距離的藝術。" }
                     ],
                     timetable: [{ time: "09:04", label: "Asama 605", highlight: true }, { time: "09:24", label: "Hakutaka 557" }]
                     },
@@ -410,99 +575,72 @@
                     time: "10:10", 
                     type: "activity", 
                     title: "少林山達磨寺", 
-                    desc: "達磨發源地", 
-                    details: "遍地達磨的壯觀景象。",
+                    desc: "萬延元年的沈默", 
+                    details: "「死者在地下長眠，而生者在地上燃燒慾望。」大江健三郎式的存在主義瀰漫在這座古老的寺廟中。無數只有一隻眼睛的達磨，凝視著虛空。這裡是慾望的墳場，也是希望的起點。在群馬的山林中，我們與自己的靈魂對話。",
                     locationQuery: "Shorinzan Daruma-ji",
                     icon: MapPin,
+                    style: 'oe', // Kenzaburo Oe Style
                     weather: { type: 'sun', temp: '9°C', loc: 'Gunma' },
-                    keywords: ["七轉八起", "鶴龜松竹梅", "求勝運"],
-                    outfit: "這裡要爬長長的階梯！絕對要穿防滑好走的運動鞋。",
+                    keywords: ["存在主義", "個人的體驗", "靈魂"],
+                    outfit: "這裡要爬長長的階梯！穿著樸素、耐磨的衣物，準備好接受肉體的勞動。",
                     insights: {
                         travel: "買達磨時，眉毛代表「鶴」、鬍鬚代表「龜」。許願時先畫上「左眼」。",
-                        local: "「群馬人每家每戶過年一定會買新的達磨。舊的達磨我們會在年底帶回神社燒掉。」",
-                        trap: "回程的公車班次非常少。下車時務必先拍下回程時刻表，並設好鬧鐘。",
                         creative: "達磨不倒翁的設計重心在底部，象徵「七轉八起」的韌性精神。",
-                        business: "【勝運壟斷】高崎市生產了全日本 80% 的達磨。每逢日本大選，政治人物必買高崎達磨祈求當選。",
-                        history: "【飢荒對策】達磨製作最早是天明大飢荒時，寺院住持為了救濟貧困農民，教導他們用紙漿製作副業產品販售。",
-                        politics: "【總理產地】群馬縣被稱為「保守王國」，出了福田赳夫、中曾根康弘、小淵惠三等多位自民黨首相。達磨因此成為日本政壇「必勝」的文化符號。",
-                        shopping: "【色彩學】紅色是基本款（家內安全），金色求財運，黑色擋煞（生意興隆），粉色求戀愛。可以根據當下的願望挑選顏色。"
+                        business: "【勝運壟斷】高崎市生產了全日本 80% 的達磨。",
+                        politics: "【總理產地】群馬縣被稱為「保守王國」，出了多位自民黨首相。達磨因此成為日本政壇「必勝」的文化符號。",
+                        shopping: "【色彩學】紅色是基本款，金色求財運，黑色擋煞，粉色求戀愛。"
                     },
                     vocabulary: [
-                        { term: "縁起物", reading: "えんぎもの", meaning: "吉祥物", desc: "「縁起」原本是佛教用語「因緣生起」，後來轉指運氣的由來。達磨、招財貓都是常見的緣起物。" },
-                        { term: "七転八起", reading: "ななころびやおき", meaning: "百折不撓", desc: "跌倒七次，第八次還是會站起來。這是達磨不倒翁的核心精神，象徵人生的韌性。" }
+                        { term: "実存", reading: "じつぞん", meaning: "存在", desc: "人存在的意義與本質。" },
+                        { term: "沈黙", reading: "ちんもく", meaning: "沈默", desc: "面對巨大的歷史與自然時的無語。" }
                     ]
-                    },
-                    { 
-                    time: "11:30", 
-                    type: "transport", 
-                    title: "往輕井澤", 
-                    desc: "高崎 → 輕井澤", 
-                    details: "新幹線約 15 分鐘。",
-                    locationQuery: "Takasaki Station",
-                    icon: Train,
-                    weather: { type: 'cloud', temp: '5°C', loc: 'Takasaki' },
-                    keywords: ["穿越山脈", "瞬間溫差", "信州門戶"],
-                    outfit: "準備好圍巾，一下車氣溫會直接掉 5 度。",
-                    insights: {
-                        travel: "這 15 分鐘會穿越長長的隧道，窗外景色瞬間從關東平原變成信州高原。",
-                        local: "「去輕井澤的新幹線上，如果看到穿著很時髦、牽著狗的人，大概就是要去別墅度假的東京有錢人。」",
-                        trap: "高崎站轉乘時間雖然夠，但別在站內商店街逛太久。",
-                        creative: "從隧道出來的瞬間，植被從闊葉林變成針葉林，是地理景觀的蒙太奇切換。",
-                        business: "【西武王國】輕井澤的發展與西武集團的經營密不可分。透過「交通+地產」TOD 開發模式，成功打造了東京後花園。",
-                        history: "【皇室羅曼史】現在的上皇明仁與上皇后美智子就是在輕井澤的網球場相遇的。",
-                        shopping: "【澤屋果醬】在車站就能買到「澤屋 (Sawaya)」的果醬。推薦「整顆草莓」口味，裡面真的有一顆顆完整的草莓，視覺與味覺雙重享受。"
-                    },
-                    timetable: [{ time: "11:29", label: "Asama 609", highlight: true }]
                     },
                     { 
                     time: "15:30", 
                     type: "transport", 
-                    title: "巴士前往草津", 
-                    desc: "草輕交通巴士", 
-                    details: "輕井澤北口搭乘。山區溫差大。",
+                    title: "草輕交通巴士", 
+                    desc: "龍貓公車的森林之旅", 
+                    details: "從輕井澤搭乘巴士前往草津溫泉。這段路程會穿越茂密的森林與蜿蜒的山路，彷彿進入了吉卜力的世界。窗外的景色從別墅區逐漸變成原始的雪國森林，或許在某個轉彎處，你會看見龍貓在樹梢上等車。這是一段關於鄉愁與自然的旅程。",
                     locationQuery: "Karuizawa Station",
                     icon: Train,
+                    style: 'ghibli', // Ghibli Style
                     timetableUrl: "https://www.kkKG.co.jp/bus/rosen-bus.html",
                     weather: { type: 'snow', temp: '1°C', loc: 'Karuizawa' },
-                    keywords: ["暈車藥", "雪景", "山路"],
+                    keywords: ["森林隧道", "雪之國度", "懷舊旅程"],
                     outfit: "車程 80 分鐘山路，怕暈車的建議穿寬鬆不勒肚子的褲子。",
                     insights: {
-                        travel: "山路蜿蜒 80 分鐘，容易暈車的人務必坐前排並先吃藥。中途可能會停休息站，推薦買當地的「輕井澤牛奶」或優酪乳。",
-                        culture: "這條路線連結了「西洋避暑地」輕井澤與「傳統湯治場」草津，是一條穿越日本近代與傳統的文化之路。",
-                        tech: "冬季行駛山區巴士極度考驗技術。車輛配備了特製的雪地輪胎與防滑系統，且道路養護單位會即時噴灑防凍劑。",
-                        local: "「這條路真的是『暈車地獄』，連我們當地人搭都要深呼吸。不過下雪的時候，看著窗外白茫茫的森林很美。」",
-                        trap: "巴士上沒有廁所。上車前請務必在輕井澤車站先上好廁所。",
-                        creative: "巴士在雪壁中穿行的景象，是冬季限定的極簡主義風景畫。",
-                        business: "【虧損補貼】這類山區路線通常難以盈利，往往仰賴地方政府補貼或觀光旺季的高票價來交叉補貼。",
+                        travel: "山路蜿蜒 80 分鐘，容易暈車的人務必坐前排並先吃藥。",
+                        local: "「這條路真的是『暈車地獄』。不過下雪的時候，看著窗外白茫茫的森林很美。」",
+                        creative: "巴士在森林中穿梭，光影透過樹葉灑在車窗上，每一幀都像是手繪的水彩背景畫。這裡沒有壞人，只有大自然的魔法。",
+                        business: "【虧損補貼】這類山區路線通常難以盈利，往往仰賴地方政府補貼。",
                         history: "【輕井澤鐵道】這條路以前其實是有火車的（草輕電氣鐵道），後來因為颱風破壞與汽車普及而廢線。",
-                        shopping: "【牛奶】中途如果停「北輕井澤」休息站，請務必買當地的牛奶或優酪乳，濃郁程度是便利商店的兩倍。"
+                        shopping: "【牛奶】中途如果停「北輕井澤」休息站，請務必買當地的牛奶或優酪乳。"
                     },
                     timetable: [{ time: "14:20", label: "草輕交通" }, { time: "15:40", label: "草輕交通", highlight: true }]
                     },
                     { 
                     time: "17:00", 
                     type: "hotel", 
-                    title: "草津 Check-in", 
-                    desc: "Hotel Ichii 一井", 
+                    title: "Hotel Ichii 一井", 
+                    desc: "湯畑旁的溫泉宿", 
                     price: "$6681", 
-                    details: "湯畑旁。晚餐前可先去泡湯。",
+                    details: "入住位於草津溫泉核心地帶「湯畑」正前方的老牌旅館「一井」。",
                     locationQuery: "Kusatsu Onsen Hotel Ichii",
                     icon: Hotel,
                     weather: { type: 'snow', temp: '-2°C', loc: 'Kusatsu' },
                     keywords: ["湯畑第一排", "日本三名泉", "強酸性泉"],
                     outfit: "晚上看湯畑點燈『超級冷』，體感通常在零下。務必全副武裝。",
                     insights: {
-                        travel: "草津溫泉是強酸性 (pH 2.1)，殺菌力強但對皮膚刺激大。**銀飾品千萬別戴下水**。",
-                        local: "「草津的水真的很『利』！皮膚敏感的人可能會癢。還有，溫泉饅頭試吃千萬別客氣。」",
-                        trap: "泡湯時絕對不要揉眼睛！草津的溫泉水進眼睛會非常痛。",
+                        travel: "草津溫泉是強酸性，殺菌力強但對皮膚刺激大。**銀飾品千萬別戴下水**。",
+                        local: "「草津的水真的很『利』！皮膚敏感的人可能會癢。」",
+                        trap: "泡湯時絕對不要揉眼睛！草津的溫泉水進眼睛會非常非常痛。",
                         creative: "湯畑湧出的蒸氣在夜間點燈下，形成千變萬化的雲霧光影秀。",
-                        business: "【No.1 品牌學】草津連續 19 年蟬聯「日本溫泉 100 選」第一名。這種壓倒性的品牌地位，讓它即使交通不便，依然能維持極高的旅館房價。",
-                        history: "【德川將軍御汲湯】江戶時代的德川將軍曾命人將草津的溫泉水裝在木桶裡，一路運回江戶（東京）給他泡澡。",
-                        shopping: "【湯之花】草津名產「湯之花 (Yunohana)」是溫泉結晶粉，回家泡澡就像在草津一樣。請認明黃色包裝的天然採取版，不是化學合成的。"
+                        business: "【No.1 品牌學】草津連續 19 年蟬聯「日本溫泉 100 選」第一名。",
+                        shopping: "【湯之花】草津名產「湯之花」是溫泉結晶粉，回家泡澡就像在草津一樣。"
                     },
                     vocabulary: [
-                        { term: "湯畑", reading: "ゆばたけ", meaning: "熱水田", desc: "「湯」是熱水，「畑」是田地。指利用像田地一樣的木槽，讓滾燙的泉水與空氣接觸自然降溫，同時採集湯花（溫泉結晶）。" },
-                        { term: "源泉", reading: "げんせん", meaning: "泉源", desc: "溫泉湧出的源頭。草津的源泉溫度高達 50-90 度，直接泡會燙傷，所以才需要「湯畑」降溫。" }
+                        { term: "湯畑", reading: "ゆばたけ", meaning: "熱水田", desc: "指利用像田地一樣的木槽，讓滾燙的泉水自然降溫。" },
+                        { term: "源泉", reading: "げんせん", meaning: "泉源", desc: "溫泉湧出的源頭。" }
                     ]
                     }
                 ]
@@ -510,78 +648,78 @@
                 {
                 date: "12/22",
                 day: "月曜日(Mon)",
-                title: "港の物語 (Tale of the Port)",
+                title: "港の物語",
+                subtitle: "Tale of the Port",
                 location: "草津 → 輕井澤 → 橫濱",
-                theme: "from-purple-900 to-violet-900",
-                themeBtn: "bg-purple-800",
+                theme: { main: "text-purple-900", sub: "text-purple-600", btn: "bg-purple-700" },
                 events: [
                     { 
                     time: "11:30", 
                     type: "shop", 
-                    title: "王子 Outlet", 
-                    desc: "輕井澤購物", 
-                    details: "車站南口直達。",
+                    title: "輕井澤王子 Outlet", 
+                    desc: "一塊布的幾何美學", 
+                    details: "在這片高原上的購物廣場，我們不談流行，談結構。輕井澤王子 Outlet 的空間設計如同三宅一生 (Issey Miyake) 的「一塊布 (A Piece of Cloth)」哲學，利用自然的摺疊與延展，創造出與環境共生的商業空間。在這裡購物，是對生活型態的幾何解構。",
                     locationQuery: "Karuizawa Prince Shopping Plaza",
                     icon: ShoppingBag,
+                    style: 'miyake', // Miyake Style
                     weather: { type: 'cloud', temp: '3°C', loc: 'Karuizawa' },
-                    keywords: ["湖畔購物", "名牌折扣", "高原風景"],
+                    keywords: ["幾何結構", "PLEATS PLEASE", "空間哲學"],
                     outfit: "這 Outlet 很大且是戶外開放式，風很大。建議穿防風大衣。",
                     insights: {
                         travel: "別只顧著逛街，中間的大湖景色美到像風景區。這裡的 Gucci 和 Nike 庫存通常比市區多。",
                         local: "「輕井澤 Outlet 對我們來說其實是大公園。很多長野縣民週末會全家開車來這裡溜狗。」",
                         trap: "Outlet 美食街中午 12:00-13:30 是尖峰時刻。建議 11:30 前就先吃午餐。",
-                        creative: "將大自然湖景與商業空間無縫融合，創造了「滯留型」的消費體驗。",
-                        business: "【淡季平衡術】西武集團透過 Outlet 成功將淡季（春秋甚至冬季）也轉化為購物旺季，平衡了地區全年的經濟波動。",
-                        history: "【高爾夫球場】這裡的前身其實是高爾夫球場。將維護成本高昂的球場改建為 Outlet，是適應日本泡沫經濟破滅後消費降級的成功轉型。",
-                        shopping: "【鑄鐵鍋】這裡的 Le Creuset 鑄鐵鍋常有「日本限定色」或「B級品 (些微瑕疵但超便宜)」，是主婦們的秘密戰場。"
+                        creative: "這裡的建築線條俐落，與周圍的自然景觀形成對比。就像三宅一生的皺褶，看似簡單，實則經過精密的數學計算。",
+                        business: "【淡季平衡術】西武集團透過 Outlet 成功將夏季避暑地的淡季也轉化為購物旺季。",
+                        shopping: "【BAO BAO】三宅一生的 BAO BAO 包在這裡偶爾會有折扣款，那是結構主義的隨身藝術品。"
                     },
                     vocabulary: [
-                        { term: "免税", reading: "めんぜい", meaning: "免稅", desc: "購買消耗品或一般物品滿 5000 日圓（不含稅）即可退稅。記得隨身攜帶護照。" },
-                        { term: "試着", reading: "しちゃく", meaning: "試穿", desc: "「試」是嘗試，「着」是穿著。要試穿前請先跟店員說「Shichaku OK?」。進更衣室請脫鞋。" }
+                        { term: "免税", reading: "めんぜい", meaning: "免稅", desc: "記得隨身攜帶護照。" },
+                        { term: "試着", reading: "しちゃく", meaning: "試穿", desc: "要試穿前請先跟店員說「Shichaku OK?」。進更衣室請脫鞋。" }
                     ]
                     },
                     { 
                     time: "14:52", 
                     type: "transport", 
                     title: "前往橫濱", 
-                    desc: "新幹線 + 轉乘", 
-                    details: "輕井澤 → 東京 → 橫濱。",
+                    desc: "國家戰略移動", 
+                    details: "這不是單純的移動，這是「國家戰略」等級的部署。從高山到海港，我們需要的是速度、紀律與決斷。Sanae Takaichi (高市早苗) 風格的強硬與精準，體現在這段新幹線與電車的轉乘中。沒有任何一秒鐘是可以被浪費的，目標只有一個：橫濱。",
                     locationQuery: "Karuizawa Station",
                     icon: Train,
+                    style: 'sanae', // Sanae Takaichi Style
                     weather: { type: 'cloud', temp: '10°C', loc: 'Yokohama' },
-                    keywords: ["長途移動", "便當", "補眠"],
-                    outfit: "從雪國回到平地，進東京後會覺得變熱，記得把厚圍巾收進包包。",
+                    keywords: ["國家安全", "經濟安保", "鐵娘子"],
+                    outfit: "建議穿著深藍色或黑色套裝，展現專業與權威感。",
                     insights: {
                         travel: "週日下午回東京的新幹線自由席是戰場！若沒買指定席，請務必提早 20 分鐘去月台排隊。",
                         local: "「這條路線一次體驗了『山』與『海』。橫濱人其實很自豪，覺得自己比東京更洋氣。」",
-                        trap: "東京站轉乘到橫濱線 (JR 東海道線或橫須賀線) 時，月台距離很遠，轉乘時間別抓太緊。",
                         creative: "從車窗看出去，景色從雪山過渡到混凝土叢林，再到橫濱的開闊海港。",
-                        business: "【通勤新幹線】這條路線支撐了「新幹線通勤族」的生活方式。雖然月票昂貴，但對於追求生活品質的高薪族群來說，是用金錢換取空間的合理交易。",
-                        history: "【日本第一條鐵路】橫濱到東京的新橋是日本第一條鐵路開通的路段（1872年），你正在搭乘的是日本鐵道史的原點路線。",
-                        shopping: "【崎陽軒】到了橫濱站，一定要買「崎陽軒 (Kiyoken)」的燒賣便當。它是橫濱人的靈魂食物，冷掉也很好吃。"
+                        business: "【通勤新幹線】這條路線支撐了「新幹線通勤族」的生活方式。",
+                        history: "【日本第一條鐵路】橫濱到東京的新橋是日本第一條鐵路開通的路段（1872年）。",
+                        shopping: "【崎陽軒】到了橫濱站，一定要買「崎陽軒 (Kiyoken)」的燒賣便當。"
                     },
                     timetable: [{ time: "14:55", label: "Asama 618", highlight: true }]
                     },
                     { 
                     time: "18:00", 
                     type: "activity", 
-                    title: "橫濱聖誕市集", 
-                    desc: "紅磚倉庫", 
-                    details: "海港夜景與聖誕氛圍。",
+                    title: "橫濱紅磚倉庫", 
+                    desc: "大航海時代的冒險", 
+                    details: "想要我的財寶嗎？想要的話可以全部給你！傍晚抵達橫濱紅磚倉庫，這裡曾是日本通往世界的門戶。紅磚牆上留下的斑駁痕跡，是無數水手與貨物的記憶。在海風中，彷彿能聽到海賊王的號角聲。這不是普通的倉庫，這是冒險的起點！",
                     locationQuery: "Yokohama Red Brick Warehouse",
                     icon: Camera,
+                    style: 'onepiece', // One Piece Style
                     weather: { type: 'sun', temp: '8°C', loc: 'Yokohama' },
-                    keywords: ["海風超大", "異國風情", "浪漫聖地"],
+                    keywords: ["偉大的航道", "海賊王", "紅磚要塞"],
                     outfit: "海邊的風是『會吹到頭痛』的那種。一定要戴能蓋住耳朵的帽子。",
                     insights: {
                         travel: "紅磚倉庫的地面是百年歷史的硬石板路，推行李箱會震到手麻。千萬先把行李寄放。",
                         local: "「橫濱人很愛紅磚倉庫，但也覺得那是『給觀光客去的』。不過聖誕節例外，那種氣氛真的無敵。」",
                         trap: "聖誕市集入場通常需要買票。如果不想排隊買票，其實倉庫外圍的免費區域就很美了。",
-                        creative: "紅磚的質感與聖誕裝飾的暖光非常契合，這種復古工業風 (Industrial Chic) 是現代商業空間爭相模仿的風格。",
-                        business: "【古蹟活化】橫濱市將紅磚倉庫從廢棄物流設施轉型為文化商業地標，成功帶動了整個「港未來21」地區的土地價值與觀光產值。",
-                        history: "【保稅倉庫】這裡曾是明治時代日本國家的保稅倉庫，見證了日本近代貿易的興衰。建築上的鐵門與升降機遺跡都保留了當年的工業記憶。",
-                        politics: "【美軍基地】橫濱港不僅是商業港，也是美軍設施（North Dock）的所在地。這裡的國際化不僅來自貿易，也來自長期的軍事存在，形成了獨特的政治地景。",
-                        shopping: "【紅鞋巧克力】橫濱有名謠「穿紅鞋的女孩」，這裡賣的「紅色高跟鞋巧克力」非常精緻可愛，適合送給女生朋友。"
+                        creative: "紅磚的質感像是經歷過無數戰役的船身，堅固而充滿故事。夜晚的燈光打在牆面上，如同尋寶圖上的指引。",
+                        business: "【古蹟活化】橫濱市將紅磚倉庫從廢棄物流設施轉型為文化商業地標。",
+                        politics: "【美軍基地】橫濱港不僅是商業港，也是美軍設施（North Dock）的所在地。",
+                        shopping: "【紅鞋巧克力】橫濱有名謠「穿紅鞋的女孩」，這裡賣的「紅色高跟鞋巧克力」非常精緻可愛。"
                     }
                     }
                 ]
@@ -589,44 +727,43 @@
                 {
                 date: "12/23",
                 day: "火曜日(Tue)",
-                title: "思い出を詰めた帰路 (Homeward Bound with Memories)",
+                title: "思い出を詰めた帰路",
+                subtitle: "Homeward Bound with Memories",
                 location: "橫濱 → 成田 → 台北",
-                theme: "from-sky-800 to-sky-900",
-                themeBtn: "bg-sky-700",
+                theme: { main: "text-sky-800", sub: "text-sky-600", btn: "bg-sky-700" },
                 events: [
                     { 
                     time: "11:10", 
                     type: "food", 
-                    title: "拉麵博物館", 
-                    desc: "新橫濱", 
-                    details: "復古昭和街道。",
+                    title: "新橫濱拉麵博物館", 
+                    desc: "昭和時代的號外", 
+                    details: "號外！號外！時空隧道發現確認。位於新橫濱的拉麵博物館，已確認為通往昭和33年的入口。夕陽永遠懸掛在天邊，街角的煙草店傳來收音機的雜訊，熱騰騰的拉麵香氣是這個世界唯一的真實。請所有時空旅人盡情享受這最後的懷舊時刻。",
                     locationQuery: "Shin-Yokohama Ramen Museum",
                     icon: Utensils,
+                    style: 'retro', // Retro Style
                     weather: { type: 'rain', temp: '8°C', loc: 'Yokohama' },
                     keywords: ["昭和夕陽", "迷你碗", "制霸全國"],
-                    outfit: "室內復古造景溫暖，穿脫方便的洋蔥式穿搭。",
+                    outfit: "室內復古造景溫暖，穿脫方便的洋蔥式穿搭，避免太厚重在室內熱壞。",
                     insights: {
-                        travel: "一定要點「迷你碗 (Mini Size)」！這裡集結了全日本名店，迷你碗讓你一次能吃三家。",
+                        travel: "一定要點「迷你碗 (Mini Size)」！這裡集結了全日本名店，迷你碗讓你一次能吃三家不同口味而不撐死。",
                         local: "「新橫濱其實是個除了新幹線和體育館什麼都沒有的地方（笑）。但拉麵博物館真的很強。」",
-                        trap: "博物館內樓梯很多且走道狹窄，如果有大行李箱，務必寄放在入口處或車站。",
-                        creative: "這裡的昭和佈景連海報、燈光色溫都經過考證，營造出一種「黃昏的鄉愁感」。",
+                        trap: "博物館內樓梯很多且走道狹窄，如果有大行李箱，務必寄放在入口處或車站，千萬別拖進去。",
+                        creative: "這裡的印刷品、招牌字體都有著昭和時代特有的「手寫感」與「墨暈感」。那種不完美的粗糙，正是溫度的來源。",
                         business: "【IP經濟】拉麵博物館開創了「食物主題樂園」模式，證明了即使是低單價的庶民美食，透過策展與體驗包裝，也能創造高附加價值的觀光收入。",
-                        history: "【昭和33年】館內設定在昭和 33 年（1958年），那是東京鐵塔完工、日清泡麵發明的年份，被日本人視為戰後經濟復甦與美好舊時光的代名詞。",
                         shopping: "【自製拉麵】一樓商店可以買到各家名店的拉麵調理包，甚至可以自己組合麵條與湯頭，做出獨一無二的伴手禮。"
                     },
                     vocabulary: [
-                        { term: "替玉", reading: "かえだま", meaning: "加麵", desc: "博多拉麵特有的文化。湯要留著，只加麵條。記得要在吃完前一點點就喊「Kaedama」，才不會讓湯冷掉。" },
-                        { term: "硬め", reading: "かため", meaning: "麵條偏硬", desc: "點拉麵時常被問「麵的硬度」。內行人都點「Katame (硬)」或「Barikata (超硬)」，比較有嚼勁。" }
+                        { term: "替玉", reading: "かえだま", meaning: "加麵", desc: "博多拉麵特有的文化。湯要留著，只加麵條。" },
+                        { term: "黄昏", reading: "たそがれ", meaning: "黃昏", desc: "館內永遠停留在這一刻，象徵著逢魔時刻的神秘感。" }
                     ]
                     },
                     { 
                     time: "14:28", 
                     type: "transport", 
                     title: "前往機場", 
-                    desc: "N'EX 33號", 
-                    warning: "勿遲到", 
-                    details: "橫濱直達成田。全車指定席。",
-                    locationQuery: "Yokohama Station",
+                    desc: "最後的移動", 
+                    details: "搭乘 N'EX 前往成田機場。看著窗外的景色從橫濱的港灣、東京的樓群，變回千葉的田野。",
+                    locationQuery: "Narita Airport Terminal 1",
                     icon: Train,
                     timetableUrl: "https://www.jreast.co.jp/nex/time.html",
                     weather: { type: 'rain', temp: '7°C', loc: 'Tokyo' },
@@ -634,11 +771,8 @@
                     outfit: "輕鬆舒適為主，避免穿太多層，機場過安檢脫脫穿穿很麻煩。",
                     insights: {
                         travel: "橫濱站迷宮等級很高，請預留 15 分鐘找月台。車上有大型行李鎖，記得設簡單的密碼。",
-                        local: "「N'EX 雖然貴，但那種『旅程要結束了』的安心感無可替代。橫濱站的月台很長，記得預留體力走路。」",
                         trap: "橫濱站的 N'EX 月台跟一般電車月台是同一個，但停靠位置可能不同。請看電子跑馬燈。",
-                        creative: "成田特急的紅黑配色在月台上非常顯眼，是為了讓旅客能一眼識別出「機場專車」。",
                         business: "【機場聯外競爭】N'EX 雖然速度輸給京成 Skyliner，但憑藉著 JR 龐大的路網，依然掌握了重視「一車直達」的商務與家庭客群。",
-                        history: "【軌距兼容】N'EX 運行的路線部分路段展示了日本鐵路技術如何讓不同軌距與電壓的列車共存。",
                         shopping: "【最後補給】如果還沒買夠，橫濱站的 JOINUS 地下街或高島屋百貨是最後衝刺的好地方，比機場選擇更多。"
                     },
                     timetable: [{ time: "14:29", label: "N'EX 33號", highlight: true }, { time: "15:28", label: "N'EX 37號", isWarning: true }]
@@ -647,21 +781,21 @@
                     time: "16:00", 
                     type: "plane", 
                     title: "機場 Check-in", 
-                    desc: "TR875 (T1)", 
-                    details: "南翼辦理。起飛前好好逛免稅店。",
+                    desc: "勝鬨橋的開合", 
+                    details: "機場Check-in 櫃檯如同隅田川上的勝鬨橋 (Kachidoki Bridge)。它既是終點，也是起點。巨大的鋼鐵結構象徵著工業時代的輝煌，每一次的開合（起飛降落）都是一次對世界的擁抱。在霓虹燈管的微光中，我們告別東京，如同漫畫《烏龍派出所》最後一幕的長鏡頭。",
                     locationQuery: "Narita Airport Terminal 1",
                     icon: Plane,
+                    style: 'kachidoki', // Kachidoki Bridge Style
                     weather: { type: 'rain', temp: '6°C', loc: 'NRT' },
-                    keywords: ["消耗零錢", "免稅店", "最後衝刺"],
+                    keywords: ["工業遺產", "鋼鐵結構", "開合橋"],
                     outfit: "回台灣會變熱，建議裡面穿短袖/薄長袖，外面穿厚外套。",
                     insights: {
                         travel: "手邊剩下的日幣銅板，可以去機場設有的整排扭蛋機消耗掉。FaSoLa 免稅店生意極好，看到有貨請直接拿。",
                         local: "「成田機場其實離東京超遠，我們都戲稱是『千葉機場』。不過 T1 南翼那種出發的氛圍真的很棒。」",
                         trap: "成田機場 T1 南翼的安檢排隊隊伍有時會非常長。建議 Check-in 完盡快過安檢。",
-                        creative: "機場內的導視系統 (Wayfinding) 採用了通用的圖標與色彩編碼，即使不懂日文也能直覺找到登機口。",
+                        creative: "這裡的鋼骨結構與鉚釘裝飾，是對昭和工業時代的致敬。冷冽的藍色燈光營造出夜晚隅田川邊的氛圍。",
                         business: "【免稅店經濟】機場零售營收往往佔機場總營收的一半以上。成田機場透過大數據分析旅客國籍，精準投放高單價美妝與伴手禮。",
                         history: "【釘子戶】成田機場是日本唯一有「釘子戶」還住在跑道旁的國際機場。為了避開這些農田，計程車滑行道必須繞路。",
-                        politics: "【安檢政治】成田機場過去因為政治抗爭，安檢曾是全日本最嚴格的（進機場前就要查身分證）。雖然現在已廢除，但那種肅殺的歷史氣氛仍隱約可見。",
                         shopping: "【威士忌】日本威士忌（響、山崎）在市區很難買，機場免稅店偶爾會有少量釋出。如果有看到，請不要猶豫，那是稀有寶物。"
                     },
                     flightInfo: { checkIn: "17:25", boarding: "19:10", departure: "19:55", arrival: "23:00", terminal: "T1 南翼" }
@@ -699,118 +833,102 @@
             };
 
             return (
-                <div className="min-h-screen bg-[#fdfbf7] font-sans text-slate-800 pb-12 relative transition-colors duration-700">
+                <div className="min-h-screen bg-[#f9f8f6] font-sans text-stone-800 pb-12 relative transition-colors duration-1000">
                 
                 {/* Header */}
-                <div className={`bg-gradient-to-br ${currentSchedule.theme} backdrop-blur-xl text-white p-6 pb-12 rounded-b-[3rem] shadow-2xl relative z-10 transition-all duration-700 border-b border-white/10`}>
-                    <div className="flex justify-between items-start mb-6">
-                    <div>
-                        <div className="flex items-center space-x-2 mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] border border-white/20 bg-white/10 px-3 py-1 rounded-full backdrop-blur-md font-sans">
-                            TOKYO 2025
-                        </span>
+                <div className={`p-8 pb-12 relative z-10 border-b border-stone-200 bg-[#fbfaf8]`}>
+                    <div className="flex justify-between items-start mb-8 max-w-2xl mx-auto">
+                        <div>
+                            <div className="flex items-center space-x-2 mb-3">
+                                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-stone-400 font-sans">
+                                    TOKYO CHRONICLES 2025
+                                </span>
+                            </div>
+                            <h1 className={`text-4xl font-bold tracking-tight mb-2 leading-tight font-display ${currentSchedule.theme.main}`}>
+                                {currentSchedule.title}
+                            </h1>
+                            <p className={`text-sm font-serif italic tracking-wide mb-1 ${currentSchedule.theme.sub}`}>
+                                {currentSchedule.subtitle}
+                            </p>
+                            <p className="text-stone-400 text-xs flex items-center font-medium tracking-wider font-sans mt-3">
+                                <MapPin size={12} className="mr-1.5" /> {currentSchedule.location}
+                            </p>
                         </div>
-                        <h1 className="text-3xl font-bold tracking-tight mb-2 drop-shadow-lg leading-tight font-display">
-                        {currentSchedule.title}
-                        </h1>
-                        <p className="text-white/70 text-xs flex items-center font-medium tracking-wider font-sans">
-                        <MapPin size={12} className="mr-1.5" /> {currentSchedule.location}
-                        </p>
-                    </div>
-                    <div className="text-right pt-2">
-                        <div className="text-2xl font-black opacity-10 font-display tracking-tighter text-right leading-tight">
-                            {currentSchedule.date}
-                            <br/>
-                            <span className="text-lg">{currentSchedule.day.split('(')[0]}</span>
+                        <div className="text-right pt-2">
+                            <div className="text-2xl font-black opacity-10 font-display tracking-tighter text-right leading-tight">
+                                {currentSchedule.date}
+                                <br/>
+                                <span className="text-lg">{currentSchedule.day.split('(')[1].replace(')', '')}</span>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </div>
 
                 {/* Date Selector */}
-                <div className="px-4 -mt-8 mb-6 relative z-20 animate-in">
-                    <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-lg p-2 flex justify-between overflow-x-auto no-scrollbar border border-white/60">
+                <div className="px-4 -mt-8 mb-10 relative z-20 animate-in max-w-2xl mx-auto">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-none shadow-sm p-1 flex justify-between overflow-x-auto no-scrollbar border border-stone-200">
                     {schedule.map((day, index) => (
                         <button
                         key={index}
                         onClick={() => setActiveDay(index)}
-                        className={`flex flex-col items-center justify-center min-w-[64px] py-3 rounded-2xl transition-all duration-300 ${
+                        className={`flex flex-col items-center justify-center min-w-[64px] py-4 transition-all duration-500 ${
                             activeDay === index 
-                            ? `${day.themeBtn} text-white shadow-lg transform scale-105 ring-2 ring-white ring-opacity-50` 
-                            : 'text-slate-400 hover:bg-white'
+                            ? `${currentSchedule.theme.btn} text-stone-50 shadow-md` 
+                            : 'text-stone-400 hover:bg-white hover:text-stone-600'
                         }`}
                         >
-                        <span className={`text-[10px] font-bold tracking-wider mb-0.5 ${activeDay === index ? 'opacity-80' : ''}`}>{day.date}</span>
-                        <span className="text-sm font-black font-display">{day.day.split('(')[0]}</span>
+                        <span className={`text-[10px] font-bold tracking-wider mb-1 font-sans opacity-60`}>{day.date}</span>
+                        <span className="text-sm font-medium font-serif tracking-widest">{day.day.split('(')[0].replace('曜日', '')}</span>
                         </button>
                     ))}
                     </div>
                 </div>
 
                 {/* Main List Content */}
-                <div className="px-5 max-w-2xl mx-auto min-h-[50vh]">
-                    <div className="space-y-6 animate-in pb-10">
+                <div className="px-6 max-w-2xl mx-auto min-h-[50vh]">
+                    <div className="space-y-12 animate-in pb-16">
                     {currentSchedule.events.map((event, index) => {
                         const Icon = event.icon;
                         return (
                         <div 
                             key={index} 
-                            className="flex gap-5 relative group cursor-pointer"
+                            className="group cursor-pointer relative pl-8 border-l border-stone-200 hover:border-stone-400 transition-colors duration-500"
                             onClick={() => setSelectedEvent(event)}
                         >
-                            {/* Elegant Timeline Line */}
-                            {index !== currentSchedule.events.length - 1 && (
-                            <div className="absolute left-[21px] top-14 bottom-[-24px] w-[2px] bg-slate-200 z-0 group-hover:bg-slate-300 transition-colors"></div>
-                            )}
+                            {/* Time */}
+                            <div className={`absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full border-2 border-[#f9f8f6] transition-colors duration-300 ${currentSchedule.theme.btn}`}></div>
                             
-                            {/* Time Column */}
-                            <div className="flex flex-col items-center min-w-[42px] pt-1 z-10">
-                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm transition-all duration-300 bg-white border-2 border-slate-100 group-hover:scale-110 group-hover:border-slate-300 text-slate-400`}>
-                                <Icon size={18} strokeWidth={2} />
-                            </div>
+                            <div className="flex justify-between items-start mb-2">
+                                <div className="font-serif text-stone-400 text-sm tracking-widest">{event.time}</div>
+                                
+                                {/* Right-side Google Maps Action */}
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${event.locationQuery}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="flex items-center text-[10px] font-bold text-stone-400 hover:text-stone-800 transition-colors bg-white px-2 py-1 rounded shadow-sm border border-stone-100"
+                                    >
+                                        <MapIcon size={12} className="mr-1.5" />
+                                        MAP
+                                    </a>
+                                </div>
                             </div>
 
-                            {/* Content Card */}
-                            <div className="flex-1 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1 relative overflow-hidden">
-                            
-                            <div className="relative z-10">
-                                <div className="flex justify-between items-start mb-2.5">
-                                <div className="flex items-center gap-2.5">
-                                    <span className="font-bold text-slate-800 text-lg tracking-tight font-display">{event.time}</span>
-                                    {event.endTime && (
-                                    <span className="text-slate-400 text-xs flex items-center font-bold bg-slate-50 px-2 py-1 rounded-md font-sans">
-                                        <ArrowRight size={10} className="mr-1" /> {event.endTime}
-                                    </span>
-                                    )}
-                                </div>
-                                
-                                <div className="flex gap-2">
-                                    {event.weather && (
-                                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
-                                        <WeatherIcon type={event.weather.type} size={12} />
-                                        <span>{event.weather.temp}</span>
-                                    </div>
-                                    )}
-                                    {event.price && (
-                                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                                        {event.price}
-                                    </span>
-                                    )}
-                                </div>
-                                </div>
-                                
-                                <h3 className="font-bold text-slate-800 mb-1.5 text-[17px] font-display">{event.title}</h3>
-                                <p className="text-sm text-slate-500 leading-relaxed font-medium mb-3 font-sans">{event.desc}</p>
-                                
-                                {/* Keywords */}
-                                <div className="flex gap-2 flex-wrap">
+                            {/* Content */}
+                            <div className="mb-4">
+                                <h3 className="font-display text-xl font-bold text-stone-800 mb-1 group-hover:text-black transition-colors duration-300">{event.title}</h3>
+                                <p className="text-stone-500 text-sm font-serif leading-relaxed line-clamp-2">{event.desc}</p>
+                            </div>
+
+                            {/* Tags */}
+                            <div className="flex gap-2 flex-wrap mb-4">
                                 {event.keywords && event.keywords.map((k, i) => (
-                                    <span key={i} className="text-[10px] font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 font-sans">
+                                    <span key={i} className="text-[10px] font-medium text-stone-400 border-b border-stone-200 pb-0.5">
                                     #{k}
                                     </span>
                                 ))}
-                                </div>
-                            </div>
                             </div>
                         </div>
                         );
@@ -818,341 +936,153 @@
                     </div>
 
                     {/* Daily Map Section */}
-                    <div className="mb-12 animate-in fade-in zoom-in duration-500">
-                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 font-display">
-                            <MapIcon size={14}/> 當日移動軌跡
-                        </h4>
-                        <div className="bg-white p-1 rounded-[1.5rem] shadow-lg border border-slate-100">
+                    <div className="mb-16 animate-in fade-in zoom-in duration-1000 delay-200">
+                        <div className="flex items-center justify-center mb-6">
+                            <span className="h-px w-8 bg-stone-300"></span>
+                            <h4 className="text-xs font-serif text-stone-400 uppercase tracking-[0.2em] mx-4">
+                                JOURNEY MAP
+                            </h4>
+                            <span className="h-px w-8 bg-stone-300"></span>
+                        </div>
+                        <div className="bg-white p-2 shadow-xl shadow-stone-200/50 border border-stone-100">
                             <DailyMapView route={currentRoute} dayIndex={activeDay} />
                         </div>
                     </div>
                     
-                    <div className="mt-8 text-center pb-8 opacity-50 font-display">
-                    <div className="w-12 h-1 bg-slate-200 mx-auto rounded-full mb-2"></div>
-                    <p className="text-[10px] tracking-widest uppercase text-slate-400">Designed for Travelers</p>
+                    <div className="mt-12 text-center pb-12 opacity-40 font-serif">
+                        <p className="text-[10px] tracking-[0.3em] uppercase text-stone-500">Tokyo Chronicles 2025</p>
                     </div>
                 </div>
 
                 {/* Detail Modal */}
                 {selectedEvent && (
-                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
                     <div 
-                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                        className="absolute inset-0 bg-[#f6f5f3]/90 backdrop-blur-sm transition-opacity duration-500"
                         onClick={() => setSelectedEvent(null)}
                     ></div>
-                    <div className="bg-white relative z-10 w-full sm:max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+                    <div className={`bg-[#fdfbf7] relative z-10 w-full sm:max-w-lg shadow-2xl border border-stone-200 flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-500 overflow-hidden ${selectedEvent.style === 'kon' ? 'style-kon' : ''} ${selectedEvent.style === 'kusama' ? 'style-kusama' : ''} ${selectedEvent.style === 'ghibli' ? 'style-ghibli' : ''} ${selectedEvent.style === 'retro' ? 'style-retro' : ''} ${selectedEvent.style === 'nara' ? 'style-nara' : ''} ${selectedEvent.style === 'onepiece' ? 'style-onepiece' : ''} ${selectedEvent.style === 'gintama' ? 'style-gintama' : ''} ${selectedEvent.style === 'gaiac' ? 'style-gaiac' : ''} ${selectedEvent.style === 'miyake' ? 'style-miyake' : ''} ${selectedEvent.style === 'tel' ? 'style-tel' : ''} ${selectedEvent.style === 'ishiguro' ? 'style-ishiguro' : ''} ${selectedEvent.style === 'harajuku' ? 'style-harajuku' : ''} ${selectedEvent.style === 'oe' ? 'style-oe' : ''} ${selectedEvent.style === 'todai' ? 'style-todai' : ''} ${selectedEvent.style === 'sanae' ? 'style-sanae' : ''} ${selectedEvent.style === 'kachidoki' ? 'style-kachidoki' : ''} ${selectedEvent.style === 'sumitomo' ? 'style-sumitomo' : ''}`}>
                         
+                        {/* Kon Style Glitch Effect */}
+                        {selectedEvent.style === 'kon' && (
+                             <div className="kon-border"></div>
+                        )}
+
                         {/* Modal Header */}
-                        <div className={`p-8 bg-gradient-to-br ${currentSchedule.theme} text-white relative`}>
-                        <button 
-                            onClick={() => setSelectedEvent(null)}
-                            className="absolute top-6 right-6 bg-black/20 hover:bg-black/40 rounded-full p-2 transition-colors backdrop-blur-md z-50"
-                        >
-                            <X size={18} />
-                        </button>
-                        
-                        <div className="flex items-center gap-3 mb-4 opacity-90">
-                            <div className="bg-white/20 p-2 rounded-xl backdrop-blur-sm shadow-inner border border-white/20">
-                            <selectedEvent.icon size={20} />
-                            </div>
-                            <span className="text-xs font-black uppercase tracking-[0.15em] font-sans">
-                            {selectedEvent.type.toUpperCase()}
-                            </span>
-                        </div>
-                        
-                        <h3 className="text-3xl font-bold mb-2 leading-tight font-display">{selectedEvent.title}</h3>
-                        <div className="flex items-center text-white/80 text-sm font-medium font-sans">
-                            <Clock size={16} className="mr-2" />
-                            {selectedEvent.time}
-                            {selectedEvent.weather && (
-                                <span className="ml-4 flex items-center gap-1.5 pl-4 border-l border-white/20">
-                                <WeatherIcon type={selectedEvent.weather.type} size={16} className="text-white" />
-                                {selectedEvent.weather.temp} {selectedEvent.weather.loc}
+                        <div className={`p-8 border-b border-stone-100 relative ${selectedEvent.style === 'kon' ? 'bg-[#0f172a] border-gray-800' : ''}`}>
+                            <button 
+                                onClick={() => setSelectedEvent(null)}
+                                className={`absolute top-6 right-6 transition-colors ${selectedEvent.style === 'kon' ? 'text-red-500 hover:text-red-400' : 'text-stone-300 hover:text-stone-600'}`}
+                            >
+                                <X size={20} strokeWidth={selectedEvent.style === 'kon' ? 3 : 1.5} />
+                            </button>
+                            
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-1 ${selectedEvent.style === 'kon' ? 'text-red-500 bg-black border border-red-900' : 'text-stone-400 bg-stone-50'}`}>
+                                {selectedEvent.type.toUpperCase()}
                                 </span>
-                            )}
-                        </div>
+                            </div>
+                            
+                            <h3 className={`text-3xl font-bold mb-3 leading-tight ${selectedEvent.style === 'kon' ? 'text-white' : 'font-display text-stone-800'}`}>{selectedEvent.title}</h3>
+                            <div className={`flex items-center text-sm font-medium ${selectedEvent.style === 'kon' ? 'text-blue-400 font-mono' : 'text-stone-500 font-serif italic'}`}>
+                                <Clock size={14} className="mr-2 opacity-50" />
+                                {selectedEvent.time}
+                            </div>
                         </div>
 
                         {/* Modal Content */}
-                        <div className="p-8 overflow-y-auto bg-[#fdfbf7]">
-                        
-                        {/* Trap Insight */}
-                        {selectedEvent.insights?.trap && (
-                            <div className="mb-6 bg-rose-50 border border-rose-100 rounded-2xl p-5 shadow-sm">
-                                <h4 className="text-rose-700 font-bold text-xs flex items-center mb-2 uppercase tracking-wider font-display">
-                                    <AlertTriangle size={14} className="mr-2" />
-                                    雷區注意 Trap Warning
-                                </h4>
-                                <p className="text-rose-900/80 text-sm leading-relaxed font-medium">
-                                    {selectedEvent.insights.trap}
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Japanese Vocabulary (New!) */}
-                        {selectedEvent.vocabulary && (
-                            <div className="mb-8">
-                                <h4 className="text-slate-400 font-black mb-4 text-xs flex items-center uppercase tracking-widest px-1 font-display">
-                                    <Languages size={14} className="mr-2" />
-                                    說文解字 Japanese
-                                </h4>
-                                <div className="grid gap-3">
-                                    {selectedEvent.vocabulary.map((vocab, i) => (
-                                        <div key={i} className="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
-                                            <div className="flex items-baseline gap-3 mb-2">
-                                                <ruby className="text-2xl font-black text-stone-800 font-display tracking-tight">
-                                                    {vocab.term}
-                                                    <rt className="text-sm font-normal text-stone-500 font-sans">{vocab.reading}</rt>
-                                                </ruby>
-                                                <span className="text-xs font-bold text-stone-500 bg-stone-50 px-2 py-0.5 rounded-full border border-stone-100">{vocab.meaning}</span>
-                                            </div>
-                                            <p className="text-stone-600 text-sm leading-relaxed font-serif text-justify opacity-90 pl-1 border-l-2 border-stone-200">
-                                                {vocab.desc}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Flight Info */}
-                        {selectedEvent.flightInfo && (
-                            <div className="mb-6 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
-                                <h4 className="text-sky-600 font-black mb-5 flex items-center text-xs uppercase tracking-widest font-display">
-                                    <Ticket size={14} className="mr-2"/> Flight Schedule
-                                </h4>
-                                <div className="relative pl-3 border-l-2 border-sky-100 space-y-6">
-                                    <div className="relative pl-5">
-                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-sky-200 ring-4 ring-white"></div>
-                                        <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Check-in</p>
-                                        <p className="text-sm font-bold text-slate-700">12:10</p>
-                                    </div>
-                                    <div className="relative pl-5">
-                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-sky-400 ring-4 ring-white"></div>
-                                        <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Boarding</p>
-                                        <p className="text-sm font-bold text-slate-700">13:55</p>
-                                    </div>
-                                    <div className="relative pl-5">
-                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-sky-600 ring-4 ring-white"></div>
-                                        <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Departure</p>
-                                        <p className="text-base font-black text-slate-800">{selectedEvent.flightInfo.departure}</p>
-                                    </div>
-                                    <div className="relative pl-5">
-                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-sky-800 ring-4 ring-white"></div>
-                                        <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Arrival</p>
-                                        <p className="text-base font-black text-slate-800">{selectedEvent.flightInfo.arrival}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Timetable */}
-                        {selectedEvent.timetable && (
-                            <div className="mb-6">
-                                <h4 className="text-slate-400 font-black text-xs uppercase tracking-widest flex items-center mb-3 px-1 font-display">
-                                    <List size={14} className="mr-2"/> 建議班次
-                                </h4>
-                                <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
-                                {selectedEvent.timetable.map((t, i) => (
-                                    <div key={i} className={`flex items-center justify-between px-5 py-3.5 border-b border-slate-50 last:border-0 ${t.highlight ? 'bg-emerald-50/30' : ''}`}>
-                                        <div className="flex items-center gap-4">
-                                        <span className={`font-mono text-base font-bold ${t.highlight ? 'text-emerald-700' : 'text-slate-400'}`}>
-                                            {t.time}
-                                        </span>
-                                        <span className={`text-sm font-medium ${t.highlight ? 'text-slate-700' : 'text-slate-400'}`}>
-                                            {t.label}
-                                        </span>
-                                        </div>
-                                        {t.highlight && <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shadow-sm shadow-emerald-200"></div>}
-                                    </div>
-                                ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Outfit Suggestion */}
-                        {selectedEvent.outfit && (
-                            <div className="mb-6 bg-white border border-indigo-100 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-50 rounded-bl-full -mr-8 -mt-8 z-0"></div>
-                                <div className="relative z-10">
-                                    <h4 className="text-indigo-600 font-bold mb-3 text-xs flex items-center uppercase tracking-widest font-display">
-                                        <Shirt size={14} className="mr-2" />
-                                        穿搭指南 OOTD
-                                    </h4>
-                                    <p className="text-slate-600 text-sm leading-relaxed font-medium">
-                                        {selectedEvent.outfit}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="mb-8">
-                            <h4 className="text-slate-400 font-black mb-3 text-xs uppercase tracking-widest px-1 font-display">About</h4>
-                            <p className="text-slate-600 leading-relaxed text-sm font-medium bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            {selectedEvent.details}
-                            </p>
-                        </div>
-
-                        {/* Insights (8 Dimensions) */}
-                        {selectedEvent.insights && (
-                            <div className="mb-8 space-y-4">
-                            <h4 className="text-slate-400 font-black text-xs flex items-center px-1 uppercase tracking-widest font-display">
-                                <Info size={14} className="mr-2" />
-                                深度情報 Insight
-                            </h4>
+                        <div className={`p-8 overflow-y-auto custom-scrollbar ${selectedEvent.style === 'kon' ? 'bg-[#111] text-stone-300' : ''} ${selectedEvent.style === 'kusama' ? 'inner-card' : ''}`}>
                             
-                            {/* Politics Insight */}
-                            {selectedEvent.insights.politics && (
-                                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-slate-500 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Landmark size={14} className="text-slate-600"/>
-                                        <span className="text-xs font-bold text-slate-700 uppercase tracking-wider font-display">政治觀察</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.politics}
+                            <p className={`text-sm leading-8 mb-8 text-justify ${selectedEvent.style === 'kon' ? 'text-stone-400 font-sans tracking-wide' : 'text-stone-600 font-serif'}`}>
+                                {selectedEvent.details}
+                            </p>
+
+                            {/* Trap Insight */}
+                            {selectedEvent.insights?.trap && (
+                                <div className={`mb-8 p-6 border-l-2 ${selectedEvent.style === 'kon' ? 'bg-red-900/20 border-red-600 text-red-400' : 'bg-rose-50/50 border-rose-300'}`}>
+                                    <h4 className={`font-bold text-xs flex items-center mb-3 uppercase tracking-wider ${selectedEvent.style === 'kon' ? 'text-red-500' : 'font-display text-rose-800'}`}>
+                                        <AlertTriangle size={12} className="mr-2" />
+                                        Trap Warning
+                                    </h4>
+                                    <p className={`text-sm leading-relaxed ${selectedEvent.style === 'kon' ? 'font-sans opacity-90' : 'text-rose-900/70 font-serif'}`}>
+                                        {selectedEvent.insights.trap}
                                     </p>
                                 </div>
                             )}
 
-                            {/* Shopping Insight */}
-                            {selectedEvent.insights.shopping && (
-                                <div className="bg-white border border-pink-100 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-pink-400 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Gift size={14} className="text-pink-500"/>
-                                        <span className="text-xs font-bold text-pink-600 uppercase tracking-wider font-display">選品指南</span>
+                            {/* Japanese Vocabulary */}
+                            {selectedEvent.vocabulary && (
+                                <div className="mb-10">
+                                    <h4 className={`font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${selectedEvent.style === 'kon' ? 'text-blue-900' : 'text-stone-300'}`}>
+                                        — Vocabulary —
+                                    </h4>
+                                    <div className="grid gap-6">
+                                        {selectedEvent.vocabulary.map((vocab, i) => (
+                                            <div key={i} className={`relative pl-4 border-l ${selectedEvent.style === 'kon' ? 'border-blue-900' : 'border-stone-200'}`}>
+                                                <div className="flex items-baseline gap-3 mb-1">
+                                                    <ruby className={`text-2xl font-medium tracking-wide ${selectedEvent.style === 'kon' ? 'text-white font-sans' : 'text-stone-800 font-display'}`}>
+                                                        {vocab.term}
+                                                        <rt className={`text-xs mb-1 block ${selectedEvent.style === 'kon' ? 'text-blue-500 font-mono' : 'text-stone-400 font-serif'}`}>{vocab.reading}</rt>
+                                                    </ruby>
+                                                </div>
+                                                <p className={`text-xs leading-relaxed ${selectedEvent.style === 'kon' ? 'text-stone-500 font-sans' : 'text-stone-500 font-serif'}`}>
+                                                    {vocab.desc}
+                                                </p>
+                                            </div>
+                                        ))}
                                     </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.shopping}
-                                    </p>
                                 </div>
                             )}
 
-                            {/* Economy Insight */}
-                            {selectedEvent.insights.economy && (
-                                <div className="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-blue-500 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <TrendingUp size={14} className="text-blue-600"/>
-                                        <span className="text-xs font-bold text-blue-700 uppercase tracking-wider font-display">財經觀察</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.economy}
-                                    </p>
+                            {/* Insights Grid */}
+                            {selectedEvent.insights && (
+                                <div className="space-y-8">
+                                    <h4 className={`font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${selectedEvent.style === 'kon' ? 'text-blue-900' : 'text-stone-300'}`}>
+                                        — Insights —
+                                    </h4>
+                                    
+                                    {Object.entries(selectedEvent.insights).map(([key, value]) => {
+                                        if (key === 'trap') return null;
+                                        
+                                        let icon, label;
+                                        switch(key) {
+                                            case 'shopping': icon = <Gift size={14}/>; label = "Shopping Taste"; break;
+                                            case 'creative': icon = <Lightbulb size={14}/>; label = "Creative"; break;
+                                            case 'history': icon = <BookOpen size={14}/>; label = "History"; break;
+                                            case 'business': icon = <Briefcase size={14}/>; label = "Business"; break;
+                                            case 'politics': icon = <Landmark size={14}/>; label = "Politics"; break;
+                                            case 'local': icon = <Users size={14}/>; label = "Local Voice"; break;
+                                            case 'travel': icon = <Compass size={14}/>; label = "Travel Note"; break;
+                                            default: icon = <Info size={14}/>; label = "Info";
+                                        }
+
+                                        return (
+                                            <div key={key} className="group">
+                                                <div className={`flex items-center gap-2 mb-2 transition-colors ${selectedEvent.style === 'kon' ? 'text-blue-600 group-hover:text-blue-400' : 'text-stone-400 group-hover:text-stone-600'}`}>
+                                                    {icon}
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest font-sans">{label}</span>
+                                                </div>
+                                                <p className={`text-sm leading-7 pl-6 border-l transition-colors ${selectedEvent.style === 'kon' ? 'text-stone-400 border-zinc-800 font-sans' : 'text-stone-600 font-serif border-stone-100 group-hover:border-stone-300'}`}>
+                                                    {value}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
-
-                            {/* Business Insight */}
-                            {selectedEvent.insights.business && (
-                                <div className="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-blue-500 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Briefcase size={14} className="text-blue-600"/>
-                                        <span className="text-xs font-bold text-blue-700 uppercase tracking-wider font-display">商業模式</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.business}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Creative Insight */}
-                            {selectedEvent.insights.creative && (
-                                <div className="bg-white border border-purple-100 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-purple-400 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Lightbulb size={14} className="text-purple-500"/>
-                                        <span className="text-xs font-bold text-purple-600 uppercase tracking-wider font-display">創意視角</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.creative}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Local Insight */}
-                            {selectedEvent.insights.local && (
-                                <div className="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-rose-400 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Users size={14} className="text-rose-500"/>
-                                        <span className="text-xs font-bold text-rose-600 uppercase tracking-wider font-display">當地人觀點</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed italic font-medium pl-1">
-                                        {selectedEvent.insights.local}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Travel Insight */}
-                            {selectedEvent.insights.travel && (
-                                <div className="bg-white border border-emerald-100 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-emerald-400 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Compass size={14} className="text-emerald-500"/>
-                                        <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider font-display">旅遊實戰</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.travel}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Culture Insight */}
-                            {selectedEvent.insights.culture && (
-                                <div className="bg-white border border-amber-100 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-amber-400 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <BookOpen size={14} className="text-amber-500"/>
-                                        <span className="text-xs font-bold text-amber-600 uppercase tracking-wider font-display">文化歷史</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.culture}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* History Insight */}
-                            {selectedEvent.insights.history && (
-                                <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-stone-500 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <BookOpen size={14} className="text-stone-600"/>
-                                        <span className="text-xs font-bold text-stone-700 uppercase tracking-wider font-display">歷史脈絡</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.history}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Tech Insight */}
-                            {selectedEvent.insights.tech && (
-                                <div className="bg-white border border-sky-100 rounded-2xl p-5 shadow-sm relative">
-                                    <div className="absolute left-0 top-6 w-1 h-8 bg-sky-400 rounded-r-full"></div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Zap size={14} className="text-sky-500"/>
-                                        <span className="text-xs font-bold text-sky-600 uppercase tracking-wider font-display">經濟科技</span>
-                                    </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed font-medium pl-1">
-                                        {selectedEvent.insights.tech}
-                                    </p>
-                                </div>
-                            )}
-                            </div>
-                        )}
-
-                        {/* Google Maps Button */}
-                        <a 
-                            href={`https://www.google.com/maps/search/?api=1&query=${selectedEvent.locationQuery}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className={`flex items-center justify-center w-full py-4 text-white rounded-2xl font-bold tracking-wide transition-all shadow-xl shadow-blue-200/50 active:scale-95 bg-gradient-to-r ${currentSchedule.theme}`}
-                        >
-                            <MapIcon size={18} className="mr-2" />
-                            開啟 Google Maps
-                        </a>
+                        
+                        </div>
+                        
+                        <div className={`p-6 border-t flex justify-center ${selectedEvent.style === 'kon' ? 'bg-[#0a0a0a] border-zinc-900' : 'bg-stone-50 border-stone-100'}`}>
+                             <a 
+                                href={`https://www.google.com/maps/search/?api=1&query=${selectedEvent.locationQuery}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={`text-xs font-bold tracking-widest uppercase transition-colors flex items-center gap-2 font-sans ${selectedEvent.style === 'kon' ? 'text-blue-500 hover:text-white' : 'text-stone-400 hover:text-stone-800'}`}
+                            >
+                                <MapIcon size={14} />
+                                Open in Google Maps
+                            </a>
                         </div>
                     </div>
                     </div>
