@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>東京紀行 2025 (風格大亂鬥版)</title>
+    <title>東京紀行 2025</title>
     
     <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,7 +11,7 @@
     <!-- 2. Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;500;700;900&family=Shippori+Mincho:wght@400;600;800&family=Yomogi&family=Rye&family=Courier+Prime&family=Michroma&family=Potta+One&family=Dela+Gothic+One&family=Share+Tech+Mono&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Shippori+Mincho+B1:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;600;700;900&family=Shippori+Mincho:wght@400;600;800&family=Yomogi&family=Rye&family=Courier+Prime&family=Michroma&family=Potta+One&family=Dela+Gothic+One&family=Share+Tech+Mono&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Shippori+Mincho+B1:wght@700&family=New+Tegomin&family=Reggae+One&family=Kaisei+Decol:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- 3. Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -43,14 +43,17 @@
         }
         h1, h2, h3, .font-display { font-family: 'Zen Old Mincho', serif; }
 
-        /* --- STYLES --- */
+        /* --- STYLES (Color & Contrast Tuning) --- */
 
         /* 🎬 今敏 (Kon) */
         .style-kon {
             font-family: 'Noto Sans JP', sans-serif !important;
-            background-color: #050505 !important; color: #e0e0e0 !important; border: 1px solid #333;
+            background-color: #050505 !important; 
+            color: #f8fafc !important;
+            border: 1px solid #333;
         }
-        .style-kon h3 { font-weight: 900; letter-spacing: 0.1em; text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; }
+        .style-kon h3 { font-weight: 900; letter-spacing: 0.1em; text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; color: #fff !important; }
+        .style-kon p, .style-kon span, .style-kon div { color: #e2e8f0 !important; }
         .style-kon .kon-border::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
             background: linear-gradient(90deg, #ff0000 0%, #0000ff 50%, #ff0000 100%);
@@ -66,7 +69,13 @@
             color: black !important; font-family: 'Noto Sans JP', sans-serif; font-weight: 900;
             border: 4px solid black !important; border-radius: 0 !important;
         }
-        .style-kusama .inner-card { background: white; border: 2px solid black; padding: 15px; box-shadow: 5px 5px 0 black; color: black; }
+        .style-kusama .inner-card { background: white; border: 2px solid black; padding: 15px; box-shadow: 5px 5px 0 black; color: black !important; }
+        /* 標題強制底色，確保黑色點點背景下可讀 */
+        .style-kusama h3 { 
+            background: black; color: #fbbf24 !important; padding: 5px 10px; display: inline-block; 
+            box-shadow: 4px 4px 0 #fff;
+        }
+        .style-kusama p { color: #000 !important; font-weight: 700; }
 
         /* 🍃 吉卜力 (Ghibli) */
         .style-ghibli {
@@ -75,152 +84,207 @@
             font-family: 'Zen Old Mincho', serif; border: none !important; border-radius: 24px !important;
             box-shadow: 0 10px 30px -10px rgba(22, 101, 52, 0.3) !important;
         }
-        .style-ghibli h3 { font-family: 'Yomogi', cursive; }
+        .style-ghibli h3 { font-family: 'Yomogi', cursive; color: #14532d !important; }
+        .style-ghibli p { color: #166534 !important; font-weight: 600; }
+
+        /* 🏮 神隱少女 (Spirited Away) */
+        .style-spirited {
+            background-color: #881337 !important; /* Rose 900 */
+            color: #fef3c7 !important; /* Amber 100 */
+            font-family: 'Zen Old Mincho', serif !important;
+            border: 6px double #fbbf24 !important; /* Amber 400 */
+            background-image: 
+                radial-gradient(#9f1239 15%, transparent 16%), 
+                radial-gradient(#9f1239 15%, transparent 16%) !important;
+            background-size: 20px 20px !important;
+            background-position: 0 0, 10px 10px !important;
+            box-shadow: 0 15px 40px rgba(136, 19, 55, 0.6) !important;
+            border-radius: 12px !important;
+        }
+        .style-spirited h3 { 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+            border-bottom: 2px solid #fbbf24; 
+            padding-bottom: 15px; 
+            margin-bottom: 20px;
+            color: #fffbeb !important;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+        }
+        .style-spirited p, .style-spirited span, .style-spirited div { color: #fde68a !important; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-weight: 500; }
 
         /* 📰 東京日日 (Retro) */
         .style-retro {
-            background-color: #f5f5dc !important; color: #262626 !important; font-family: 'Shippori Mincho', serif;
+            background-color: #f5f5dc !important; color: #171717 !important; font-family: 'Shippori Mincho', serif;
             border: 1px solid #444 !important; box-shadow: 10px 10px 0 rgba(0,0,0,0.1) !important; border-radius: 2px !important;
         }
-        .style-retro h3 { border-bottom: 3px double #262626; padding-bottom: 5px; margin-bottom: 15px; font-weight: 900; }
+        .style-retro h3 { border-bottom: 3px double #262626; padding-bottom: 5px; margin-bottom: 15px; font-weight: 900; color: #000 !important; }
+        .style-retro p { color: #1c1917 !important; font-weight: 600; }
 
         /* 👧 奈良美智 (Nara) */
         .style-nara {
             background-color: #fffbeb !important; color: #57534e !important; font-family: 'Yomogi', cursive !important;
             border: 2px dashed #d6d3d1 !important; border-radius: 30px !important; padding: 20px !important;
         }
-        .style-nara h3 { color: #0ea5e9; font-size: 2rem; }
+        .style-nara h3 { color: #0ea5e9 !important; font-size: 2rem; }
+        .style-nara p { color: #44403c !important; font-size: 1.05em; font-weight: 600; }
 
         /* 🏴‍☠️ 航海王 (One Piece) */
         .style-onepiece {
-            background-color: #f3e5ab !important; color: #4a3b2a !important; font-family: 'Rye', serif !important;
+            background-color: #f3e5ab !important; color: #291d12 !important; font-family: 'Rye', serif !important;
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4c596' fill-opacity='0.4'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/g%3E%3C/svg%3E") !important;
             border: 8px double #4a3b2a !important; border-radius: 4px !important;
         }
-        .style-onepiece h3 { font-size: 2.5rem; text-transform: uppercase; text-align: center; border-bottom: 2px solid #4a3b2a; margin-bottom: 20px; }
+        .style-onepiece h3 { 
+            font-size: 2.5rem; text-transform: uppercase; text-align: center; border-bottom: 2px solid #4a3b2a; margin-bottom: 20px; color: #291d12 !important;
+        }
+        .style-onepiece p { color: #3f2e18 !important; font-weight: 800; }
 
-        /* ⚔️ Style 7: 銀魂 (Gintama) - 萬事屋 */
+        /* ⚔️ Style 7: 銀魂 (Gintama) */
         .style-gintama {
             background-color: #fff !important; color: #0f172a !important; font-family: 'Potta One', cursive !important;
             background-image: repeating-linear-gradient(45deg, #e0f2fe 25%, transparent 25%, transparent 75%, #e0f2fe 75%, #e0f2fe), repeating-linear-gradient(45deg, #e0f2fe 25%, #fff 25%, #fff 75%, #e0f2fe 75%, #e0f2fe) !important;
             background-size: 20px 20px !important; border: 4px solid #000 !important;
         }
-        .style-gintama h3 { font-size: 2rem; transform: rotate(-2deg); background: white; border: 2px solid black; padding: 5px; box-shadow: 4px 4px 0 #0ea5e9; }
+        .style-gintama h3 { font-size: 2rem; transform: rotate(-2deg); background: white; border: 2px solid black; padding: 5px; box-shadow: 4px 4px 0 #0ea5e9; color: #000 !important; }
+        .style-gintama p { background: rgba(255,255,255,0.9); padding: 8px; color: #000 !important; font-weight: 700; border: 1px solid #e5e5e5; }
 
-        /* 🧪 Style 8: GAIAC 10 (Le Labo) - 工業極簡 */
+        /* 🧪 Style 8: GAIAC 10 (Le Labo) */
         .style-gaiac {
             background-color: #e5e5e5 !important; color: #111 !important; font-family: 'Courier Prime', monospace !important;
             border: 1px solid #111 !important; border-radius: 0 !important; padding: 40px !important; box-shadow: none !important;
         }
-        .style-gaiac h3 { text-transform: uppercase; font-weight: 400; letter-spacing: 2px; font-size: 1.5rem; border-bottom: 1px solid #111; padding-bottom: 10px; margin-bottom: 20px; }
+        .style-gaiac h3 { text-transform: uppercase; font-weight: 400; letter-spacing: 2px; font-size: 1.5rem; border-bottom: 1px solid #111; padding-bottom: 10px; margin-bottom: 20px; color: #000 !important;}
+        .style-gaiac p { color: #111 !important; font-weight: 600; }
 
-        /* 📐 Style 9: 三宅一生 (Miyake) - 幾何摺疊 */
+        /* 📐 Style 9: 三宅一生 (Miyake) */
         .style-miyake {
             background: #fff !important; color: #000 !important; font-family: 'Michroma', sans-serif !important;
             border: none !important; box-shadow: 0 20px 50px rgba(0,0,0,0.1) !important;
             background-image: linear-gradient(90deg, transparent 50%, rgba(0,0,0,0.05) 50%) !important; background-size: 10px 100% !important;
         }
-        .style-miyake h3 { font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; }
+        .style-miyake h3 { font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: #000 !important; }
+        .style-miyake p { color: #333 !important; font-weight: 500; }
 
-        /* 💿 Style 10: 東京威力科創 (TEL) - 科技精密 */
+        /* 💿 Style 10: 東京威力科創 (TEL) */
         .style-tel {
-            background-color: #001f3f !important; color: #00aaff !important; font-family: 'Share Tech Mono', monospace !important;
+            background-color: #001f3f !important; color: #ffffff !important; font-family: 'Share Tech Mono', monospace !important;
             border: 1px solid #00aaff !important; box-shadow: 0 0 15px rgba(0, 170, 255, 0.4) !important;
             background-image: linear-gradient(0deg, transparent 24%, rgba(0, 170, 255, .3) 25%, rgba(0, 170, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 170, 255, .3) 75%, rgba(0, 170, 255, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 170, 255, .3) 25%, rgba(0, 170, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 170, 255, .3) 75%, rgba(0, 170, 255, .3) 76%, transparent 77%, transparent) !important;
             background-size: 50px 50px !important;
         }
-        .style-tel h3 { text-shadow: 0 0 5px #00aaff; letter-spacing: 2px; }
+        .style-tel h3 { text-shadow: 0 0 5px #00aaff; letter-spacing: 2px; color: #00aaff !important; }
+        .style-tel p { color: #e0f2fe !important; font-weight: 400; text-shadow: 0 0 2px #000; }
 
-        /* 📖 Style 11: 石黑一雄 (Ishiguro) - 記憶與遺憾 */
+        /* 📖 Style 11: 石黑一雄 (Ishiguro) */
         .style-ishiguro {
-            background-color: #f3f0e9 !important; color: #5c5548 !important; font-family: 'Cormorant Garamond', serif !important;
+            background-color: #f3f0e9 !important; color: #2d2a24 !important; font-family: 'Cormorant Garamond', serif !important;
             border: 1px solid #d4cbb8 !important; padding: 40px !important;
         }
-        .style-ishiguro h3 { font-style: italic; font-weight: 400; font-size: 2.2rem; border-bottom: 1px solid #d4cbb8; margin-bottom: 20px; padding-bottom: 10px; }
+        .style-ishiguro h3 { font-style: italic; font-weight: 600; font-size: 2.2rem; border-bottom: 1px solid #d4cbb8; margin-bottom: 20px; padding-bottom: 10px; color: #1c1917 !important; }
+        .style-ishiguro p { font-size: 1.1em; line-height: 1.8; color: #44403c !important; font-weight: 600; }
 
-        /* 🌈 Style 12: 原宿 (Harajuku) - KAWAII MONSTER */
+        /* 🌈 Style 12: 原宿 (Harajuku) */
         .style-harajuku {
-            background-color: #ffccff !important; color: #6600cc !important; font-family: 'Dela Gothic One', cursive !important;
+            background-color: #ffccff !important; color: #330066 !important; font-family: 'Dela Gothic One', cursive !important;
             border: 6px dashed #00ffff !important; border-radius: 20px !important;
             box-shadow: 8px 8px 0 #ff00cc !important;
         }
-        .style-harajuku h3 { text-shadow: 2px 2px 0 #fff; transform: rotate(-3deg); background: #ffff00; padding: 5px; display: inline-block; }
+        .style-harajuku h3 { text-shadow: 2px 2px 0 #fff; transform: rotate(-3deg); background: #ffff00; padding: 5px; display: inline-block; color: #ff0066 !important; }
+        .style-harajuku p { font-weight: bold; color: #3300cc !important; background: rgba(255,255,255,0.5); padding: 5px; }
 
-        /* 🌲 Style 13: 大江建三郎 (Oe) - 森林與存在 */
+        /* 🌲 Style 13: 大江建三郎 (Oe) */
         .style-oe {
             background-color: #2c3328 !important; color: #e2e8d8 !important; font-family: 'Shippori Mincho B1', serif !important;
             border-left: 10px solid #5f6b55 !important; border-radius: 0 !important;
         }
-        .style-oe h3 { font-weight: 900; letter-spacing: 0.1em; border-bottom: 1px solid #5f6b55; padding-bottom: 15px; margin-bottom: 20px; }
+        .style-oe h3 { font-weight: 900; letter-spacing: 0.1em; border-bottom: 1px solid #5f6b55; padding-bottom: 15px; margin-bottom: 20px; color: #ffffff !important; }
+        .style-oe p { color: #f0fdf4 !important; font-weight: 500; }
 
-        /* 🎓 Style 14: 東京大學 (Todai) - 學術與赤門 */
+        /* 🎓 Style 14: 東京大學 (Todai) */
         .style-todai {
-            background-color: #fffbeb !important; /* 象牙白 */
-            color: #1a1a1a !important; 
+            background-color: #fffbeb !important; color: #1a1a1a !important; 
             font-family: 'Zen Old Mincho', serif !important;
-            border: 4px solid #7f1d1d !important; /* 赤門紅 */
-            box-shadow: 10px 10px 0 #eab308 !important; /* 銀杏黃 */
-            border-radius: 4px !important;
+            border: 4px solid #7f1d1d !important; box-shadow: 10px 10px 0 #eab308 !important; border-radius: 4px !important;
         }
-        .style-todai h3 { 
-            font-weight: 900; 
-            border-bottom: 2px solid #7f1d1d; 
-            padding-bottom: 10px; 
-            margin-bottom: 20px;
-            color: #7f1d1d;
-        }
+        .style-todai h3 { font-weight: 900; border-bottom: 2px solid #7f1d1d; padding-bottom: 10px; margin-bottom: 20px; color: #7f1d1d !important; }
+        .style-todai p { color: #450a0a !important; font-weight: 600; }
 
-        /* 🦅 Style 15: 高市早苗 (Sanae) - 鐵娘子戰略 */
+        /* 🦅 Style 15: 高市早苗 (Sanae) */
         .style-sanae {
-            background-color: #1e3a8a !important; /* Navy Blue */
-            color: #ffffff !important; /* Ensure white text for contrast */
+            background-color: #1e3a8a !important; color: #ffffff !important; 
             font-family: 'Noto Sans JP', sans-serif !important;
-            border: 2px solid #fcd34d !important; /* Gold */
-            border-radius: 0 !important;
+            border: 2px solid #fcd34d !important; border-radius: 0 !important;
             background-image: linear-gradient(45deg, #172554 25%, transparent 25%, transparent 75%, #172554 75%, #172554), linear-gradient(45deg, #172554 25%, transparent 25%, transparent 75%, #172554 75%, #172554) !important;
-            background-size: 20px 20px !important;
-            background-position: 0 0, 10px 10px !important;
+            background-size: 20px 20px !important; background-position: 0 0, 10px 10px !important;
         }
-        .style-sanae h3 { 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            letter-spacing: 0.2em; 
-            color: #fcd34d !important;
-            border-bottom: 4px solid #fcd34d;
-        }
+        .style-sanae h3 { font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #fcd34d !important; border-bottom: 4px solid #fcd34d; }
+        .style-sanae p, .style-sanae span, .style-sanae div { color: #fefce8 !important; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 
-        /* 🌉 Style 16: 勝鬨橋 (Kachidoki) - 工業結構 */
+        /* 🌉 Style 16: 勝鬨橋 (Kachidoki) */
         .style-kachidoki {
-            background-color: #334155 !important; /* Slate 700 */
-            color: #e2e8f0 !important;
+            background-color: #334155 !important; color: #e2e8f0 !important;
             font-family: 'Share Tech Mono', monospace !important;
-            border: 4px dashed #94a3b8 !important; /* Rivet look */
-            border-radius: 10px !important;
+            border: 4px dashed #94a3b8 !important; border-radius: 10px !important;
             box-shadow: inset 0 0 20px #0f172a !important;
         }
-        .style-kachidoki h3 { 
-            text-shadow: 0 0 10px #38bdf8; 
-            color: #38bdf8 !important;
-            font-weight: 400;
-        }
+        .style-kachidoki h3 { text-shadow: 0 0 10px #38bdf8; color: #38bdf8 !important; font-weight: 400; }
+        .style-kachidoki p { color: #cbd5e1 !important; }
 
-        /* 🏢 Style 17: 住友商事 (Sumitomo) - 財閥與信用 */
+        /* 🏢 Style 17: 住友商事 (Sumitomo) */
         .style-sumitomo {
-            background-color: #064e3b !important; /* Deep Green */
-            color: #ffffff !important;
+            background-color: #064e3b !important; color: #ffffff !important;
             font-family: 'Noto Serif JP', serif !important;
-            border: 3px solid #f59e0b !important; /* Gold border */
-            border-radius: 2px !important;
+            border: 3px solid #f59e0b !important; border-radius: 2px !important;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3) !important;
         }
-        .style-sumitomo h3 {
-            font-weight: 700;
-            border-bottom: 1px solid #f59e0b;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            color: #f59e0b !important;
-            letter-spacing: 0.1em;
+        .style-sumitomo h3 { font-weight: 700; border-bottom: 1px solid #f59e0b; padding-bottom: 15px; margin-bottom: 20px; color: #f59e0b !important; letter-spacing: 0.1em; }
+        .style-sumitomo p { color: #ecfdf5 !important; font-weight: 400; }
+
+        /* 🕵️ Style 18: 東野圭吾 (Higashino) */
+        .style-higashino {
+            background-color: #171717 !important; color: #d4d4d4 !important;
+            font-family: 'Shippori Mincho', serif !important;
+            border-left: 1px solid #404040; padding: 30px !important;
         }
+        .style-higashino h3 { color: #ffffff !important; font-weight: 700; letter-spacing: 0.15em; border-bottom: 1px solid #a3a3a3; padding-bottom: 10px; }
+        .style-higashino p { color: #e5e5e5 !important; font-size: 0.95em; line-height: 2; font-weight: 500; }
+
+        /* 🧟 Style 19: 東京喰種 (Tokyo Ghoul) */
+        .style-ghoul {
+            background-color: #000000 !important; color: #ff0000 !important;
+            font-family: 'Reggae One', cursive !important;
+            border: 3px solid #ff0000 !important;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.1) 0%, transparent 60%), repeating-linear-gradient(45deg, rgba(20, 0, 0, 0.5) 0px, rgba(20, 0, 0, 0.5) 2px, transparent 2px, transparent 4px);
+        }
+        .style-ghoul h3 { font-size: 2.5rem; color: #ffffff !important; text-shadow: 2px 2px 0 #ff0000, -1px -1px 0 #550000; transform: skew(-5deg); }
+        .style-ghoul p { color: #fca5a5 !important; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; text-shadow: 1px 1px 0 #000; }
+        .style-ghoul .kon-border::before { background: linear-gradient(90deg, #ff0000 0%, #ffffff 50%, #ff0000 100%); }
+
+        /* ✏️ Style 20: 松本大洋 (Matsumoto) - 東京日日 */
+        .style-matsumoto {
+            background-color: #f2f2f2 !important; /* Paper white */
+            background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23d4d4d4' fill-opacity='0.4'/%3E%3C/svg%3E") !important;
+            color: #111 !important;
+            font-family: 'Kaisei Decol', serif !important;
+            border: 3px solid #222 !important;
+            border-radius: 4px 12px 4px 12px !important;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.1) !important; /* 修正：陰影淡化 */
+        }
+        .style-matsumoto h3 { font-weight: 700; border-bottom: 2px dashed #444; padding-bottom: 10px; margin-bottom: 20px; color: #000 !important; }
+        .style-matsumoto p { font-size: 1.05em; color: #1f2937 !important; font-weight: 600; }
+
+        /* 🗼 Style 21: 東京都同情塔 (Sympathy Tower) */
+        .style-sympathy {
+            background-color: #e2e8f0 !important;
+            background-image: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%) !important;
+            color: #0f172a !important;
+            font-family: 'Michroma', sans-serif !important;
+            border: 1px solid #fff !important;
+            border-radius: 40px 0 40px 0 !important;
+            box-shadow: 0 10px 40px -10px rgba(71, 85, 105, 0.5) !important;
+        }
+        .style-sympathy h3 { color: #1e293b !important; text-transform: uppercase; letter-spacing: 0.1em; }
+        .style-sympathy p { color: #334155 !important; font-family: 'Noto Sans JP', sans-serif; font-weight: 600; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -232,6 +296,14 @@
         .leaflet-tooltip-left:before, .leaflet-tooltip-right:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-top:before { border: none !important; }
         ruby { font-family: 'Zen Old Mincho', serif; }
         rt { font-family: 'Shippori Mincho', serif; font-size: 0.55em; opacity: 0.7; letter-spacing: 0.05em; color: inherit; }
+
+        /* !IMPORTANT: 強制修正 Vocabulary 區塊易讀性 */
+        .vocab-card { background-color: #ffffff !important; border: 1px solid #e5e7eb !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
+        .vocab-card h4 { color: #94a3b8 !important; }
+        .vocab-card .vocab-term { color: #1f2937 !important; text-shadow: none !important; }
+        .vocab-card .vocab-reading { color: #6b7280 !important; text-shadow: none !important; }
+        .vocab-card .vocab-desc { color: #4b5563 !important; text-shadow: none !important; }
+        .vocab-card .vocab-badge { background-color: #f9fafb !important; color: #6b7280 !important; border-color: #e5e7eb !important; text-shadow: none !important; }
     </style>
 </head>
 <body>
@@ -289,7 +361,7 @@
                 setTimeout(() => { map.invalidateSize(); }, 100);
             }, [route]);
 
-            return <div ref={mapRef} className="h-[350px] w-full rounded-md border border-stone-200 z-0 relative shadow-sm" />;
+            return <div ref={mapRef} className="h-[350px] w-full rounded-md border border-stone-200 z-0 relative shadow-sm style-matsumoto" />;
         };
 
         const TripApp = () => {
@@ -411,13 +483,13 @@
                     type: "food", 
                     title: "Shabuzen 六本木", 
                     desc: "黑毛和牛的味覺饗宴", 
-                    details: "進入「赤門」，迎接您的是東京大學（Todai）般的學術氛圍...不，是壽喜燒的香氣。在這裡，每一片 A5 和牛都經過嚴格的「論文審查」。霜降的比例、醬汁的甜度、蛋液的黏稠度，都是一場精密的化學實驗。這是一場關於味覺的研討會，請帶著敬畏之心品嚐。",
+                    details: "我...好餓...肉...新鮮的肉... Shabuzen 的黑毛和牛吃到飽，對於飢餓的靈魂來說是無法抗拒的誘惑。看著紅色的肉片在滾燙的湯汁中翻滾，那一瞬間，理智斷線，只剩下最原始的食慾。這不是晚餐，這是狩獵。",
                     locationQuery: "Shabuzen Roppongi",
                     icon: Utensils,
-                    style: 'todai', // Todai Style
+                    style: 'ghoul', // Tokyo Ghoul Style
                     weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
-                    keywords: ["學術研究", "赤門", "精英晚宴"],
-                    outfit: "建議穿著正式或半正式服裝。想像自己是要去參加學術發表的教授。",
+                    keywords: ["暴食", "赫子", "A5和牛"],
+                    outfit: "建議穿著深色衣服，因為吃肉的時候可能會噴濺...湯汁。",
                     insights: {
                         travel: "日本壽喜燒分關東風與關西風。這裡提供的是適合吃到飽的關東風（醬汁煮）。",
                         creative: "觀察和牛切片上如同大理石般的油花紋路，那是一種天然的藝術品。",
@@ -426,7 +498,7 @@
                     },
                     vocabulary: [
                         { term: "食べ放題", reading: "たべほうだい", meaning: "吃到飽", desc: "「放」是釋放，「題」在此指範圍。" },
-                        { term: "霜降り", reading: "しもふり", meaning: "霜降", desc: "形容牛肉油脂分佈像初冬的白霜一樣細緻均勻。" }
+                        { term: "喰種", reading: "グール", meaning: "喰種", desc: "以人類為食的亞人種。但在這裡，我們吃的是牛。" }
                     ]
                     }
                 ]
@@ -622,25 +694,27 @@
                     time: "17:00", 
                     type: "hotel", 
                     title: "Hotel Ichii 一井", 
-                    desc: "湯畑旁的溫泉宿", 
+                    desc: "神隱少女的湯屋", 
                     price: "$6681", 
-                    details: "入住位於草津溫泉核心地帶「湯畑」正前方的老牌旅館「一井」。",
+                    details: "歡迎來到油屋！這座位於湯畑正前方的老牌旅館，夜晚燈火通明時，彷彿通往神靈世界的入口。紅色的橋樑、升騰的白煙、穿著浴衣穿梭的人群，這裡不是草津，這裡是千尋迷路的那個世界。別忘了呼吸，過橋時要憋氣喔，不然會被湯婆婆發現。",
                     locationQuery: "Kusatsu Onsen Hotel Ichii",
                     icon: Hotel,
+                    style: 'spirited', // Spirited Away Style
+                    timetableUrl: "https://www.kkKG.co.jp/bus/rosen-bus.html",
                     weather: { type: 'snow', temp: '-2°C', loc: 'Kusatsu' },
-                    keywords: ["湯畑第一排", "日本三名泉", "強酸性泉"],
+                    keywords: ["千與千尋", "湯婆婆", "不可思議"],
                     outfit: "晚上看湯畑點燈『超級冷』，體感通常在零下。務必全副武裝。",
                     insights: {
                         travel: "草津溫泉是強酸性，殺菌力強但對皮膚刺激大。**銀飾品千萬別戴下水**。",
                         local: "「草津的水真的很『利』！皮膚敏感的人可能會癢。」",
-                        trap: "泡湯時絕對不要揉眼睛！草津的溫泉水進眼睛會非常非常痛。",
+                        trap: "在這裡如果不工作，就會被湯婆婆變成動物...啊不，是如果不泡湯，就白來了。",
                         creative: "湯畑湧出的蒸氣在夜間點燈下，形成千變萬化的雲霧光影秀。",
                         business: "【No.1 品牌學】草津連續 19 年蟬聯「日本溫泉 100 選」第一名。",
                         shopping: "【湯之花】草津名產「湯之花」是溫泉結晶粉，回家泡澡就像在草津一樣。"
                     },
                     vocabulary: [
                         { term: "湯畑", reading: "ゆばたけ", meaning: "熱水田", desc: "指利用像田地一樣的木槽，讓滾燙的泉水自然降溫。" },
-                        { term: "源泉", reading: "げんせん", meaning: "泉源", desc: "溫泉湧出的源頭。" }
+                        { term: "千尋", reading: "ちひろ", meaning: "千尋", desc: "尋找名字與回家的路。" }
                     ]
                     }
                 ]
@@ -761,10 +835,11 @@
                     time: "14:28", 
                     type: "transport", 
                     title: "前往機場", 
-                    desc: "最後的移動", 
-                    details: "搭乘 N'EX 前往成田機場。看著窗外的景色從橫濱的港灣、東京的樓群，變回千葉的田野。",
+                    desc: "東京都同情塔", 
+                    details: "Sympathy Tower / Terminal Connection... Initiating. \n機場不只是交通樞紐，它是現代社會的「同情塔」。巨大的流線型建築如同 Zaha Hadid 的未實現藍圖，在這裡，所有的悲歡離合都被 AI 演算法溫柔地包覆。我們是數據流中的粒子，正準備被傳送回原點。",
                     locationQuery: "Narita Airport Terminal 1",
                     icon: Train,
+                    style: 'sympathy', // Tokyo Sympathy Tower Style
                     timetableUrl: "https://www.jreast.co.jp/nex/time.html",
                     weather: { type: 'rain', temp: '7°C', loc: 'Tokyo' },
                     keywords: ["準點", "直達", "補眠"],
@@ -772,6 +847,7 @@
                     insights: {
                         travel: "橫濱站迷宮等級很高，請預留 15 分鐘找月台。車上有大型行李鎖，記得設簡單的密碼。",
                         trap: "橫濱站的 N'EX 月台跟一般電車月台是同一個，但停靠位置可能不同。請看電子跑馬燈。",
+                        creative: "流線型的建築線條象徵著無阻力的未來。在這裡，語言被簡化為圖標，情感被轉化為登機門的開闔。",
                         business: "【機場聯外競爭】N'EX 雖然速度輸給京成 Skyliner，但憑藉著 JR 龐大的路網，依然掌握了重視「一車直達」的商務與家庭客群。",
                         shopping: "【最後補給】如果還沒買夠，橫濱站的 JOINUS 地下街或高島屋百貨是最後衝刺的好地方，比機場選擇更多。"
                     },
@@ -835,37 +911,36 @@
             return (
                 <div className="min-h-screen bg-[#f9f8f6] font-sans text-stone-800 pb-12 relative transition-colors duration-1000">
                 
-                {/* Header */}
-                <div className={`p-8 pb-12 relative z-10 border-b border-stone-200 bg-[#fbfaf8]`}>
-                    <div className="flex justify-between items-start mb-8 max-w-2xl mx-auto">
-                        <div>
-                            <div className="flex items-center space-x-2 mb-3">
+                {/* Header - Compact Layout */}
+                <div className={`p-4 pb-6 relative z-10 border-b border-stone-200 bg-[#fbfaf8]`}>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 sm:mb-4 max-w-2xl mx-auto gap-2">
+                        <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-1">
                                 <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-stone-400 font-sans">
                                     TOKYO CHRONICLES 2025
                                 </span>
                             </div>
-                            <h1 className={`text-4xl font-bold tracking-tight mb-2 leading-tight font-display ${currentSchedule.theme.main}`}>
+                            <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight mb-1 leading-tight font-display ${currentSchedule.theme.main}`}>
                                 {currentSchedule.title}
                             </h1>
-                            <p className={`text-sm font-serif italic tracking-wide mb-1 ${currentSchedule.theme.sub}`}>
+                            <p className={`text-xs sm:text-sm font-serif italic tracking-wide mb-1 ${currentSchedule.theme.sub}`}>
                                 {currentSchedule.subtitle}
                             </p>
-                            <p className="text-stone-400 text-xs flex items-center font-medium tracking-wider font-sans mt-3">
+                            <p className="text-stone-400 text-xs flex items-center font-medium tracking-wider font-sans mt-2">
                                 <MapPin size={12} className="mr-1.5" /> {currentSchedule.location}
                             </p>
                         </div>
-                        <div className="text-right pt-2">
-                            <div className="text-2xl font-black opacity-10 font-display tracking-tighter text-right leading-tight">
-                                {currentSchedule.date}
-                                <br/>
-                                <span className="text-lg">{currentSchedule.day.split('(')[1].replace(')', '')}</span>
+                        <div className="text-left sm:text-right mt-2 sm:mt-0 flex flex-row sm:flex-col items-baseline sm:items-end gap-2 sm:gap-0">
+                            <div className="text-4xl sm:text-5xl font-black text-stone-200 font-display tracking-tighter leading-none">
+                                {currentSchedule.date.split('/')[1]}
                             </div>
+                            <div className="text-stone-300 font-serif text-sm tracking-widest uppercase">Dec</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Date Selector */}
-                <div className="px-4 -mt-8 mb-10 relative z-20 animate-in max-w-2xl mx-auto">
+                <div className="px-4 -mt-8 mb-8 relative z-20 animate-in max-w-2xl mx-auto">
                     <div className="bg-white/80 backdrop-blur-sm rounded-none shadow-sm p-1 flex justify-between overflow-x-auto no-scrollbar border border-stone-200">
                     {schedule.map((day, index) => (
                         <button
@@ -944,7 +1019,7 @@
                             </h4>
                             <span className="h-px w-8 bg-stone-300"></span>
                         </div>
-                        <div className="bg-white p-2 shadow-xl shadow-stone-200/50 border border-stone-100">
+                        <div className="bg-white p-2 shadow-xl shadow-stone-200/50 border border-stone-100 style-matsumoto">
                             <DailyMapView route={currentRoute} dayIndex={activeDay} />
                         </div>
                     </div>
@@ -961,50 +1036,50 @@
                         className="absolute inset-0 bg-[#f6f5f3]/90 backdrop-blur-sm transition-opacity duration-500"
                         onClick={() => setSelectedEvent(null)}
                     ></div>
-                    <div className={`bg-[#fdfbf7] relative z-10 w-full sm:max-w-lg shadow-2xl border border-stone-200 flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-500 overflow-hidden ${selectedEvent.style === 'kon' ? 'style-kon' : ''} ${selectedEvent.style === 'kusama' ? 'style-kusama' : ''} ${selectedEvent.style === 'ghibli' ? 'style-ghibli' : ''} ${selectedEvent.style === 'retro' ? 'style-retro' : ''} ${selectedEvent.style === 'nara' ? 'style-nara' : ''} ${selectedEvent.style === 'onepiece' ? 'style-onepiece' : ''} ${selectedEvent.style === 'gintama' ? 'style-gintama' : ''} ${selectedEvent.style === 'gaiac' ? 'style-gaiac' : ''} ${selectedEvent.style === 'miyake' ? 'style-miyake' : ''} ${selectedEvent.style === 'tel' ? 'style-tel' : ''} ${selectedEvent.style === 'ishiguro' ? 'style-ishiguro' : ''} ${selectedEvent.style === 'harajuku' ? 'style-harajuku' : ''} ${selectedEvent.style === 'oe' ? 'style-oe' : ''} ${selectedEvent.style === 'todai' ? 'style-todai' : ''} ${selectedEvent.style === 'sanae' ? 'style-sanae' : ''} ${selectedEvent.style === 'kachidoki' ? 'style-kachidoki' : ''} ${selectedEvent.style === 'sumitomo' ? 'style-sumitomo' : ''}`}>
+                    <div className={`bg-[#fdfbf7] relative z-10 w-full sm:max-w-lg shadow-2xl border border-stone-200 flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-500 overflow-hidden ${selectedEvent.style === 'kon' ? 'style-kon' : ''} ${selectedEvent.style === 'kusama' ? 'style-kusama' : ''} ${selectedEvent.style === 'ghibli' ? 'style-ghibli' : ''} ${selectedEvent.style === 'retro' ? 'style-retro' : ''} ${selectedEvent.style === 'nara' ? 'style-nara' : ''} ${selectedEvent.style === 'onepiece' ? 'style-onepiece' : ''} ${selectedEvent.style === 'gintama' ? 'style-gintama' : ''} ${selectedEvent.style === 'gaiac' ? 'style-gaiac' : ''} ${selectedEvent.style === 'miyake' ? 'style-miyake' : ''} ${selectedEvent.style === 'tel' ? 'style-tel' : ''} ${selectedEvent.style === 'ishiguro' ? 'style-ishiguro' : ''} ${selectedEvent.style === 'harajuku' ? 'style-harajuku' : ''} ${selectedEvent.style === 'oe' ? 'style-oe' : ''} ${selectedEvent.style === 'todai' ? 'style-todai' : ''} ${selectedEvent.style === 'sanae' ? 'style-sanae' : ''} ${selectedEvent.style === 'kachidoki' ? 'style-kachidoki' : ''} ${selectedEvent.style === 'sumitomo' ? 'style-sumitomo' : ''} ${selectedEvent.style === 'higashino' ? 'style-higashino' : ''} ${selectedEvent.style === 'ghoul' ? 'style-ghoul' : ''} ${selectedEvent.style === 'matsumoto' ? 'style-matsumoto' : ''} ${selectedEvent.style === 'sympathy' ? 'style-sympathy' : ''} ${selectedEvent.style === 'spirited' ? 'style-spirited' : ''}`}>
                         
                         {/* Kon Style Glitch Effect */}
-                        {selectedEvent.style === 'kon' && (
+                        {(selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul') && (
                              <div className="kon-border"></div>
                         )}
 
                         {/* Modal Header */}
-                        <div className={`p-8 border-b border-stone-100 relative ${selectedEvent.style === 'kon' ? 'bg-[#0f172a] border-gray-800' : ''}`}>
+                        <div className={`p-8 border-b border-stone-100 relative ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'bg-[#0f172a] border-gray-800' : ''}`}>
                             <button 
                                 onClick={() => setSelectedEvent(null)}
-                                className={`absolute top-6 right-6 transition-colors ${selectedEvent.style === 'kon' ? 'text-red-500 hover:text-red-400' : 'text-stone-300 hover:text-stone-600'}`}
+                                className={`absolute top-6 right-6 transition-colors ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-red-500 hover:text-red-400' : 'text-stone-300 hover:text-stone-600'}`}
                             >
                                 <X size={20} strokeWidth={selectedEvent.style === 'kon' ? 3 : 1.5} />
                             </button>
                             
                             <div className="flex items-center gap-3 mb-4">
-                                <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-1 ${selectedEvent.style === 'kon' ? 'text-red-500 bg-black border border-red-900' : 'text-stone-400 bg-stone-50'}`}>
+                                <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-1 ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-red-500 bg-black border border-red-900' : 'text-stone-400 bg-stone-50'}`}>
                                 {selectedEvent.type.toUpperCase()}
                                 </span>
                             </div>
                             
-                            <h3 className={`text-3xl font-bold mb-3 leading-tight ${selectedEvent.style === 'kon' ? 'text-white' : 'font-display text-stone-800'}`}>{selectedEvent.title}</h3>
-                            <div className={`flex items-center text-sm font-medium ${selectedEvent.style === 'kon' ? 'text-blue-400 font-mono' : 'text-stone-500 font-serif italic'}`}>
+                            <h3 className={`text-3xl font-bold mb-3 leading-tight ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-white' : 'font-display text-stone-800'}`}>{selectedEvent.title}</h3>
+                            <div className={`flex items-center text-sm font-medium ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-400 font-mono' : 'text-stone-500 font-serif italic'}`}>
                                 <Clock size={14} className="mr-2 opacity-50" />
                                 {selectedEvent.time}
                             </div>
                         </div>
 
                         {/* Modal Content */}
-                        <div className={`p-8 overflow-y-auto custom-scrollbar ${selectedEvent.style === 'kon' ? 'bg-[#111] text-stone-300' : ''} ${selectedEvent.style === 'kusama' ? 'inner-card' : ''}`}>
+                        <div className={`p-8 overflow-y-auto custom-scrollbar ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'bg-[#111] text-stone-300' : ''} ${selectedEvent.style === 'kusama' ? 'inner-card' : ''}`}>
                             
-                            <p className={`text-sm leading-8 mb-8 text-justify ${selectedEvent.style === 'kon' ? 'text-stone-400 font-sans tracking-wide' : 'text-stone-600 font-serif'}`}>
+                            <p className={`text-sm leading-8 mb-8 text-justify ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-stone-400 font-sans tracking-wide' : 'text-stone-600 font-serif'}`}>
                                 {selectedEvent.details}
                             </p>
 
                             {/* Trap Insight */}
                             {selectedEvent.insights?.trap && (
-                                <div className={`mb-8 p-6 border-l-2 ${selectedEvent.style === 'kon' ? 'bg-red-900/20 border-red-600 text-red-400' : 'bg-rose-50/50 border-rose-300'}`}>
-                                    <h4 className={`font-bold text-xs flex items-center mb-3 uppercase tracking-wider ${selectedEvent.style === 'kon' ? 'text-red-500' : 'font-display text-rose-800'}`}>
+                                <div className={`mb-8 p-6 border-l-2 ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'bg-red-900/20 border-red-600 text-red-400' : 'bg-rose-50/50 border-rose-300'}`}>
+                                    <h4 className={`font-bold text-xs flex items-center mb-3 uppercase tracking-wider ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-red-500' : 'font-display text-rose-800'}`}>
                                         <AlertTriangle size={12} className="mr-2" />
                                         Trap Warning
                                     </h4>
-                                    <p className={`text-sm leading-relaxed ${selectedEvent.style === 'kon' ? 'font-sans opacity-90' : 'text-rose-900/70 font-serif'}`}>
+                                    <p className={`text-sm leading-relaxed ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'font-sans opacity-90' : 'text-rose-900/70 font-serif'}`}>
                                         {selectedEvent.insights.trap}
                                     </p>
                                 </div>
@@ -1012,20 +1087,21 @@
 
                             {/* Japanese Vocabulary */}
                             {selectedEvent.vocabulary && (
-                                <div className="mb-10">
-                                    <h4 className={`font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${selectedEvent.style === 'kon' ? 'text-blue-900' : 'text-stone-300'}`}>
+                                <div className="mb-10 vocab-section">
+                                    <h4 className={`font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-900' : 'text-stone-300'}`}>
                                         — Vocabulary —
                                     </h4>
                                     <div className="grid gap-6">
                                         {selectedEvent.vocabulary.map((vocab, i) => (
-                                            <div key={i} className={`relative pl-4 border-l ${selectedEvent.style === 'kon' ? 'border-blue-900' : 'border-stone-200'}`}>
+                                            <div key={i} className="vocab-card relative pl-4 border-l border-stone-200 p-4 rounded-lg">
                                                 <div className="flex items-baseline gap-3 mb-1">
-                                                    <ruby className={`text-2xl font-medium tracking-wide ${selectedEvent.style === 'kon' ? 'text-white font-sans' : 'text-stone-800 font-display'}`}>
+                                                    <ruby className="vocab-term text-2xl font-medium tracking-wide text-stone-800 font-display">
                                                         {vocab.term}
-                                                        <rt className={`text-xs mb-1 block ${selectedEvent.style === 'kon' ? 'text-blue-500 font-mono' : 'text-stone-400 font-serif'}`}>{vocab.reading}</rt>
+                                                        <rt className="vocab-reading text-xs mb-1 block text-stone-500 font-serif">{vocab.reading}</rt>
                                                     </ruby>
+                                                    <span className="vocab-badge text-xs font-bold text-stone-500 bg-stone-50 px-2 py-0.5 rounded-full border border-stone-100">{vocab.meaning}</span>
                                                 </div>
-                                                <p className={`text-xs leading-relaxed ${selectedEvent.style === 'kon' ? 'text-stone-500 font-sans' : 'text-stone-500 font-serif'}`}>
+                                                <p className="vocab-desc text-xs leading-relaxed text-stone-600 font-serif">
                                                     {vocab.desc}
                                                 </p>
                                             </div>
@@ -1037,7 +1113,7 @@
                             {/* Insights Grid */}
                             {selectedEvent.insights && (
                                 <div className="space-y-8">
-                                    <h4 className={`font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${selectedEvent.style === 'kon' ? 'text-blue-900' : 'text-stone-300'}`}>
+                                    <h4 className={`font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-900' : 'text-stone-300'}`}>
                                         — Insights —
                                     </h4>
                                     
@@ -1058,11 +1134,11 @@
 
                                         return (
                                             <div key={key} className="group">
-                                                <div className={`flex items-center gap-2 mb-2 transition-colors ${selectedEvent.style === 'kon' ? 'text-blue-600 group-hover:text-blue-400' : 'text-stone-400 group-hover:text-stone-600'}`}>
+                                                <div className={`flex items-center gap-2 mb-2 transition-colors ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-600 group-hover:text-blue-400' : 'text-stone-400 group-hover:text-stone-600'}`}>
                                                     {icon}
                                                     <span className="text-[10px] font-bold uppercase tracking-widest font-sans">{label}</span>
                                                 </div>
-                                                <p className={`text-sm leading-7 pl-6 border-l transition-colors ${selectedEvent.style === 'kon' ? 'text-stone-400 border-zinc-800 font-sans' : 'text-stone-600 font-serif border-stone-100 group-hover:border-stone-300'}`}>
+                                                <p className={`text-sm leading-7 pl-6 border-l transition-colors ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-stone-400 border-zinc-800 font-sans' : 'text-stone-600 font-serif border-stone-100 group-hover:border-stone-300'}`}>
                                                     {value}
                                                 </p>
                                             </div>
@@ -1073,12 +1149,12 @@
                         
                         </div>
                         
-                        <div className={`p-6 border-t flex justify-center ${selectedEvent.style === 'kon' ? 'bg-[#0a0a0a] border-zinc-900' : 'bg-stone-50 border-stone-100'}`}>
+                        <div className={`p-6 border-t flex justify-center ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'bg-[#0a0a0a] border-zinc-900' : 'bg-stone-50 border-stone-100'}`}>
                              <a 
                                 href={`https://www.google.com/maps/search/?api=1&query=${selectedEvent.locationQuery}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className={`text-xs font-bold tracking-widest uppercase transition-colors flex items-center gap-2 font-sans ${selectedEvent.style === 'kon' ? 'text-blue-500 hover:text-white' : 'text-stone-400 hover:text-stone-800'}`}
+                                className={`text-xs font-bold tracking-widest uppercase transition-colors flex items-center gap-2 font-sans ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-500 hover:text-white' : 'text-stone-400 hover:text-stone-800'}`}
                             >
                                 <MapIcon size={14} />
                                 Open in Google Maps
