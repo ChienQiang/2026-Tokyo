@@ -31,6 +31,7 @@
       }
     </script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
         /* 基礎風格 */
@@ -304,14 +305,307 @@
         .vocab-card .vocab-reading { color: #6b7280 !important; text-shadow: none !important; }
         .vocab-card .vocab-desc { color: #4b5563 !important; text-shadow: none !important; }
         .vocab-card .vocab-badge { background-color: #f9fafb !important; color: #6b7280 !important; border-color: #e5e7eb !important; text-shadow: none !important; }
+
+        /* --- Floating FAB --- */
+        .floating-menu {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 1.5rem;
+            z-index: 9999;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .floating-fab-button {
+            width: 56px;
+            height: 56px;
+            border-radius: 999px;
+            border: 1px solid #e7e5e4;
+            cursor: pointer;
+            font-size: 24px;
+            background: #fdfbf7;
+            color: #292524;
+            box-shadow: 0 8px 20px rgba(41, 37, 36, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .floating-fab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(41, 37, 36, 0.2);
+            background: #f5f1e9;
+        }
+
+        /* --- 主選單面板 --- */
+        .floating-menu-panel {
+            position: absolute;
+            right: 0;
+            bottom: 64px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(253, 251, 247, 0.96);
+            border-radius: 16px;
+            border: 1px solid #e7e5e4;
+            box-shadow: 0 10px 30px rgba(41, 37, 36, 0.16);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            min-width: 180px;
+        }
+
+        .floating-menu-panel.is-open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .floating-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            background: transparent;
+            color: #292524;
+            font-size: 14px;
+            padding: 0.4rem 0.5rem;
+            border-radius: 999px;
+            cursor: pointer;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .floating-menu-item span.icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .floating-menu-item span.label {
+            flex: 1;
+        }
+
+        .floating-menu-item:hover {
+            background: rgba(231, 229, 228, 0.8);
+        }
+
+        /* --- 浮出小面板共用樣式（緊急資訊 / 熊的情報） --- */
+        .floating-panel {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 80px;
+            width: 260px;
+            max-width: calc(100vw - 3rem);
+            background: rgba(253, 251, 247, 0.98);
+            color: #292524;
+            border-radius: 16px;
+            border: 1px solid #e7e5e4;
+            box-shadow: 0 10px 30px rgba(41, 37, 36, 0.18);
+            padding: 0.75rem 0.75rem 0.85rem;
+            font-size: 13px;
+            display: none;
+            z-index: 9998;
+        }
+
+        .floating-panel.is-open {
+            display: block;
+        }
+
+        .floating-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .floating-panel-header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .floating-panel-close {
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .floating-panel-close:hover {
+            color: #111827;
+        }
+
+        .floating-textarea {
+            width: 100%;
+            min-height: 90px;
+            resize: vertical;
+            border-radius: 10px;
+            border: 1px solid #e7e5e4;
+            background: #fff;
+            color: #292524;
+            font-size: 13px;
+            padding: 0.5rem;
+            box-sizing: border-box;
+        }
+
+        .floating-textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        .floating-sos-list {
+            list-style: none;
+            padding: 0;
+            margin: 0.2rem 0 0.3rem;
+        }
+
+        .floating-sos-list li {
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+
+        .floating-sos-label {
+            color: #6b7280;
+            margin-right: 0.25rem;
+        }
+
+        .floating-sos-note {
+            margin-top: 0.25rem;
+            color: #6b7280;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .bear-note {
+            font-size: 12px;
+            line-height: 1.55;
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 6px 0;
+            white-space: normal;
+        }
+
+        .bear-note a {
+            color: #4fa3ff;
+            text-decoration: underline;
+        }
+
+        .bear-note a:hover {
+            opacity: 0.7;
+        }
+
+        /* 日期 Tabs 容器：負責「有間隔」 */
+        .day-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0 14px;
+            flex-wrap: wrap;
+        }
+
+        /* 雜誌排版風＋支援每一天自己的主題色 */
+        .day-tab {
+            font-family: "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.1;
+            text-align: center;
+            padding: 8px 12px 6px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #d3d3d3;
+            color: #1a1a1a;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition:
+                background 0.25s ease,
+                color 0.25s ease,
+                border-color 0.25s ease,
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        /* 星期小字 */
+        .day-tab .jp {
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.6;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* hover 的質感 */
+        .day-tab:hover {
+            background: #f7f7f7;
+        }
+
+        /* 每天自己的主題色：用 --day-color 控制 */
+        .day-tab.is-active {
+            background: var(--day-color, #000);
+            border-color: var(--day-color, #000);
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+        }
+
+        .day-panel-container {
+            position: relative;
+            overflow: hidden;
+            min-height: 280px;
+        }
+
+        /* 基本狀態：先看不到、待命中 */
+        .day-panel {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transform: translateX(0);
+            pointer-events: none;
+            transition:
+                opacity 0.45s ease,
+                transform 0.45s cubic-bezier(.22,.61,.36,1);
+        }
+
+        /* 顯示中的那一天 */
+        .day-panel.is-active {
+            opacity: 1;
+            pointer-events: auto;
+            position: relative;
+        }
+
+        /* 進場起始位置（新的一天從這裡開始） */
+        .day-panel.slide-in-from-right {
+            transform: translateX(24px);
+        }
+
+        .day-panel.slide-in-from-left {
+            transform: translateX(-24px);
+        }
+
+        @media (max-width: 600px) {
+            .floating-menu {
+                right: 1rem;
+                bottom: 1rem;
+            }
+            .floating-panel {
+                right: 1rem;
+                bottom: 76px;
+            }
+        }
     </style>
 </head>
-<body>
+<body data-bear-feed="https://jsonplaceholder.typicode.com/posts/1">
     
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
-        import React, { useState, useEffect, useRef } from 'react';
+        import React, { useState, useEffect, useRef, useMemo } from 'react';
         import { createRoot } from 'react-dom/client';
         import { 
             Plane, Train, Hotel, MapPin, Camera, ShoppingBag, Home, Clock, 
@@ -324,6 +618,26 @@
         const DailyMapView = ({ route, dayIndex }) => {
             const mapRef = useRef(null);
             const mapInstanceRef = useRef(null);
+
+            const haversineKm = (a, b) => {
+                const toRad = (deg) => (deg * Math.PI) / 180;
+                const [lat1, lon1] = a;
+                const [lat2, lon2] = b;
+                const R = 6371; // km
+                const dLat = toRad(lat2 - lat1);
+                const dLon = toRad(lon2 - lon1);
+                const h =
+                    Math.sin(dLat / 2) ** 2 +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+                return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+            };
+
+            const totalDistanceKm = useMemo(() => {
+                if (!route?.path || route.path.length < 2) return 0;
+                return route.path.slice(1).reduce((sum, coord, idx) => {
+                    return sum + haversineKm(route.path[idx], coord);
+                }, 0);
+            }, [route]);
 
             useEffect(() => {
                 if (!mapRef.current) return;
@@ -355,18 +669,60 @@
                             .addTo(map);
                         });
                     }
-                    const bounds = L.latLngBounds(route.path);
+                    if (route.landmarks) {
+                        route.landmarks.forEach((spot) => {
+                            const icon = L.divIcon({
+                                className: 'custom-div-icon',
+                                html: `<div style="font-size:18px;">${spot.emoji}</div>`
+                            });
+                            L.marker(spot.coord, { icon })
+                                .bindTooltip(spot.label, { direction: 'top', offset: [0, -8], className: 'map-label' })
+                                .addTo(map);
+                        });
+                    }
+                    const bounds = L.latLngBounds(route.path.concat(route.landmarks?.map(l => l.coord) || []));
                     map.fitBounds(bounds, { padding: [60, 60] });
                 }
                 setTimeout(() => { map.invalidateSize(); }, 100);
             }, [route]);
 
-            return <div ref={mapRef} className="h-[350px] w-full rounded-md border border-stone-200 z-0 relative shadow-sm style-matsumoto" />;
+            return (
+                <div className="space-y-3">
+                    <div ref={mapRef} className="h-[350px] w-full rounded-md border border-stone-200 z-0 relative shadow-sm style-matsumoto" />
+                    <div className="grid sm:grid-cols-3 gap-2 text-xs text-stone-600">
+                        <div className="flex items-center gap-2 bg-white border border-stone-200 px-3 py-2 rounded">
+                            <Compass size={14} className="text-stone-500" />
+                            <div className="flex flex-col leading-tight">
+                                <span className="text-[10px] uppercase tracking-[0.15em] text-stone-400">Distance</span>
+                                <span className="font-semibold text-stone-800">{totalDistanceKm.toFixed(1)} km</span>
+                            </div>
+                        </div>
+                        <div className="sm:col-span-2 bg-white border border-stone-200 px-3 py-2 rounded">
+                            <div className="text-[10px] uppercase tracking-[0.15em] text-stone-400 mb-1">Nearby Landmarks</div>
+                            <div className="flex flex-wrap gap-1.5">
+                                {(route?.landmarks || []).map((spot, idx) => (
+                                    <span key={idx} className="inline-flex items-center gap-1 bg-stone-50 border border-stone-200 px-2 py-1 rounded-full text-[11px] font-semibold text-stone-700">
+                                        <span>{spot.emoji}</span>
+                                        <span className="leading-none">{spot.label}</span>
+                                    </span>
+                                ))}
+                                {(!route?.landmarks || route.landmarks.length === 0) && (
+                                    <span className="text-stone-400 text-[11px]">No nearby notes added.</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
         };
 
         const TripApp = () => {
             const [activeDay, setActiveDay] = useState(0);
             const [selectedEvent, setSelectedEvent] = useState(null);
+            const [currentDayKey, setCurrentDayKey] = useState("1219");
+            const [prevDayKey, setPrevDayKey] = useState("1219");
+            const [transitionDir, setTransitionDir] = useState("forward");
+            const [slideInKey, setSlideInKey] = useState("1219");
 
             const coords = {
                 tpe: [25.0797, 121.2342], nrt: [35.7719, 140.3929], roppongi: [35.6628, 139.7314],
@@ -377,11 +733,65 @@
             };
 
             const mapRoutes = [
-                { id: 'day1', path: [coords.nrt, coords.roppongi], stops: [{ name: "成田", coord: coords.nrt, landmark: "" }, { name: "六本木", coord: coords.roppongi, landmark: "" }] },
-                { id: 'day2', path: [coords.roppongi, coords.ginza, coords.hibiya, coords.roppongi], stops: [{ name: "六本木", coord: coords.roppongi, landmark: "" }, { name: "銀座", coord: coords.ginza, landmark: "" }, { name: "日比谷", coord: coords.hibiya, landmark: "" }] },
-                { id: 'day3', path: [coords.roppongi, coords.tokyoSt, coords.takasaki, coords.daruma, coords.takasaki, coords.karuizawa, coords.kusatsu], stops: [{ name: "東京", coord: coords.tokyoSt, landmark: "" }, { name: "高崎", coord: coords.takasaki, landmark: "" }, { name: "草津", coord: coords.kusatsu, landmark: "" }] },
-                { id: 'day4', path: [coords.kusatsu, coords.karuizawa, coords.tokyoSt, coords.yokohama, coords.redbrick], stops: [{ name: "草津", coord: coords.kusatsu, landmark: "" }, { name: "軽井沢", coord: coords.karuizawa, landmark: "" }, { name: "横浜", coord: coords.yokohama, landmark: "" }] },
-                { id: 'day5', path: [coords.yokohama, coords.shinyokohama, coords.nrt], stops: [{ name: "横浜", coord: coords.yokohama, landmark: "" }, { name: "新横浜", coord: coords.shinyokohama, landmark: "" }, { name: "成田", coord: coords.nrt, landmark: "" }] }
+                { 
+                    id: 'day1', 
+                    path: [coords.nrt, coords.roppongi], 
+                    stops: [{ name: "成田", coord: coords.nrt, landmark: "" }, { name: "六本木", coord: coords.roppongi, landmark: "" }],
+                    landmarks: [
+                        { emoji: "🛫", label: "成田空港 T1 展望台", coord: [35.7719, 140.3929] },
+                        { emoji: "🗼", label: "東京タワー 夜景", coord: [35.6586, 139.7454] },
+                        { emoji: "🏙️", label: "汐留 濱離宮庭園", coord: [35.6639, 139.7634] },
+                        { emoji: "🌉", label: "彩虹大橋 觀景", coord: [35.6350, 139.7634] }
+                    ]
+                },
+                { 
+                    id: 'day2', 
+                    path: [coords.roppongi, coords.ginza, coords.hibiya, coords.roppongi], 
+                    stops: [{ name: "六本木", coord: coords.roppongi, landmark: "" }, { name: "銀座", coord: coords.ginza, landmark: "" }, { name: "日比谷", coord: coords.hibiya, landmark: "" }],
+                    landmarks: [
+                        { emoji: "🎨", label: "森美術館", coord: [35.6605, 139.7293] },
+                        { emoji: "🛍️", label: "銀座中央通り", coord: [35.6712, 139.7650] },
+                        { emoji: "🌿", label: "日比谷公園", coord: [35.6750, 139.7570] },
+                        { emoji: "🎬", label: "TOHO Hibiya 戲院街", coord: [35.6744, 139.7584] },
+                        { emoji: "🍜", label: "有樂町 高架下美食", coord: [35.6731, 139.7633] }
+                    ]
+                },
+                { 
+                    id: 'day3', 
+                    path: [coords.roppongi, coords.tokyoSt, coords.takasaki, coords.daruma, coords.takasaki, coords.karuizawa, coords.kusatsu], 
+                    stops: [{ name: "東京", coord: coords.tokyoSt, landmark: "" }, { name: "高崎", coord: coords.takasaki, landmark: "" }, { name: "草津", coord: coords.kusatsu, landmark: "" }],
+                    landmarks: [
+                        { emoji: "🎯", label: "高崎達磨寺", coord: [36.3285, 139.0036] },
+                        { emoji: "🌲", label: "軽井沢 雲場池", coord: [36.3578, 138.6277] },
+                        { emoji: "♨️", label: "草津温泉 湯畑", coord: [36.6208, 138.5963] },
+                        { emoji: "🚂", label: "群馬 蒸氣小火車展示", coord: [36.3289, 139.0128] },
+                        { emoji: "🏔️", label: "淺間山 遠眺", coord: [36.4069, 138.5232] }
+                    ]
+                },
+                { 
+                    id: 'day4', 
+                    path: [coords.kusatsu, coords.karuizawa, coords.tokyoSt, coords.yokohama, coords.redbrick], 
+                    stops: [{ name: "草津", coord: coords.kusatsu, landmark: "" }, { name: "軽井沢", coord: coords.karuizawa, landmark: "" }, { name: "横浜", coord: coords.yokohama, landmark: "" }],
+                    landmarks: [
+                        { emoji: "🍃", label: "旧軽井沢 銀座通り", coord: [36.3451, 138.6419] },
+                        { emoji: "⚓", label: "横浜赤レンガ倉庫", coord: [35.4526, 139.6429] },
+                        { emoji: "🎡", label: "コスモクロック21", coord: [35.4575, 139.6340] },
+                        { emoji: "⛪", label: "山下公園 & 氷川丸", coord: [35.4430, 139.6502] },
+                        { emoji: "🏞️", label: "港の見える丘公園", coord: [35.4414, 139.6521] }
+                    ]
+                },
+                { 
+                    id: 'day5', 
+                    path: [coords.yokohama, coords.shinyokohama, coords.nrt], 
+                    stops: [{ name: "横浜", coord: coords.yokohama, landmark: "" }, { name: "新横浜", coord: coords.shinyokohama, landmark: "" }, { name: "成田", coord: coords.nrt, landmark: "" }],
+                    landmarks: [
+                        { emoji: "🏟️", label: "日産スタジアム", coord: [35.5090, 139.6060] },
+                        { emoji: "🍜", label: "新横浜ラーメン博物館", coord: [35.5095, 139.6158] },
+                        { emoji: "🛫", label: "成田空港 さくらの山", coord: [35.7796, 140.3712] },
+                        { emoji: "🧸", label: "ANA FESTA 土產店", coord: [35.7719, 140.3929] },
+                        { emoji: "🌾", label: "成田山新勝寺", coord: [35.7830, 140.3186] }
+                    ]
+                }
             ];
 
             const WeatherIcon = ({ type, size = 14, className }) => {
@@ -409,6 +819,7 @@
                     type: "flight", 
                     title: "飛往東京：啟程", 
                     desc: "搭乘酷航 TR874 夢幻客機。", 
+                    preview: "光從跑道升起，影子留在雲下，第一幕開場。",
                     details: "LABORATORY: GAIAC 10 // TOKYO \n\n成分：檜木、麝香、癒創木、乳香。\n\n狀態：飛行中。\n\n這不僅是一次移動，而是一場嗅覺的淨化。脫離地面的瞬間，如同噴灑在試紙上的前調，清冽而充滿期待。艙內的乾燥空氣混合著淡淡的皮革味，這是旅行專屬的氣息。",
                     locationQuery: "Taoyuan International Airport Terminal 1",
                     icon: Plane,
@@ -434,6 +845,7 @@
                     type: "transport", 
                     title: "成田特急 N'EX", 
                     desc: "前往六本木的紅色閃電", 
+                    preview: "紅黑列車穿過暗田進霓虹，光影邊界一線之隔。",
                     details: "降落後，我們將搭乘 JR 的招牌列車「成田特急 (Narita Express)」。車窗外的景色從黑暗的田野瞬間切換到刺眼的都市霓虹，這不僅是物理上的移動，更像是一場意識流的剪接。紅黑配色的車體，如同警告信號般劃破夜空。",
                     locationQuery: "六本木駅",
                     icon: Train,
@@ -458,6 +870,7 @@
                     type: "hotel", 
                     title: "APA 六本木飯店", 
                     desc: "都市叢林中的棲身之所", 
+                    preview: "霓虹與狹縫房間交錯的夜基地，光影交纏的棲身所。",
                     price: "$3068", 
                     details: "歡迎來到原宿...啊不，是六本木！APA 飯店就是都市裡的怪獸大廈。這裡混雜著商務客、觀光客與夜生活的人群。極度狹窄的空間與極度鮮豔的社長看板，構成了一種強烈的視覺衝擊。這就是東京，擁擠、混亂，卻充滿能量。",
                     locationQuery: "APA Hotel Roppongi Ekimae",
@@ -483,6 +896,7 @@
                     type: "food", 
                     title: "Shabuzen 六本木", 
                     desc: "黑毛和牛的味覺饗宴", 
+                    preview: "霧氣與肉香同時升起，光照鍋面、影落心底。",
                     details: "我...好餓...肉...新鮮的肉... Shabuzen 的黑毛和牛吃到飽，對於飢餓的靈魂來說是無法抗拒的誘惑。看著紅色的肉片在滾燙的湯汁中翻滾，那一瞬間，理智斷線，只剩下最原始的食慾。這不是晚餐，這是狩獵。",
                     locationQuery: "Shabuzen Roppongi",
                     icon: Utensils,
@@ -516,6 +930,7 @@
                     type: "food", 
                     title: "鮨・Itsumi", 
                     desc: "赤坂的隱藏版 Omakase", 
+                    preview: "昭和巷弄的靜謐吧台，握出未來的味道。",
                     details: "「記憶，就像這貫壽司的餘韻，模糊卻真實。」在石黑一雄的筆下，每一口食物都是通往過去的鑰匙。赤坂這間隱密的壽司店，師傅安靜地捏製著壽司，彷彿在修復著某段失落的時光。醋飯的溫度、魚料的熟成，都是為了那一瞬間的完美而存在，然後消逝，只留下回憶。",
                     locationQuery: "Sushi Itsumi",
                     icon: Utensils,
@@ -540,6 +955,7 @@
                     type: "activity", 
                     title: "有樂町大江戶古董市集", 
                     desc: "萬事屋的尋寶委託", 
+                    preview: "玻璃帷幕下的昭和寶物，把過去攤在未來光影裡。",
                     details: "喂喂，新八！聽說這裡有賣阿通小姐的絕版唱片？這裡可是有樂町啊，不是歌舞伎町！在現代化的東京國際論壇大樓廣場，每月舉辦兩次的「大江戶古董市集」。雖然沒有天人，但這裡有昭和時代的破銅爛鐵...啊不，是珍貴的古董。在摩天大樓的陰影下，充滿了吐槽點與寶物。",
                     locationQuery: "Tokyo International Forum",
                     icon: ShoppingBag,
@@ -564,6 +980,7 @@
                     type: "activity", 
                     title: "皇居外苑 / 日比谷公園", 
                     desc: "權力與綠地的交響曲", 
+                    preview: "石牆與松林對話財閥高樓，昭和威嚴連接現代金融。",
                     details: "這裡是東京的心臟，也是權力的象徵。住友商事（Sumitomo Corporation）風格的穩重與信用，瀰漫在丸之內與日比谷的空氣中。從皇居外苑的莊嚴松林，到日比谷公園的近代洋風設計，每一步都踏在日本現代化的歷史基石上。這是一場關於「信用」與「傳統」的散策。",
                     locationQuery: "Hibiya Park",
                     icon: Camera,
@@ -588,6 +1005,7 @@
                     type: "activity", 
                     title: "六本木聖誕燈飾", 
                     desc: "無限增殖的光點", 
+                    preview: "冷白燈海把未來點成昭和星河，戀人穿梭其間。",
                     details: "傍晚回到六本木，欣賞著名的「櫸坂通」聖誕點燈。在草間彌生的眼中，這些冷白與藍色的光點不斷增殖、擴散，直到吞沒了整條街道與行人的自我。這不是浪漫，而是一種對於「無限」的恐懼與迷戀。我是光，光是我，我們都消融在宇宙的網中。",
                     locationQuery: "Roppongi Keyakizaka Dori",
                     icon: Camera,
@@ -622,6 +1040,7 @@
                     type: "transport", 
                     title: "北陸新幹線", 
                     desc: "精密製程的移動", 
+                    preview: "白色子彈劃破雪空，蒸氣未起先直奔湯煙彼端。",
                     details: "System Status: NORMAL. Velocity: 260 km/h. \n搭乘北陸新幹線如同進入一個巨大的半導體製程。所有的時間表精確到秒，所有的動作都被標準化。藍白相間的車體在軌道上滑行，沒有多餘的震動，沒有誤差。這是東京威力科創 (Tokyo Electron) 級別的精密移動體驗。",
                     locationQuery: "Tokyo Station",
                     icon: Train,
@@ -648,6 +1067,7 @@
                     type: "activity", 
                     title: "少林山達磨寺", 
                     desc: "萬延元年的沈默", 
+                    preview: "山寺靜默與香火縈繞，在霧氣裡向湯煙彼方許願。",
                     details: "「死者在地下長眠，而生者在地上燃燒慾望。」大江健三郎式的存在主義瀰漫在這座古老的寺廟中。無數只有一隻眼睛的達磨，凝視著虛空。這裡是慾望的墳場，也是希望的起點。在群馬的山林中，我們與自己的靈魂對話。",
                     locationQuery: "Shorinzan Daruma-ji",
                     icon: MapPin,
@@ -672,6 +1092,7 @@
                     type: "transport", 
                     title: "草輕交通巴士", 
                     desc: "龍貓公車的森林之旅", 
+                    preview: "森林隧道中的巴士穿梭，窗外霧白預告即將抵達溫泉。",
                     details: "從輕井澤搭乘巴士前往草津溫泉。這段路程會穿越茂密的森林與蜿蜒的山路，彷彿進入了吉卜力的世界。窗外的景色從別墅區逐漸變成原始的雪國森林，或許在某個轉彎處，你會看見龍貓在樹梢上等車。這是一段關於鄉愁與自然的旅程。",
                     locationQuery: "Karuizawa Station",
                     icon: Train,
@@ -695,6 +1116,7 @@
                     type: "hotel", 
                     title: "Hotel Ichii 一井", 
                     desc: "神隱少女的湯屋", 
+                    preview: "湯畑蒸氣當作門簾，踏進旅館就像穿越一層溫暖的霧。",
                     price: "$6681", 
                     details: "歡迎來到油屋！這座位於湯畑正前方的老牌旅館，夜晚燈火通明時，彷彿通往神靈世界的入口。紅色的橋樑、升騰的白煙、穿著浴衣穿梭的人群，這裡不是草津，這裡是千尋迷路的那個世界。別忘了呼吸，過橋時要憋氣喔，不然會被湯婆婆發現。",
                     locationQuery: "Kusatsu Onsen Hotel Ichii",
@@ -732,6 +1154,7 @@
                     type: "shop", 
                     title: "輕井澤王子 Outlet", 
                     desc: "一塊布的幾何美學", 
+                    preview: "高原冷風中的購物大道，山林轉向港口前的補給站。",
                     details: "在這片高原上的購物廣場，我們不談流行，談結構。輕井澤王子 Outlet 的空間設計如同三宅一生 (Issey Miyake) 的「一塊布 (A Piece of Cloth)」哲學，利用自然的摺疊與延展，創造出與環境共生的商業空間。在這裡購物，是對生活型態的幾何解構。",
                     locationQuery: "Karuizawa Prince Shopping Plaza",
                     icon: ShoppingBag,
@@ -757,6 +1180,7 @@
                     type: "transport", 
                     title: "前往橫濱", 
                     desc: "國家戰略移動", 
+                    preview: "列車越過山與海，把行李和心意送進港口故事的開頭。",
                     details: "這不是單純的移動，這是「國家戰略」等級的部署。從高山到海港，我們需要的是速度、紀律與決斷。Sanae Takaichi (高市早苗) 風格的強硬與精準，體現在這段新幹線與電車的轉乘中。沒有任何一秒鐘是可以被浪費的，目標只有一個：橫濱。",
                     locationQuery: "Karuizawa Station",
                     icon: Train,
@@ -779,6 +1203,7 @@
                     type: "activity", 
                     title: "橫濱紅磚倉庫", 
                     desc: "大航海時代的冒險", 
+                    preview: "夕陽映紅磚，海風翻頁，港口物語在此展開。",
                     details: "想要我的財寶嗎？想要的話可以全部給你！傍晚抵達橫濱紅磚倉庫，這裡曾是日本通往世界的門戶。紅磚牆上留下的斑駁痕跡，是無數水手與貨物的記憶。在海風中，彷彿能聽到海賊王的號角聲。這不是普通的倉庫，這是冒險的起點！",
                     locationQuery: "Yokohama Red Brick Warehouse",
                     icon: Camera,
@@ -811,6 +1236,7 @@
                     type: "food", 
                     title: "新橫濱拉麵博物館", 
                     desc: "昭和時代的號外", 
+                    preview: "昭和街景的最後一碗，把回程的記憶盛進湯裡。",
                     details: "號外！號外！時空隧道發現確認。位於新橫濱的拉麵博物館，已確認為通往昭和33年的入口。夕陽永遠懸掛在天邊，街角的煙草店傳來收音機的雜訊，熱騰騰的拉麵香氣是這個世界唯一的真實。請所有時空旅人盡情享受這最後的懷舊時刻。",
                     locationQuery: "Shin-Yokohama Ramen Museum",
                     icon: Utensils,
@@ -836,6 +1262,7 @@
                     type: "transport", 
                     title: "前往機場", 
                     desc: "東京都同情塔", 
+                    preview: "列車滑向跑道，所有回憶被妥善打包準備起飛。",
                     details: "Sympathy Tower / Terminal Connection... Initiating. \n機場不只是交通樞紐，它是現代社會的「同情塔」。巨大的流線型建築如同 Zaha Hadid 的未實現藍圖，在這裡，所有的悲歡離合都被 AI 演算法溫柔地包覆。我們是數據流中的粒子，正準備被傳送回原點。",
                     locationQuery: "Narita Airport Terminal 1",
                     icon: Train,
@@ -858,6 +1285,7 @@
                     type: "plane", 
                     title: "機場 Check-in", 
                     desc: "勝鬨橋的開合", 
+                    preview: "登機口像開合橋，記憶箱緩緩收束，等待返航。",
                     details: "機場Check-in 櫃檯如同隅田川上的勝鬨橋 (Kachidoki Bridge)。它既是終點，也是起點。巨大的鋼鐵結構象徵著工業時代的輝煌，每一次的開合（起飛降落）都是一次對世界的擁抱。在霓虹燈管的微光中，我們告別東京，如同漫畫《烏龍派出所》最後一幕的長鏡頭。",
                     locationQuery: "Narita Airport Terminal 1",
                     icon: Plane,
@@ -880,10 +1308,18 @@
                 }
             ];
 
+            const dayKeys = schedule.map((day) => day.date.replace('/', ''));
+
             const currentSchedule = schedule[activeDay];
             const currentRoute = mapRoutes[activeDay]; 
             
             if (!currentSchedule) return null;
+
+            useEffect(() => {
+                if (!slideInKey) return;
+                const id = requestAnimationFrame(() => setSlideInKey(null));
+                return () => cancelAnimationFrame(id);
+            }, [slideInKey]);
 
             const getTypeColor = (type) => {
                 switch (type) {
@@ -907,6 +1343,32 @@
                 default: return 'bg-white border-slate-200 hover:bg-slate-50';
                 }
             };
+
+            const getStyleClass = (style) => style ? `style-${style}` : '';
+            const isGlitchStyle = (style) => ['kon', 'ghoul'].includes(style);
+
+            const modalStyle = selectedEvent?.style;
+            const glitchStyle = isGlitchStyle(modalStyle);
+            const isKusama = modalStyle === 'kusama';
+            const modalContainerClass = [
+                "bg-[#fdfbf7] relative z-10 w-full sm:max-w-lg shadow-2xl border border-stone-200 flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-500 overflow-hidden",
+                getStyleClass(modalStyle)
+            ].join(' ');
+            const modalHeaderClass = `p-8 border-b border-stone-100 relative ${glitchStyle ? 'bg-[#0f172a] border-gray-800' : ''}`;
+            const modalCloseClass = `absolute top-6 right-6 transition-colors ${glitchStyle ? 'text-red-500 hover:text-red-400' : 'text-stone-300 hover:text-stone-600'}`;
+            const modalContentClass = `p-8 overflow-y-auto custom-scrollbar ${glitchStyle ? 'bg-[#111] text-stone-300' : ''} ${isKusama ? 'inner-card' : ''}`;
+            const modalFooterClass = `p-6 border-t flex justify-center ${glitchStyle ? 'bg-[#0a0a0a] border-zinc-900' : 'bg-stone-50 border-stone-100'}`;
+            const badgeClass = `text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-1 ${glitchStyle ? 'text-red-500 bg-black border border-red-900' : 'text-stone-400 bg-stone-50'}`;
+            const glitchTitleClass = glitchStyle ? 'text-white' : 'font-display text-stone-800';
+            const glitchMetaClass = `flex items-center text-sm font-medium ${glitchStyle ? 'text-blue-400 font-mono' : 'text-stone-500 font-serif italic'}`;
+            const glitchContentText = `text-sm leading-8 mb-8 text-justify ${glitchStyle ? 'text-stone-400 font-sans tracking-wide' : 'text-stone-600 font-serif'}`;
+            const vocabTitleClass = `font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${glitchStyle ? 'text-blue-900' : 'text-stone-300'}`;
+            const trapContainerClass = `mb-8 p-6 border-l-2 ${glitchStyle ? 'bg-red-900/20 border-red-600 text-red-400' : 'bg-rose-50/50 border-rose-300'}`;
+            const trapHeadingClass = `font-bold text-xs flex items-center mb-3 uppercase tracking-wider ${glitchStyle ? 'text-red-500' : 'font-display text-rose-800'}`;
+            const trapTextClass = `text-sm leading-relaxed ${glitchStyle ? 'font-sans opacity-90' : 'text-rose-900/70 font-serif'}`;
+            const insightHeaderClass = `flex items-center gap-2 mb-2 transition-colors ${glitchStyle ? 'text-blue-600 group-hover:text-blue-400' : 'text-stone-400 group-hover:text-stone-600'}`;
+            const insightBodyClass = `text-sm leading-7 pl-6 border-l transition-colors ${glitchStyle ? 'text-stone-400 border-zinc-800 font-sans' : 'text-stone-600 font-serif border-stone-100 group-hover:border-stone-300'}`;
+            const mapLinkClass = `text-xs font-bold tracking-widest uppercase transition-colors flex items-center gap-2 font-sans ${glitchStyle ? 'text-blue-500 hover:text-white' : 'text-stone-400 hover:text-stone-800'}`;
 
             return (
                 <div className="min-h-screen bg-[#f9f8f6] font-sans text-stone-800 pb-12 relative transition-colors duration-1000">
@@ -941,87 +1403,181 @@
 
                 {/* Date Selector */}
                 <div className="px-4 -mt-8 mb-8 relative z-20 animate-in max-w-2xl mx-auto">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-none shadow-sm p-1 flex justify-between overflow-x-auto no-scrollbar border border-stone-200">
-                    {schedule.map((day, index) => (
+                    <div className="bg-white/80 backdrop-blur-sm rounded-none shadow-sm p-2 overflow-x-auto no-scrollbar border border-stone-200 day-tabs">
                         <button
-                        key={index}
-                        onClick={() => setActiveDay(index)}
-                        className={`flex flex-col items-center justify-center min-w-[64px] py-4 transition-all duration-500 ${
-                            activeDay === index 
-                            ? `${currentSchedule.theme.btn} text-stone-50 shadow-md` 
-                            : 'text-stone-400 hover:bg-white hover:text-stone-600'
-                        }`}
+                            className={`day-tab ${currentDayKey === '1219' ? 'is-active' : ''}`}
+                            data-day="1219"
+                            style={{ '--day-color': '#b91c1c' }}
+                            onClick={() => {
+                                if ('1219' === currentDayKey) return;
+                                setTransitionDir(Number('1219') > Number(currentDayKey) ? 'forward' : 'backward');
+                                setPrevDayKey(currentDayKey);
+                                setCurrentDayKey('1219');
+                                setActiveDay(0);
+                                setSlideInKey('1219');
+                            }}
                         >
-                        <span className={`text-[10px] font-bold tracking-wider mb-1 font-sans opacity-60`}>{day.date}</span>
-                        <span className="text-sm font-medium font-serif tracking-widest">{day.day.split('(')[0].replace('曜日', '')}</span>
+                            12/19 <span className="jp">金</span>
                         </button>
-                    ))}
+                        <button
+                            className={`day-tab ${currentDayKey === '1220' ? 'is-active' : ''}`}
+                            data-day="1220"
+                            style={{ '--day-color': '#1d4ed8' }}
+                            onClick={() => {
+                                if ('1220' === currentDayKey) return;
+                                setTransitionDir(Number('1220') > Number(currentDayKey) ? 'forward' : 'backward');
+                                setPrevDayKey(currentDayKey);
+                                setCurrentDayKey('1220');
+                                setActiveDay(1);
+                                setSlideInKey('1220');
+                            }}
+                        >
+                            12/20 <span className="jp">土</span>
+                        </button>
+                        <button
+                            className={`day-tab ${currentDayKey === '1221' ? 'is-active' : ''}`}
+                            data-day="1221"
+                            style={{ '--day-color': '#0d9488' }}
+                            onClick={() => {
+                                if ('1221' === currentDayKey) return;
+                                setTransitionDir(Number('1221') > Number(currentDayKey) ? 'forward' : 'backward');
+                                setPrevDayKey(currentDayKey);
+                                setCurrentDayKey('1221');
+                                setActiveDay(2);
+                                setSlideInKey('1221');
+                            }}
+                        >
+                            12/21 <span className="jp">日</span>
+                        </button>
+                        <button
+                            className={`day-tab ${currentDayKey === '1222' ? 'is-active' : ''}`}
+                            data-day="1222"
+                            style={{ '--day-color': '#b45309' }}
+                            onClick={() => {
+                                if ('1222' === currentDayKey) return;
+                                setTransitionDir(Number('1222') > Number(currentDayKey) ? 'forward' : 'backward');
+                                setPrevDayKey(currentDayKey);
+                                setCurrentDayKey('1222');
+                                setActiveDay(3);
+                                setSlideInKey('1222');
+                            }}
+                        >
+                            12/22 <span className="jp">月</span>
+                        </button>
+                        <button
+                            className={`day-tab ${currentDayKey === '1223' ? 'is-active' : ''}`}
+                            data-day="1223"
+                            style={{ '--day-color': '#4b5563' }}
+                            onClick={() => {
+                                if ('1223' === currentDayKey) return;
+                                setTransitionDir(Number('1223') > Number(currentDayKey) ? 'forward' : 'backward');
+                                setPrevDayKey(currentDayKey);
+                                setCurrentDayKey('1223');
+                                setActiveDay(4);
+                                setSlideInKey('1223');
+                            }}
+                        >
+                            12/23 <span className="jp">火</span>
+                        </button>
                     </div>
                 </div>
 
                 {/* Main List Content */}
                 <div className="px-6 max-w-2xl mx-auto min-h-[50vh]">
-                    <div className="space-y-12 animate-in pb-16">
-                    {currentSchedule.events.map((event, index) => {
-                        const Icon = event.icon;
+                    <div className="day-panel-container pb-16">
+                        {schedule.map((day, dayIndex) => {
+                        const dayKey = dayKeys[dayIndex];
+                        const isActivePanel = currentDayKey === dayKey;
+                        const slideClass = isActivePanel && slideInKey === dayKey
+                            ? (transitionDir === 'forward' ? ' slide-in-from-right' : ' slide-in-from-left')
+                            : '';
+                        const panelClass = `day-panel${isActivePanel ? ' is-active' : ''}${slideClass ? ' ' + slideClass : ''}`;
+                        const route = mapRoutes[dayIndex];
                         return (
-                        <div 
-                            key={index} 
-                            className="group cursor-pointer relative pl-8 border-l border-stone-200 hover:border-stone-400 transition-colors duration-500"
-                            onClick={() => setSelectedEvent(event)}
-                        >
-                            {/* Time */}
-                            <div className={`absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full border-2 border-[#f9f8f6] transition-colors duration-300 ${currentSchedule.theme.btn}`}></div>
-                            
-                            <div className="flex justify-between items-start mb-2">
-                                <div className="font-serif text-stone-400 text-sm tracking-widest">{event.time}</div>
-                                
-                                {/* Right-side Google Maps Action */}
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
-                                    <a
-                                        href={`https://www.google.com/maps/search/?api=1&query=${event.locationQuery}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="flex items-center text-[10px] font-bold text-stone-400 hover:text-stone-800 transition-colors bg-white px-2 py-1 rounded shadow-sm border border-stone-100"
+                            <div 
+                                key={dayKey} 
+                                className={panelClass}
+                                data-day={dayKey}
+                            >
+                                <div className="space-y-12">
+                                {day.events.map((event, index) => {
+                                    const Icon = event.icon;
+                                    const preview = event.preview || event.desc;
+                                    return (
+                                    <div 
+                                        key={index} 
+                                        className="group cursor-pointer relative pl-8 border-l border-stone-200 hover:border-stone-400 transition-colors duration-500"
+                                        onClick={() => setSelectedEvent(event)}
                                     >
-                                        <MapIcon size={12} className="mr-1.5" />
-                                        MAP
-                                    </a>
+                                        {/* Time */}
+                                        <div className={`absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full border-2 border-[#f9f8f6] transition-colors duration-300 ${day.theme.btn}`}></div>
+                                        
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="flex flex-col gap-1">
+                                                <div className="font-serif text-stone-400 text-sm tracking-widest">{event.time}</div>
+                                                {event.weather && (
+                                                    <div className="flex items-center text-[11px] text-stone-500 font-sans">
+                                                        <WeatherIcon type={event.weather.type} size={14} className="mr-1" />
+                                                        <span className="font-semibold">{event.weather.temp}</span>
+                                                        <span className="ml-2 text-[10px] uppercase tracking-[0.25em] text-stone-400">{event.weather.loc}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            {/* Right-side Google Maps Action */}
+                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
+                                                <a
+                                                    href={`https://www.google.com/maps/search/?api=1&query=${event.locationQuery}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="flex items-center text-[10px] font-bold text-stone-400 hover:text-stone-800 transition-colors bg-white px-2 py-1 rounded shadow-sm border border-stone-100"
+                                                >
+                                                    <MapIcon size={12} className="mr-1.5" />
+                                                    MAP
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="mb-4">
+                                            <h3 className={`font-display text-xl font-bold mb-1 group-hover:text-black transition-colors duration-300 ${day.theme.main}`}>{event.title}</h3>
+                                            <p className={`text-sm font-serif leading-relaxed line-clamp-2 ${day.theme.sub}`}>
+                                                {preview}
+                                            </p>
+                                        </div>
+
+                                        {/* Tags */}
+                                        <div className="flex gap-2 flex-wrap mb-4">
+                                            {event.keywords && event.keywords.map((k, i) => (
+                                                <span key={i} className="text-[10px] font-medium text-stone-400 border-b border-stone-200 pb-0.5">
+                                                #{k}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    );
+                                })}
                                 </div>
-                            </div>
 
-                            {/* Content */}
-                            <div className="mb-4">
-                                <h3 className="font-display text-xl font-bold text-stone-800 mb-1 group-hover:text-black transition-colors duration-300">{event.title}</h3>
-                                <p className="text-stone-500 text-sm font-serif leading-relaxed line-clamp-2">{event.desc}</p>
+                                {/* Daily Map Section */}
+                                {activeDay === dayIndex && (
+                                <div className="mb-16 animate-in fade-in zoom-in duration-1000 delay-200">
+                                    <div className="flex items-center justify-center mb-6">
+                                        <span className="h-px w-8 bg-stone-300"></span>
+                                        <h4 className="text-xs font-serif text-stone-400 uppercase tracking-[0.2em] mx-4">
+                                            JOURNEY MAP
+                                        </h4>
+                                        <span className="h-px w-8 bg-stone-300"></span>
+                                    </div>
+                                    <div className="bg-white p-2 shadow-xl shadow-stone-200/50 border border-stone-100 style-matsumoto">
+                                        <DailyMapView route={route} dayIndex={dayIndex} />
+                                    </div>
+                                </div>
+                                )}
                             </div>
-
-                            {/* Tags */}
-                            <div className="flex gap-2 flex-wrap mb-4">
-                                {event.keywords && event.keywords.map((k, i) => (
-                                    <span key={i} className="text-[10px] font-medium text-stone-400 border-b border-stone-200 pb-0.5">
-                                    #{k}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
                         );
-                    })}
-                    </div>
-
-                    {/* Daily Map Section */}
-                    <div className="mb-16 animate-in fade-in zoom-in duration-1000 delay-200">
-                        <div className="flex items-center justify-center mb-6">
-                            <span className="h-px w-8 bg-stone-300"></span>
-                            <h4 className="text-xs font-serif text-stone-400 uppercase tracking-[0.2em] mx-4">
-                                JOURNEY MAP
-                            </h4>
-                            <span className="h-px w-8 bg-stone-300"></span>
-                        </div>
-                        <div className="bg-white p-2 shadow-xl shadow-stone-200/50 border border-stone-100 style-matsumoto">
-                            <DailyMapView route={currentRoute} dayIndex={activeDay} />
-                        </div>
+                        })}
                     </div>
                     
                     <div className="mt-12 text-center pb-12 opacity-40 font-serif">
@@ -1036,50 +1592,50 @@
                         className="absolute inset-0 bg-[#f6f5f3]/90 backdrop-blur-sm transition-opacity duration-500"
                         onClick={() => setSelectedEvent(null)}
                     ></div>
-                    <div className={`bg-[#fdfbf7] relative z-10 w-full sm:max-w-lg shadow-2xl border border-stone-200 flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-500 overflow-hidden ${selectedEvent.style === 'kon' ? 'style-kon' : ''} ${selectedEvent.style === 'kusama' ? 'style-kusama' : ''} ${selectedEvent.style === 'ghibli' ? 'style-ghibli' : ''} ${selectedEvent.style === 'retro' ? 'style-retro' : ''} ${selectedEvent.style === 'nara' ? 'style-nara' : ''} ${selectedEvent.style === 'onepiece' ? 'style-onepiece' : ''} ${selectedEvent.style === 'gintama' ? 'style-gintama' : ''} ${selectedEvent.style === 'gaiac' ? 'style-gaiac' : ''} ${selectedEvent.style === 'miyake' ? 'style-miyake' : ''} ${selectedEvent.style === 'tel' ? 'style-tel' : ''} ${selectedEvent.style === 'ishiguro' ? 'style-ishiguro' : ''} ${selectedEvent.style === 'harajuku' ? 'style-harajuku' : ''} ${selectedEvent.style === 'oe' ? 'style-oe' : ''} ${selectedEvent.style === 'todai' ? 'style-todai' : ''} ${selectedEvent.style === 'sanae' ? 'style-sanae' : ''} ${selectedEvent.style === 'kachidoki' ? 'style-kachidoki' : ''} ${selectedEvent.style === 'sumitomo' ? 'style-sumitomo' : ''} ${selectedEvent.style === 'higashino' ? 'style-higashino' : ''} ${selectedEvent.style === 'ghoul' ? 'style-ghoul' : ''} ${selectedEvent.style === 'matsumoto' ? 'style-matsumoto' : ''} ${selectedEvent.style === 'sympathy' ? 'style-sympathy' : ''} ${selectedEvent.style === 'spirited' ? 'style-spirited' : ''}`}>
+                    <div className={modalContainerClass}>
                         
                         {/* Kon Style Glitch Effect */}
-                        {(selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul') && (
+                        {glitchStyle && (
                              <div className="kon-border"></div>
                         )}
 
                         {/* Modal Header */}
-                        <div className={`p-8 border-b border-stone-100 relative ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'bg-[#0f172a] border-gray-800' : ''}`}>
+                        <div className={modalHeaderClass}>
                             <button 
                                 onClick={() => setSelectedEvent(null)}
-                                className={`absolute top-6 right-6 transition-colors ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-red-500 hover:text-red-400' : 'text-stone-300 hover:text-stone-600'}`}
+                                className={modalCloseClass}
                             >
-                                <X size={20} strokeWidth={selectedEvent.style === 'kon' ? 3 : 1.5} />
+                                <X size={20} strokeWidth={modalStyle === 'kon' ? 3 : 1.5} />
                             </button>
                             
                             <div className="flex items-center gap-3 mb-4">
-                                <span className={`text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-1 ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-red-500 bg-black border border-red-900' : 'text-stone-400 bg-stone-50'}`}>
+                                <span className={badgeClass}>
                                 {selectedEvent.type.toUpperCase()}
                                 </span>
                             </div>
                             
-                            <h3 className={`text-3xl font-bold mb-3 leading-tight ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-white' : 'font-display text-stone-800'}`}>{selectedEvent.title}</h3>
-                            <div className={`flex items-center text-sm font-medium ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-400 font-mono' : 'text-stone-500 font-serif italic'}`}>
+                            <h3 className={`text-3xl font-bold mb-3 leading-tight ${glitchTitleClass}`}>{selectedEvent.title}</h3>
+                            <div className={glitchMetaClass}>
                                 <Clock size={14} className="mr-2 opacity-50" />
                                 {selectedEvent.time}
                             </div>
                         </div>
 
                         {/* Modal Content */}
-                        <div className={`p-8 overflow-y-auto custom-scrollbar ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'bg-[#111] text-stone-300' : ''} ${selectedEvent.style === 'kusama' ? 'inner-card' : ''}`}>
+                        <div className={modalContentClass}>
                             
-                            <p className={`text-sm leading-8 mb-8 text-justify ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-stone-400 font-sans tracking-wide' : 'text-stone-600 font-serif'}`}>
+                            <p className={glitchContentText}>
                                 {selectedEvent.details}
                             </p>
 
                             {/* Trap Insight */}
                             {selectedEvent.insights?.trap && (
-                                <div className={`mb-8 p-6 border-l-2 ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'bg-red-900/20 border-red-600 text-red-400' : 'bg-rose-50/50 border-rose-300'}`}>
-                                    <h4 className={`font-bold text-xs flex items-center mb-3 uppercase tracking-wider ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-red-500' : 'font-display text-rose-800'}`}>
+                                <div className={trapContainerClass}>
+                                    <h4 className={trapHeadingClass}>
                                         <AlertTriangle size={12} className="mr-2" />
                                         Trap Warning
                                     </h4>
-                                    <p className={`text-sm leading-relaxed ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'font-sans opacity-90' : 'text-rose-900/70 font-serif'}`}>
+                                    <p className={trapTextClass}>
                                         {selectedEvent.insights.trap}
                                     </p>
                                 </div>
@@ -1088,7 +1644,7 @@
                             {/* Japanese Vocabulary */}
                             {selectedEvent.vocabulary && (
                                 <div className="mb-10 vocab-section">
-                                    <h4 className={`font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-900' : 'text-stone-300'}`}>
+                                    <h4 className={vocabTitleClass}>
                                         — Vocabulary —
                                     </h4>
                                     <div className="grid gap-6">
@@ -1113,7 +1669,7 @@
                             {/* Insights Grid */}
                             {selectedEvent.insights && (
                                 <div className="space-y-8">
-                                    <h4 className={`font-bold mb-6 text-[10px] flex items-center justify-center uppercase tracking-[0.2em] font-sans ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-900' : 'text-stone-300'}`}>
+                                    <h4 className={vocabTitleClass}>
                                         — Insights —
                                     </h4>
                                     
@@ -1134,11 +1690,11 @@
 
                                         return (
                                             <div key={key} className="group">
-                                                <div className={`flex items-center gap-2 mb-2 transition-colors ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-600 group-hover:text-blue-400' : 'text-stone-400 group-hover:text-stone-600'}`}>
+                                                <div className={insightHeaderClass}>
                                                     {icon}
                                                     <span className="text-[10px] font-bold uppercase tracking-widest font-sans">{label}</span>
                                                 </div>
-                                                <p className={`text-sm leading-7 pl-6 border-l transition-colors ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-stone-400 border-zinc-800 font-sans' : 'text-stone-600 font-serif border-stone-100 group-hover:border-stone-300'}`}>
+                                                <p className={insightBodyClass}>
                                                     {value}
                                                 </p>
                                             </div>
@@ -1149,12 +1705,12 @@
                         
                         </div>
                         
-                        <div className={`p-6 border-t flex justify-center ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'bg-[#0a0a0a] border-zinc-900' : 'bg-stone-50 border-stone-100'}`}>
+                        <div className={modalFooterClass}>
                              <a 
                                 href={`https://www.google.com/maps/search/?api=1&query=${selectedEvent.locationQuery}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className={`text-xs font-bold tracking-widest uppercase transition-colors flex items-center gap-2 font-sans ${selectedEvent.style === 'kon' || selectedEvent.style === 'ghoul' ? 'text-blue-500 hover:text-white' : 'text-stone-400 hover:text-stone-800'}`}
+                                className={mapLinkClass}
                             >
                                 <MapIcon size={14} />
                                 Open in Google Maps
@@ -1169,6 +1725,214 @@
 
         const root = createRoot(document.getElementById('root'));
         root.render(<TripApp />);
+    </script>
+
+    <!-- Floating Menu -->
+    <div class="floating-menu">
+      <button class="floating-fab-button" id="fabToggle" aria-label="快速功能">
+        ☰
+      </button>
+
+      <div class="floating-menu-panel" id="floatingMenuPanel">
+        <button class="floating-menu-item" data-action="sos">
+          <span class="icon">🚨</span>
+          <span class="label">緊急資訊</span>
+        </button>
+        <button class="floating-menu-item" data-action="bear">
+          <span class="icon">🐻</span>
+          <span class="label">熊的情報</span>
+        </button>
+        <button class="floating-menu-item" data-action="top">
+          <span class="icon">⬆️</span>
+          <span class="label">回到最上面</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 緊急資訊面板 -->
+    <div class="floating-panel" id="floatingSos">
+      <div class="floating-panel-header">
+        <div class="floating-panel-header-title">
+          <span>🚨</span>
+          <span>日本緊急資訊 &amp; 處理步驟</span>
+        </div>
+        <button class="floating-panel-close" data-close="sos" aria-label="關閉緊急資訊">
+          ×
+        </button>
+      </div>
+
+      <div class="floating-sos-note">
+        <strong>📞 緊急電話</strong><br>
+        110 警察（事故/竊盜）<br>
+        119 救護/消防<br>
+        信用卡 → 打卡背面國際電話<br>
+        護照 → 找交番報案＋去辦事處補發<br><br>
+
+        <strong>🛑 交通事故（車禍／碰撞）</strong><br>
+        有傷→119 要救護車<br>
+        後→110 報案等警察<br>
+        拍照＋記車牌＋時間地點<br>
+        交換聯絡方式<br>
+        句子可直接念：<br>
+        「Kotsu jiko desu. Keisatsu wo yonde kudasai.」<br><br>
+
+        <strong>👮 物品遭竊</strong><br>
+        去交番報案<br>
+        拿遺失/被害證明<br>
+        卡/手機 → 立即掛失<br>
+        句子可念：<br>
+        「Dorobo desu.」<br><br>
+
+        <strong>🛂 護照遺失</strong><br>
+        交番拿遺失證明<br>
+        去 台灣駐日/辦事處<br>
+        可申請旅行證明回台<br>
+        小提醒：護照影本請存手機<br><br>
+
+        <strong>🤢 生病受傷</strong><br>
+        急重→119<br>
+        輕症→找 內科 Clinic／藥局 Yakkyoku
+      </div>
+    </div>
+
+    <!-- 熊的情報面板 -->
+    <div class="floating-panel" id="floatingBear">
+      <div class="floating-panel-header">
+        <div class="floating-panel-header-title">
+          <span>🐻</span>
+          <span>熊的情報</span>
+        </div>
+        <button class="floating-panel-close" data-close="bear" aria-label="關閉熊的情報">
+          ×
+        </button>
+      </div>
+
+      <div class="bear-note">
+        <strong>🐻 熊資訊 Note（預防 &amp; 遇到時應對）</strong><br><br>
+
+        🔹 避免遇熊<br>
+        • 不單獨、不清晨傍晚進山<br>
+        • 行走有聲音（熊鈴/講話）<br>
+        • 不丟食物、垃圾<br>
+        • 看到糞便/爪痕→折返<br><br>
+
+        🔹 遇到熊時<br>
+        • <strong>保持冷靜，不跑</strong><br>
+        • 面對熊 <strong>慢慢後退</strong><br>
+        • 輕聲說話，不尖叫<br>
+        • 背包擋前防護<br><br>
+
+        🔹 熊靠近時<br>
+        • 找掩蔽物、保護頭頸<br>
+        • 脫身後通報管理單位<br><br>
+
+        📎 熊相關資訊 / 官方入口：<br>
+        <a href="https://www.pref.nagano.lg.jp/yasei/bear.html" target="_blank">🟡 長野縣熊資訊（含輕井澤）</a><br>
+        <a href="https://www.pref.gunma.jp/page/16709.html" target="_blank">🟡 群馬縣熊注意公告（草津）</a><br>
+        <a href="https://www.kankyo.metro.tokyo.lg.jp/nature/index.html" target="_blank">🟡 東京都自然野生動物資訊</a><br>
+        <a href="https://kumanichi.com/feed" target="_blank">📰 熊本熊新聞 RSS</a><br>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const fabToggle = document.getElementById("fabToggle");
+        const menuPanel = document.getElementById("floatingMenuPanel");
+        const sosPanel = document.getElementById("floatingSos");
+        const bearPanel = document.getElementById("floatingBear");
+        // 點 FAB 展開 / 收合選單
+        fabToggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          menuPanel.classList.toggle("is-open");
+        });
+
+        // 點選各個 menu item
+        menuPanel.addEventListener("click", function (e) {
+          const item = e.target.closest(".floating-menu-item");
+          if (!item) return;
+
+          const action = item.dataset.action;
+          menuPanel.classList.remove("is-open"); // 點了就先收起主選單
+
+          switch (action) {
+            case "sos": {
+              sosPanel.classList.toggle("is-open");
+              bearPanel.classList.remove("is-open");
+              break;
+            }
+            case "bear": {
+              bearPanel.classList.toggle("is-open");
+              sosPanel.classList.remove("is-open");
+              break;
+            }
+            case "top": {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              sosPanel.classList.remove("is-open");
+              bearPanel.classList.remove("is-open");
+              break;
+            }
+            default:
+              break;
+          }
+        });
+
+        // 關閉小面板按鈕
+        document.querySelectorAll(".floating-panel-close").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const type = this.dataset.close;
+            if (type === "sos") {
+              sosPanel.classList.remove("is-open");
+            } else if (type === "bear") {
+              bearPanel.classList.remove("is-open");
+            }
+          });
+        });
+
+        // 點擊頁面其他地方時，關閉選單
+        document.addEventListener("click", function (e) {
+          const insideMenu =
+            e.target.closest(".floating-menu") ||
+            e.target.closest(".floating-panel");
+          if (!insideMenu) {
+            menuPanel.classList.remove("is-open");
+          }
+        });
+
+        // 日期 tabs 切換 day-panel (滑入 + 淡入版)
+        const tabs = document.querySelectorAll(".day-tab");
+        const panels = document.querySelectorAll(".day-panel");
+        let currentDay = "1219";
+
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const targetDay = tab.dataset.day;
+            if (targetDay === currentDay) return;
+
+            tabs.forEach((t) => t.classList.remove("is-active"));
+            tab.classList.add("is-active");
+
+            const currentPanel = document.querySelector(`.day-panel[data-day="${currentDay}"]`);
+            const nextPanel = document.querySelector(`.day-panel[data-day="${targetDay}"]`);
+            if (!currentPanel || !nextPanel) return;
+
+            const forward = Number(targetDay) > Number(currentDay);
+
+            currentPanel.classList.remove("is-active");
+            currentPanel.classList.remove("slide-in-from-left", "slide-in-from-right");
+
+            nextPanel.classList.remove("slide-in-from-left", "slide-in-from-right");
+            nextPanel.classList.add(forward ? "slide-in-from-right" : "slide-in-from-left");
+            nextPanel.classList.add("is-active");
+
+            requestAnimationFrame(() => {
+              nextPanel.classList.remove("slide-in-from-right", "slide-in-from-left");
+            });
+
+            currentDay = targetDay;
+          });
+        });
+
+      });
     </script>
 </body>
 </html>
