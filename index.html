@@ -34,6 +34,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --accent-color: #111111;
+        }
+
         /* 基礎風格 */
         body { 
             font-family: 'Shippori Mincho', 'Noto Serif JP', serif; 
@@ -298,6 +302,33 @@
         ruby { font-family: 'Zen Old Mincho', serif; }
         rt { font-family: 'Shippori Mincho', serif; font-size: 0.55em; opacity: 0.7; letter-spacing: 0.05em; color: inherit; }
 
+        .map-toggle-btn {
+            position: absolute;
+            left: 12px;
+            bottom: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #fff;
+            color: #334155;
+            border: 1px solid #e5e7eb;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            z-index: 5;
+        }
+
+        .map-toggle-btn:hover {
+            background: #f8fafc;
+            border-color: #d1d5db;
+            color: #0f172a;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+        }
+
         /* !IMPORTANT: 強制修正 Vocabulary 區塊易讀性 */
         .vocab-card { background-color: #ffffff !important; border: 1px solid #e5e7eb !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
         .vocab-card h4 { color: #94a3b8 !important; }
@@ -408,6 +439,8 @@
             font-size: 13px;
             display: none;
             z-index: 9998;
+            max-height: 70vh;
+            overflow-y: auto;
         }
 
         .floating-panel.is-open {
@@ -483,6 +516,41 @@
             line-height: 1.5;
         }
 
+        .sos-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.25rem 0 0.5rem;
+            font-size: 11px;
+            color: #4b5563;
+            gap: 0.5rem;
+        }
+
+        .sos-page-btn {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #374151;
+            padding: 4px 6px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .sos-page-btn.is-active {
+            background: #0f172a;
+            color: #fff;
+            border-color: #0f172a;
+        }
+
+        .sos-page {
+            display: none;
+        }
+
+        .sos-page.is-active {
+            display: block;
+        }
+
         .bear-note {
             font-size: 12px;
             line-height: 1.55;
@@ -501,57 +569,69 @@
             opacity: 0.7;
         }
 
-        /* 日期 Tabs 容器：負責「有間隔」 */
+        .map-toggle-btn {
+            position: absolute;
+            left: 12px;
+            bottom: 12px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            background: rgba(255,255,255,0.92);
+            color: #1f2937;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+        }
+
+        .map-toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.16);
+            background: #ffffff;
+        }
+
+        .hero-title-main {
+            color: var(--accent-color);
+        }
+
+        /* 日期列 */
         .day-tabs {
             display: flex;
-            gap: 8px;
-            padding: 8px 0 14px;
-            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px 0 14px;
+            flex-wrap: nowrap;
+            font-family: 'Zen Old Mincho', serif;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
 
-        /* 雜誌排版風＋支援每一天自己的主題色 */
+        .day-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 日期按鈕 */
         .day-tab {
-            font-family: "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            line-height: 1.1;
-            text-align: center;
-            padding: 8px 12px 6px;
-            border-radius: 10px;
-            background: #ffffff;
-            border: 1px solid #d3d3d3;
-            color: #1a1a1a;
+            flex: 0 0 auto;
+            padding: 9px 16px;
+            border-radius: 0;
+            font-family: 'Zen Old Mincho', serif;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            background: #fff;
+            border: 1px solid var(--day-color, var(--accent-color));
+            color: var(--day-color, var(--accent-color));
             cursor: pointer;
-            letter-spacing: 0.5px;
-            transition:
-                background 0.25s ease,
-                color 0.25s ease,
-                border-color 0.25s ease,
-                transform 0.25s ease,
-                box-shadow 0.25s ease;
+            transition: 0.3s ease;
         }
 
-        /* 星期小字 */
-        .day-tab .jp {
-            font-size: 10px;
-            font-weight: 400;
-            opacity: 0.6;
-            display: block;
-            margin-top: 2px;
-        }
-
-        /* hover 的質感 */
-        .day-tab:hover {
-            background: #f7f7f7;
-        }
-
-        /* 每天自己的主題色：用 --day-color 控制 */
         .day-tab.is-active {
-            background: var(--day-color, #000);
-            border-color: var(--day-color, #000);
-            color: #ffffff;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+            background: var(--day-color, var(--accent-color));
+            color: #fff;
         }
 
         .day-panel-container {
@@ -618,6 +698,7 @@
         const DailyMapView = ({ route, dayIndex }) => {
             const mapRef = useRef(null);
             const mapInstanceRef = useRef(null);
+            const [interactive, setInteractive] = useState(false);
 
             const haversineKm = (a, b) => {
                 const toRad = (deg) => (deg * Math.PI) / 180;
@@ -639,6 +720,17 @@
                 }, 0);
             }, [route]);
 
+            const setMapInteractivity = (map, enabled) => {
+                if (!map) return;
+                const toggle = enabled ? 'enable' : 'disable';
+                ['dragging', 'scrollWheelZoom', 'doubleClickZoom', 'boxZoom', 'keyboard', 'touchZoom', 'tap']
+                    .forEach((feature) => {
+                        if (map[feature] && map[feature][toggle]) {
+                            map[feature][toggle]();
+                        }
+                    });
+            };
+
             useEffect(() => {
                 if (!mapRef.current) return;
                 if (typeof L === 'undefined') return;
@@ -650,6 +742,7 @@
                     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                         subdomains: 'abcd', maxZoom: 19
                     }).addTo(mapInstanceRef.current);
+                    setMapInteractivity(mapInstanceRef.current, false);
                 }
 
                 const map = mapInstanceRef.current;
@@ -686,9 +779,26 @@
                 setTimeout(() => { map.invalidateSize(); }, 100);
             }, [route]);
 
+            useEffect(() => {
+                setMapInteractivity(mapInstanceRef.current, interactive);
+                setTimeout(() => { mapInstanceRef.current?.invalidateSize(); }, 80);
+            }, [interactive]);
+
             return (
                 <div className="space-y-3">
-                    <div ref={mapRef} className="h-[350px] w-full rounded-md border border-stone-200 z-0 relative shadow-sm style-matsumoto" />
+                    <div className="relative">
+                        <div ref={mapRef} className="h-[350px] w-full rounded-md border border-stone-200 z-0 relative shadow-sm style-matsumoto" />
+                        <button
+                            className="map-toggle-btn"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setInteractive((prev) => !prev);
+                            }}
+                            aria-label={interactive ? "鎖定地圖" : "啟用地圖"}
+                        >
+                            {interactive ? "🔒 點一下鎖定地圖" : "👉 點一下啟用地圖"}
+                        </button>
+                    </div>
                     <div className="grid sm:grid-cols-3 gap-2 text-xs text-stone-600">
                         <div className="flex items-center gap-2 bg-white border border-stone-200 px-3 py-2 rounded">
                             <Compass size={14} className="text-stone-500" />
@@ -1354,10 +1464,10 @@
                 "bg-[#fdfbf7] relative z-10 w-full sm:max-w-lg shadow-2xl border border-stone-200 flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-500 overflow-hidden",
                 getStyleClass(modalStyle)
             ].join(' ');
-            const modalHeaderClass = `p-8 border-b border-stone-100 relative ${glitchStyle ? 'bg-[#0f172a] border-gray-800' : ''}`;
+            const modalHeaderClass = `p-5 sm:p-6 border-b border-stone-100 relative ${glitchStyle ? 'bg-[#0f172a] border-gray-800' : ''}`;
             const modalCloseClass = `absolute top-6 right-6 transition-colors ${glitchStyle ? 'text-red-500 hover:text-red-400' : 'text-stone-300 hover:text-stone-600'}`;
-            const modalContentClass = `p-8 overflow-y-auto custom-scrollbar ${glitchStyle ? 'bg-[#111] text-stone-300' : ''} ${isKusama ? 'inner-card' : ''}`;
-            const modalFooterClass = `p-6 border-t flex justify-center ${glitchStyle ? 'bg-[#0a0a0a] border-zinc-900' : 'bg-stone-50 border-stone-100'}`;
+            const modalContentClass = `p-5 sm:p-6 overflow-y-auto custom-scrollbar ${glitchStyle ? 'bg-[#111] text-stone-300' : ''} ${isKusama ? 'inner-card' : ''}`;
+            const modalFooterClass = `p-4 sm:p-5 border-t flex justify-center ${glitchStyle ? 'bg-[#0a0a0a] border-zinc-900' : 'bg-stone-50 border-stone-100'}`;
             const badgeClass = `text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-1 ${glitchStyle ? 'text-red-500 bg-black border border-red-900' : 'text-stone-400 bg-stone-50'}`;
             const glitchTitleClass = glitchStyle ? 'text-white' : 'font-display text-stone-800';
             const glitchMetaClass = `flex items-center text-sm font-medium ${glitchStyle ? 'text-blue-400 font-mono' : 'text-stone-500 font-serif italic'}`;
@@ -1382,7 +1492,7 @@
                                     TOKYO CHRONICLES 2025
                                 </span>
                             </div>
-                            <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight mb-1 leading-tight font-display ${currentSchedule.theme.main}`}>
+                            <h1 className={`hero-title-main text-2xl sm:text-4xl font-bold tracking-tight mb-1 leading-tight font-display ${currentSchedule.theme.main}`}>
                                 {currentSchedule.title}
                             </h1>
                             <p className={`text-xs sm:text-sm font-serif italic tracking-wide mb-1 ${currentSchedule.theme.sub}`}>
@@ -1407,7 +1517,6 @@
                         <button
                             className={`day-tab ${currentDayKey === '1219' ? 'is-active' : ''}`}
                             data-day="1219"
-                            style={{ '--day-color': '#b91c1c' }}
                             onClick={() => {
                                 if ('1219' === currentDayKey) return;
                                 setTransitionDir(Number('1219') > Number(currentDayKey) ? 'forward' : 'backward');
@@ -1417,12 +1526,11 @@
                                 setSlideInKey('1219');
                             }}
                         >
-                            12/19 <span className="jp">金</span>
+                            12/19 金
                         </button>
                         <button
                             className={`day-tab ${currentDayKey === '1220' ? 'is-active' : ''}`}
                             data-day="1220"
-                            style={{ '--day-color': '#1d4ed8' }}
                             onClick={() => {
                                 if ('1220' === currentDayKey) return;
                                 setTransitionDir(Number('1220') > Number(currentDayKey) ? 'forward' : 'backward');
@@ -1432,12 +1540,11 @@
                                 setSlideInKey('1220');
                             }}
                         >
-                            12/20 <span className="jp">土</span>
+                            12/20 土
                         </button>
                         <button
                             className={`day-tab ${currentDayKey === '1221' ? 'is-active' : ''}`}
                             data-day="1221"
-                            style={{ '--day-color': '#0d9488' }}
                             onClick={() => {
                                 if ('1221' === currentDayKey) return;
                                 setTransitionDir(Number('1221') > Number(currentDayKey) ? 'forward' : 'backward');
@@ -1447,12 +1554,11 @@
                                 setSlideInKey('1221');
                             }}
                         >
-                            12/21 <span className="jp">日</span>
+                            12/21 日
                         </button>
                         <button
                             className={`day-tab ${currentDayKey === '1222' ? 'is-active' : ''}`}
                             data-day="1222"
-                            style={{ '--day-color': '#b45309' }}
                             onClick={() => {
                                 if ('1222' === currentDayKey) return;
                                 setTransitionDir(Number('1222') > Number(currentDayKey) ? 'forward' : 'backward');
@@ -1462,12 +1568,11 @@
                                 setSlideInKey('1222');
                             }}
                         >
-                            12/22 <span className="jp">月</span>
+                            12/22 月
                         </button>
                         <button
                             className={`day-tab ${currentDayKey === '1223' ? 'is-active' : ''}`}
                             data-day="1223"
-                            style={{ '--day-color': '#4b5563' }}
                             onClick={() => {
                                 if ('1223' === currentDayKey) return;
                                 setTransitionDir(Number('1223') > Number(currentDayKey) ? 'forward' : 'backward');
@@ -1477,7 +1582,7 @@
                                 setSlideInKey('1223');
                             }}
                         >
-                            12/23 <span className="jp">火</span>
+                            12/23 火
                         </button>
                     </div>
                 </div>
@@ -1524,17 +1629,16 @@
                                                 )}
                                             </div>
                                             
-                                            {/* Right-side Google Maps Action */}
-                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
+                                            {/* Always-visible Google Maps shortcut */}
+                                            <div className="flex items-center">
                                                 <a
                                                     href={`https://www.google.com/maps/search/?api=1&query=${event.locationQuery}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="flex items-center text-[10px] font-bold text-stone-400 hover:text-stone-800 transition-colors bg-white px-2 py-1 rounded shadow-sm border border-stone-100"
+                                                    className="flex items-center justify-center w-8 h-8 text-[11px] font-bold text-stone-500 hover:text-stone-800 transition-colors bg-white rounded-full shadow-sm border border-stone-200"
                                                 >
-                                                    <MapIcon size={12} className="mr-1.5" />
-                                                    MAP
+                                                    <MapIcon size={13} />
                                                 </a>
                                             </div>
                                         </div>
@@ -1614,7 +1718,7 @@
                                 </span>
                             </div>
                             
-                            <h3 className={`text-3xl font-bold mb-3 leading-tight ${glitchTitleClass}`}>{selectedEvent.title}</h3>
+                            <h3 className={`text-2xl sm:text-3xl font-bold mb-2 leading-tight ${glitchTitleClass}`}>{selectedEvent.title}</h3>
                             <div className={glitchMetaClass}>
                                 <Clock size={14} className="mr-2 opacity-50" />
                                 {selectedEvent.time}
@@ -1763,35 +1867,54 @@
 
       <div class="floating-sos-note">
         <strong>📞 緊急電話</strong><br>
-        110 警察（事故/竊盜）<br>
-        119 救護/消防<br>
+        110 警察（事故/竊盜） → 警察＝けいさつ（Keisatsu）<br>
+        119 救護/消防 → 救護車＝きゅうきゅうしゃ／消防＝しょうぼう<br>
         信用卡 → 打卡背面國際電話<br>
-        護照 → 找交番報案＋去辦事處補發<br><br>
+        護照 → 先去<strong>交番＝こうばん（Kōban）</strong>報案＋代表處補發<br><br>
 
         <strong>🛑 交通事故（車禍／碰撞）</strong><br>
-        有傷→119 要救護車<br>
-        後→110 報案等警察<br>
-        拍照＋記車牌＋時間地點<br>
-        交換聯絡方式<br>
-        句子可直接念：<br>
-        「Kotsu jiko desu. Keisatsu wo yonde kudasai.」<br><br>
+        有傷→119（救護車）<br>
+        後→110（警察到場）<br>
+        拍照 / 車牌 / 時間 / 地點 / 交換聯絡<br>
+        可直接講的詞：<br>
+        交通事故＝こうつうじこ（Kōtsū jiko）<br>
+        警察＝けいさつ（Keisatsu）<br>
+        救護車＝きゅうきゅうしゃ（Kyūkyūsha）<br><br>
 
-        <strong>👮 物品遭竊</strong><br>
-        去交番報案<br>
-        拿遺失/被害證明<br>
-        卡/手機 → 立即掛失<br>
-        句子可念：<br>
-        「Dorobo desu.」<br><br>
+        👉 說法示例（短字喊就行）：<br>
+        「交通事故！警察！救護車！」<br><br>
+
+        <strong>👮 物品遭竊/不見</strong><br>
+        去交番報案 → 拿遺失/被害證明<br>
+        卡/手機 → 立刻掛失<br>
+        可講的詞：<br>
+        盗難＝とうなん（Tōnan）（失竊）<br>
+        落としました＝おとしました（落/不見）<br>
+        交番＝こうばん（派出所）<br>
+        財布＝さいふ（錢包）｜スマホ（手機）<br><br>
+
+        👉 實用喊法：<br>
+        「盗難！交番？」「パスポート 落としました」<br><br>
 
         <strong>🛂 護照遺失</strong><br>
-        交番拿遺失證明<br>
-        去 台灣駐日/辦事處<br>
-        可申請旅行證明回台<br>
-        小提醒：護照影本請存手機<br><br>
+        交番報案→取得遺失證明<br>
+        去台灣駐日代表處辦補發或旅行證明<br>
+        可講詞：<br>
+        パスポート（護照）<br>
+        再発行＝さいはっこう（補發）<br>
+        台湾代表処＝たいわんだいひょうしょ<br>
+        📌 小提醒：護照影本存手機/雲端<br><br>
 
-        <strong>🤢 生病受傷</strong><br>
-        急重→119<br>
-        輕症→找 內科 Clinic／藥局 Yakkyoku
+        <strong>🤢 生病/受傷</strong><br>
+        急重→119（救護）<br>
+        輕症→內科 Clinic／藥局 薬局＝やっきょく（Yakkyoku）<br>
+        常用詞：<br>
+        具合悪い＝ぐあいわるい（不舒服）<br>
+        病院＝びょういん（醫院）<br>
+        頭痛（ずつう）／発熱（はつねつ）／下痢（げり）<br><br>
+
+        👉 直接說症狀＋病院即可<br>
+        例：「具合悪い 病院？」
       </div>
     </div>
 
