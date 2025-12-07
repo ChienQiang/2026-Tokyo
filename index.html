@@ -830,6 +830,13 @@
             overflow: hidden;
             min-height: 280px;
         }
+        .day-panel-container.swipe-enabled {
+            cursor: grab;
+            user-select: none;
+        }
+        .day-panel-container.swipe-enabled:active {
+            cursor: grabbing;
+        }
 
         /* 基本狀態：先看不到、待命中 */
         .day-panel {
@@ -1117,6 +1124,7 @@
             const [prevDayKey, setPrevDayKey] = useState("1219");
             const [transitionDir, setTransitionDir] = useState("forward");
             const [slideInKey, setSlideInKey] = useState("1219");
+            const tabsRef = useRef(null);
 
             const coords = useMemo(() => ({
                 tpe: [25.0797, 121.2342], nrt: [35.7719, 140.3929], roppongi: [35.6628, 139.7314],
@@ -1706,6 +1714,14 @@
                 return () => cancelAnimationFrame(id);
             }, [slideInKey]);
 
+            useEffect(() => {
+                if (!tabsRef.current) return;
+                const dayKey = dayKeys[activeDay];
+                if (!dayKey) return;
+                const tab = tabsRef.current.querySelector(`[data-day="${dayKey}"]`);
+                tab?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+            }, [activeDay, dayKeys]);
+
             const updateActiveDay = (targetIndex) => {
                 if (targetIndex === activeDay || targetIndex < 0 || targetIndex >= schedule.length) return;
                 const direction = targetIndex > activeDay ? 'forward' : 'backward';
@@ -1721,44 +1737,43 @@
                 if (!container) return;
                 let startX = null;
                 let deltaX = 0;
+                let pointerId = null;
                 const threshold = 50;
 
-                const handleStart = (event) => {
-                    const x = event.touches ? event.touches[0].clientX : event.clientX;
-                    startX = x;
+                const handlePointerDown = (event) => {
+                    pointerId = event.pointerId;
+                    startX = event.clientX;
+                    deltaX = 0;
+                    container.setPointerCapture(pointerId);
+                    event.preventDefault();
                 };
 
-                const handleMove = (event) => {
-                    if (startX === null) return;
-                    const x = event.touches ? event.touches[0].clientX : event.clientX;
-                    deltaX = x - startX;
+                const handlePointerMove = (event) => {
+                    if (pointerId !== event.pointerId || startX === null) return;
+                    deltaX = event.clientX - startX;
+                    event.preventDefault();
                 };
 
-                const handleEnd = () => {
-                    if (startX === null) return;
-                    if (deltaX > threshold) {
-                        updateActiveDay(activeDay - 1);
-                    } else if (deltaX < -threshold) {
-                        updateActiveDay(activeDay + 1);
-                    }
+                const handlePointerUp = (event) => {
+                    if (pointerId !== event.pointerId) return;
+                    if (deltaX > threshold) updateActiveDay(activeDay - 1);
+                    else if (deltaX < -threshold) updateActiveDay(activeDay + 1);
+                    container.releasePointerCapture(pointerId);
+                    pointerId = null;
                     startX = null;
                     deltaX = 0;
                 };
 
-                container.addEventListener('touchstart', handleStart);
-                container.addEventListener('touchmove', handleMove);
-                container.addEventListener('touchend', handleEnd);
-                container.addEventListener('mousedown', handleStart);
-                container.addEventListener('mousemove', handleMove);
-                container.addEventListener('mouseup', handleEnd);
+                container.addEventListener('pointerdown', handlePointerDown);
+                container.addEventListener('pointermove', handlePointerMove);
+                container.addEventListener('pointerup', handlePointerUp);
+                container.addEventListener('pointercancel', handlePointerUp);
 
                 return () => {
-                    container.removeEventListener('touchstart', handleStart);
-                    container.removeEventListener('touchmove', handleMove);
-                    container.removeEventListener('touchend', handleEnd);
-                    container.removeEventListener('mousedown', handleStart);
-                    container.removeEventListener('mousemove', handleMove);
-                    container.removeEventListener('mouseup', handleEnd);
+                    container.removeEventListener('pointerdown', handlePointerDown);
+                    container.removeEventListener('pointermove', handlePointerMove);
+                    container.removeEventListener('pointerup', handlePointerUp);
+                    container.removeEventListener('pointercancel', handlePointerUp);
                 };
             }, [activeDay, currentDayKey, dayKeys, schedule.length]);
 
@@ -1844,7 +1859,7 @@
 
                 {/* Date Selector */}
                 <div className="px-4 -mt-8 mb-8 relative z-20 animate-in max-w-2xl mx-auto">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-none shadow-sm p-2 overflow-x-auto no-scrollbar border border-stone-200 day-tabs">
+                    <div ref={tabsRef} className="bg-white/80 backdrop-blur-sm rounded-none shadow-sm p-2 overflow-x-auto no-scrollbar border border-stone-200 day-tabs">
                         <button
                             className={`day-tab ${currentDayKey === '1219' ? 'is-active' : ''}`}
                             data-day="1219"
@@ -1920,7 +1935,7 @@
 
                 {/* Main List Content */}
                 <div className="px-6 max-w-2xl mx-auto min-h-[50vh]">
-                    <div className="day-panel-container pb-16" ref={panelRef}>
+                    <div className="day-panel-container swipe-enabled pb-16" ref={panelRef}>
                         {schedule.map((day, dayIndex) => {
                         const dayKey = dayKeys[dayIndex];
                         const isActivePanel = currentDayKey === dayKey;
