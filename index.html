@@ -32,10 +32,24 @@
     </script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
     <style>
         :root {
             --accent-color: #111111;
+            --floating-bg: #fdfbf7;
+            --floating-border: rgba(15, 23, 42, 0.12);
+            --floating-menu-bg: #f5f5f5;
+            --floating-menu-bg-active: #eaeaeb;
+            --floating-panel-bg: #fafafa;
+            --floating-panel-bg-active: #f1f1f3;
+            --floating-panel-border: rgba(31, 41, 55, 0.15);
         }
 
         /* 基礎風格 */
@@ -314,31 +328,77 @@
         .floating-menu {
             position: fixed;
             right: 1.5rem;
-            bottom: 1.5rem;
+            bottom: 2rem;
             z-index: 9999;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: 'Shippori Mincho', 'Noto Sans JP', serif;
+            background: var(--floating-bg);
+            border-radius: 999px;
+            border: 1px solid var(--floating-border);
+            padding: 0.25rem;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
         }
 
         .floating-fab-button {
             width: 56px;
             height: 56px;
-            border-radius: 999px;
-            border: 1px solid #e7e5e4;
+            border-radius: 50%;
+            border: 1px solid #dcdada;
             cursor: pointer;
-            font-size: 24px;
             background: #fdfbf7;
             color: #292524;
-            box-shadow: 0 8px 20px rgba(41, 37, 36, 0.15);
+            box-shadow: 0 10px 28px rgba(41, 37, 36, 0.18);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease,
+                background 0.3s ease,
+                border-color 0.3s ease;
         }
 
         .floating-fab-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(41, 37, 36, 0.2);
+            box-shadow: 0 14px 28px rgba(41, 37, 36, 0.25);
             background: #f5f1e9;
+        }
+
+        .floating-fab-button.is-open {
+            background: #e4e7ec;
+            color: #1f2937;
+            border-color: #cfd3da;
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.25);
+        }
+
+        .fab-icon {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 3px;
+            align-items: center;
+        }
+
+        .fab-icon span {
+            width: 24px;
+            height: 2px;
+            border-radius: 1px;
+            background: #4b5563;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+        }
+
+        .floating-fab-button.is-open .fab-icon span:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+            background: #1f2937;
+        }
+
+        .floating-fab-button.is-open .fab-icon span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .floating-fab-button.is-open .fab-icon span:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+            background: #1f2937;
         }
 
         /* --- 主選單面板 --- */
@@ -348,38 +408,43 @@
             bottom: 64px;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            background: rgba(253, 251, 247, 0.96);
-            border-radius: 16px;
-            border: 1px solid #e7e5e4;
-            box-shadow: 0 10px 30px rgba(41, 37, 36, 0.16);
+            gap: 0.9rem;
+            padding: 1.1rem 1.25rem;
+            background: var(--floating-menu-bg);
+            border-radius: 18px;
+            border: 1px solid var(--floating-border);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
+            font-family: 'Shippori Mincho', 'Noto Sans JP', serif;
             opacity: 0;
             pointer-events: none;
-            transform: translateY(8px);
-            transition: opacity 0.18s ease, transform 0.18s ease;
-            min-width: 180px;
+            transform: translateY(12px);
+            transition: opacity 0.18s ease, transform 0.18s ease, background 0.3s ease, border-color 0.3s ease;
+            min-width: 270px;
+            max-width: 360px;
         }
 
         .floating-menu-panel.is-open {
             opacity: 1;
             pointer-events: auto;
             transform: translateY(0);
+            background: var(--floating-menu-bg-active);
+            border-color: rgba(31, 41, 55, 0.25);
         }
 
         .floating-menu-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.65rem;
             border: none;
             background: transparent;
-            color: #292524;
-            font-size: 14px;
-            padding: 0.4rem 0.5rem;
+            color: #1f1f1f;
+            font-size: 16px;
+            padding: 0.65rem 0.8rem;
             border-radius: 999px;
             cursor: pointer;
             text-align: left;
             white-space: nowrap;
+            font-family: 'Noto Sans JP', 'Shippori Mincho', serif;
         }
 
         .floating-menu-item span.icon {
@@ -389,11 +454,12 @@
         }
 
         .floating-menu-item span.label {
+            font-family: 'Noto Sans JP', 'Shippori Mincho', serif;
             flex: 1;
         }
 
         .floating-menu-item:hover {
-            background: rgba(231, 229, 228, 0.8);
+            background: rgba(149, 129, 88, 0.08);
         }
 
         /* --- 浮出小面板共用樣式（緊急資訊 / 熊的情報） --- */
@@ -401,23 +467,36 @@
             position: fixed;
             right: 1.5rem;
             bottom: 80px;
-            width: 260px;
-            max-width: calc(100vw - 3rem);
-            background: rgba(253, 251, 247, 0.98);
-            color: #292524;
-            border-radius: 16px;
-            border: 1px solid #e7e5e4;
-            box-shadow: 0 10px 30px rgba(41, 37, 36, 0.18);
-            padding: 0.75rem 0.75rem 0.85rem;
-            font-size: 13px;
+            width: 320px;
+            max-width: calc(100vw - 2rem);
+            background: var(--floating-panel-bg);
+            color: #1f1f1f;
+            border-radius: 18px;
+            border: 1px solid var(--floating-panel-border);
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.2);
+            padding: 1rem 1rem 1.1rem;
+            font-size: 14px;
             display: none;
             z-index: 9998;
-            max-height: 70vh;
-            overflow-y: auto;
+            max-height: 80vh;
+            overflow: hidden;
+            font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+            flex-direction: column;
+            gap: 0.9rem;
+            transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
         }
 
         .floating-panel.is-open {
-            display: block;
+            display: flex;
+            background: var(--floating-panel-bg-active);
+            border-color: rgba(31, 41, 55, 0.2);
+        }
+
+        .floating-panel.dark-panel {
+            background: var(--floating-bg);
+            color: #1f1f1f;
+            padding: 0.75rem;
+            border-color: var(--floating-border);
         }
 
         .floating-panel-header {
@@ -429,23 +508,162 @@
             font-size: 13px;
         }
 
-        .floating-panel-header-title {
+        .floating-panel-header-title,
+        .floating-panel-title {
             display: flex;
             align-items: center;
             gap: 0.4rem;
         }
 
+        .floating-panel-title i {
+            color: #fbbf24;
+        }
+
+        .floating-panel-hero {
+            margin-bottom: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .floating-panel-hero img {
+            width: 100%;
+            display: block;
+        }
+
+        .floating-panel-body {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+            max-height: 65vh;
+            overflow-y: auto;
+            padding-right: 0.35rem;
+            padding-left: 0.35rem;
+        }
+
+        .checklist-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .checklist-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .checklist-card-header span {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .checklist-section {
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
+            padding-top: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .checklist-section h4 {
+            margin: 0;
+            font-size: 13px;
+            letter-spacing: 0.04em;
+            color: #1f2937;
+            text-transform: uppercase;
+        }
+
+        .checklist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .checklist-items label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 13px;
+            color: #111827;
+        }
+
+        .checklist-items input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #2952ff;
+        }
+
+        .checklist-note {
+            font-size: 11px;
+            color: #4b5563;
+        }
+
+        .fp-section-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .fp-section-title i {
+            font-size: 14px;
+            color: #93c5fd;
+        }
+
+        .fp-list {
+            margin: 0;
+            padding-left: 1.2em;
+            list-style: disc;
+        }
+
+        .fp-list li {
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .fp-reading {
+            display: block;
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .fp-reading-inline {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
         .floating-panel-close {
             border: none;
-            background: transparent;
-            color: #6b7280;
+            background: rgba(255, 255, 255, 0.8);
+            color: #374151;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 20px;
+            font-family: 'Noto Sans JP', 'Shippori Mincho', serif;
             line-height: 1;
-            padding: 0;
+            padding: 8px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
         }
 
         .floating-panel-close:hover {
+            background: #f8fafc;
             color: #111827;
         }
 
@@ -654,13 +872,25 @@
         }
 
         @media (max-width: 600px) {
+            body {
+                font-size: 15px;
+            }
             .floating-menu {
                 right: 1rem;
-                bottom: 1rem;
+                bottom: 2rem;
             }
             .floating-panel {
                 right: 1rem;
                 bottom: 76px;
+            }
+            .floating-panel,
+            .floating-sos-note,
+            .bear-note,
+            .day-tab {
+                font-size: 14px;
+            }
+            .floating-panel-header-title span {
+                font-size: 14px;
             }
         }
     </style>
@@ -1829,30 +2059,93 @@
       </button>
 
       <div class="floating-menu-panel" id="floatingMenuPanel">
-        <button class="floating-menu-item" data-action="sos">
-          <span class="icon">🚨</span>
+        <a class="floating-menu-item" href="#" data-action="sos">
+          <span class="icon">1</span>
           <span class="label">緊急資訊</span>
-        </button>
-        <button class="floating-menu-item" data-action="bear">
-          <span class="icon">🐻</span>
+        </a>
+        <a class="floating-menu-item" href="#" data-action="bear">
+          <span class="icon">2</span>
           <span class="label">熊的情報</span>
-        </button>
-        <button class="floating-menu-item" data-action="map">
-          <span class="icon">🗺️</span>
+        </a>
+        <a class="floating-menu-item" href="#" data-action="map">
+          <span class="icon">3</span>
           <span class="label">東京地鐵圖</span>
-        </button>
-        <button class="floating-menu-item" data-action="top">
-          <span class="icon">⬆️</span>
+        </a>
+        <a class="floating-menu-item" href="#" data-action="tax">
+          <span class="icon">4</span>
+          <span class="label">2026 日本退稅新制</span>
+        </a>
+        <a class="floating-menu-item" href="#" data-action="check">
+          <span class="icon">5</span>
+          <span class="label">日本入境 Check Card</span>
+        </a>
+        <a class="floating-menu-item" href="#" data-action="prep">
+          <span class="icon">6</span>
+          <span class="label">行前 Checklist</span>
+        </a>
+        <a class="floating-menu-item" href="#" data-action="top">
+          <span class="icon">7</span>
           <span class="label">回到最上面</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="floating-panel" id="floatingCheck">
+      <div class="floating-panel-header">
+        <div class="floating-panel-title">
+          <i class="fa-solid fa-plane-arrival" aria-hidden="true"></i>
+          <span>日本入境 Check Card（2025-2026適用）</span>
+        </div>
+        <button class="floating-panel-close" data-close="check" aria-label="關閉 Check Card">
+          ×
         </button>
+      </div>
+      <div class="floating-panel-body">
+        <div>
+          <p class="fp-section-title">
+            <i class="fa-solid fa-plane" aria-hidden="true"></i>
+            出發前（建議必做）
+          </p>
+          <ul class="fp-list">
+            <li>
+              🌐 <a href="https://www.vjw.digital.go.jp/main/#/vjwplo001" target="_blank" rel="noopener noreferrer" style="color:#93c5fd;">Visit Japan Web（VJW）</a> 事先填寫
+            </li>
+            <li>→ 護照資訊＋航班＋住宿地址，出示 QR 即可通關</li>
+            <li>📁 備份重要資料：護照影本／住宿地址電話（中英）／回程機票</li>
+            <li>📱 手機準備：網路可用或 QR 截圖；準備信用卡/保險記錄</li>
+          </ul>
+        </div>
+        <div>
+          <p class="fp-section-title">
+            <i class="fa-solid fa-passport" aria-hidden="true"></i>
+            抵達日本時會做什麼？
+          </p>
+          <ul class="fp-list">
+            <li>排入境隊伍 → 出示 VJW QR</li>
+            <li>入境審查：會問旅遊目的與停留天數</li>
+            <li>海關申告 → 出示 QR 或配合行李檢查</li>
+          </ul>
+        </div>
+        <div>
+          <p class="fp-section-title">
+            <i class="fa-solid fa-exclamation-triangle" aria-hidden="true"></i>
+            只有以下情況須補紙本
+          </p>
+          <ul class="fp-list">
+            <li>⚠ 沒事先填 VJW → 需要入境卡＋海關申告書</li>
+            <li>⚠ 手機沒電 / 無網路 / QR 遺失</li>
+            <li>⚠ 被抽查或系統當機需現場補紙本</li>
+          </ul>
+          <p class="fp-reading">先填 VJW = 大多免紙卡。沒填才要寫。</p>
+        </div>
       </div>
     </div>
 
     <!-- 緊急資訊面板 -->
-    <div class="floating-panel" id="floatingSos">
+    <div class="floating-panel dark-panel" id="floatingSos">
       <div class="floating-panel-header">
-        <div class="floating-panel-header-title">
-          <span>🚨</span>
+        <div class="floating-panel-title">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
           <span>日本緊急資訊 &amp; 處理步驟</span>
         </div>
         <button class="floating-panel-close" data-close="sos" aria-label="關閉緊急資訊">
@@ -1860,64 +2153,124 @@
         </button>
       </div>
 
-      <div class="floating-sos-note">
-        <strong>📞 緊急電話</strong><br>
-        110 警察（事故/竊盜） → 警察＝けいさつ（Keisatsu）<br>
-        119 救護/消防 → 救護車＝きゅうきゅうしゃ／消防＝しょうぼう<br>
-        信用卡 → 打卡背面國際電話<br>
-        護照 → 先去<strong>交番＝こうばん（Kōban）</strong>報案＋代表處補發<br><br>
+      <div class="floating-panel-hero">
+        <img
+          src="https://pic.pimg.tw/robow/1380002383-2771175169.jpg"
+          alt="夜間警局外觀與閃爍警燈"
+        />
+      </div>
 
-        <strong>🛑 交通事故（車禍／碰撞）</strong><br>
-        有傷→119（救護車）<br>
-        後→110（警察到場）<br>
-        拍照 / 車牌 / 時間 / 地點 / 交換聯絡<br>
-        可直接講的詞：<br>
-        交通事故＝こうつうじこ（Kōtsū jiko）<br>
-        警察＝けいさつ（Keisatsu）<br>
-        救護車＝きゅうきゅうしゃ（Kyūkyūsha）<br><br>
+      <div class="floating-panel-body">
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-phone-volume" aria-hidden="true"></i>
+            緊急電話
+          </h3>
+          <ul class="fp-list">
+            <li>
+              <strong>110 警察（事故／竊盜）</strong>
+              <span class="fp-reading">けいさつ（Keisatsu）</span>
+            </li>
+            <li>
+              <strong>119 救護／消防</strong>
+              <span class="fp-reading">きゅうきゅうしゃ／しょうぼう</span>
+            </li>
+            <li><strong>信用卡</strong> → 打卡背面國際電話</li>
+            <li>
+              <strong>護照</strong> → 先去
+              <span class="fp-reading-inline">交番＝こうばん（Kōban）</span> 報案＋
+              代表處補發
+            </li>
+          </ul>
+        </div>
 
-        👉 說法示例（短字喊就行）：<br>
-        「交通事故！警察！救護車！」<br><br>
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-car-burst" aria-hidden="true"></i>
+            交通事故（車禍／碰撞）
+          </h3>
+          <ul class="fp-list">
+            <li>有傷→119（救護車）</li>
+            <li>後→110（警察到場）</li>
+            <li>拍照 / 車牌 / 時間 / 地點 / 交換聯絡</li>
+            <li>
+              可直接講的詞：
+              <span class="fp-reading-inline">こうつうじこ（交通事故）</span>
+              <span class="fp-reading-inline">けいさつ（警察）</span>
+              <span class="fp-reading-inline">きゅうきゅうしゃ（救護車）</span>
+            </li>
+          </ul>
+          <p class="fp-reading">
+            👉 說法示例（短字喊就行）：「交通事故！警察！救護車！」
+          </p>
+        </div>
 
-        <strong>👮 物品遭竊/不見</strong><br>
-        去交番報案 → 拿遺失/被害證明<br>
-        卡/手機 → 立刻掛失<br>
-        可講的詞：<br>
-        盗難＝とうなん（Tōnan）（失竊）<br>
-        落としました＝おとしました（落/不見）<br>
-        交番＝こうばん（派出所）<br>
-        財布＝さいふ（錢包）｜スマホ（手機）<br><br>
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-person-circle-question" aria-hidden="true"></i>
+            物品遭竊/不見
+          </h3>
+          <ul class="fp-list">
+            <li>去交番報案 → 拿遺失/被害證明</li>
+            <li>卡/手機 → 立刻掛失</li>
+            <li>
+              可講的詞：
+              <span class="fp-reading-inline">盗難＝とうなん（Tōnan）（失竊）</span>
+              <span class="fp-reading-inline">落としました＝おとしました（落/不見）</span>
+              <span class="fp-reading-inline">交番＝こうばん（派出所）</span>
+              <span class="fp-reading-inline">財布＝さいふ（錢包）｜スマホ（手機）</span>
+            </li>
+          </ul>
+          <p class="fp-reading">
+            👉 實用喊法：「盗難！交番？」「パスポート 落としました」
+          </p>
+        </div>
 
-        👉 實用喊法：<br>
-        「盗難！交番？」「パスポート 落としました」<br><br>
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-passport" aria-hidden="true"></i>
+            護照遺失
+          </h3>
+          <ul class="fp-list">
+            <li>交番報案→取得遺失證明</li>
+            <li>去台灣駐日代表處辦補發或旅行證明</li>
+            <li>
+              可講詞：
+              <span class="fp-reading-inline">パスポート（護照）</span>
+              <span class="fp-reading-inline">再発行＝さいはっこう（補發）</span>
+              <span class="fp-reading-inline">台湾代表処＝たいわんだいひょうしょ</span>
+            </li>
+          </ul>
+          <p class="fp-reading">📌 小提醒：護照影本存手機/雲端</p>
+        </div>
 
-        <strong>🛂 護照遺失</strong><br>
-        交番報案→取得遺失證明<br>
-        去台灣駐日代表處辦補發或旅行證明<br>
-        可講詞：<br>
-        パスポート（護照）<br>
-        再発行＝さいはっこう（補發）<br>
-        台湾代表処＝たいわんだいひょうしょ<br>
-        📌 小提醒：護照影本存手機/雲端<br><br>
-
-        <strong>🤢 生病/受傷</strong><br>
-        急重→119（救護）<br>
-        輕症→內科 Clinic／藥局 薬局＝やっきょく（Yakkyoku）<br>
-        常用詞：<br>
-        具合悪い＝ぐあいわるい（不舒服）<br>
-        病院＝びょういん（醫院）<br>
-        頭痛（ずつう）／発熱（はつねつ）／下痢（げり）<br><br>
-
-        👉 直接說症狀＋病院即可<br>
-        例：「具合悪い 病院？」
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-briefcase-medical" aria-hidden="true"></i>
+            生病/受傷
+          </h3>
+          <ul class="fp-list">
+            <li>急重→119（救護）</li>
+            <li>輕症→內科 Clinic／藥局 薬局＝やっきょく（Yakkyoku）</li>
+            <li>
+              常用詞：
+              <span class="fp-reading-inline">具合悪い＝ぐあいわるい（不舒服）</span>
+              <span class="fp-reading-inline">病院＝びょういん（醫院）</span>
+              <span class="fp-reading-inline">頭痛（ずつう）／発熱（はつねつ）／下痢（げり）</span>
+            </li>
+          </ul>
+          <p class="fp-reading">
+            👉 直接說症狀＋病院即可，例：「具合悪い 病院？」
+          </p>
+        </div>
       </div>
     </div>
 
     <!-- 熊的情報面板 -->
-    <div class="floating-panel" id="floatingBear">
+    <div class="floating-panel dark-panel" id="floatingBear">
       <div class="floating-panel-header">
-        <div class="floating-panel-header-title">
-          <span>🐻</span>
+        <div class="floating-panel-title">
+          <i class="fa-solid fa-paw" aria-hidden="true"></i>
           <span>熊的情報</span>
         </div>
         <button class="floating-panel-close" data-close="bear" aria-label="關閉熊的情報">
@@ -1925,30 +2278,82 @@
         </button>
       </div>
 
-      <div class="bear-note">
-        <strong>🐻 熊資訊 Note（預防 &amp; 遇到時應對）</strong><br><br>
+      <div class="floating-panel-hero">
+        <div style="border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);padding:0.75rem;background:rgba(15,23,42,0.6);font-size:13px;line-height:1.5;color:#e5e7eb;">
+          <p style="margin:0 0 0.35rem;font-weight:600;">
+            你行程關注區的熊碰撞機率
+          </p>
+          <p style="margin:0 0 0.4rem;">
+            依據 <a href="https://fukazawa-lab.github.io/japan-bear-map/index_en.html?utm_source=goodlucktrip" target="_blank" style="color:#93c5fd;">Japan Bear Map</a> ，可查出你將前往的地點（草津、輕井澤、熊谷）的最新接近/目擊機率。
+          </p>
+          <ul style="margin:0;padding-left:1.1rem;">
+            <li>草津（高意外熱點）→ 建議保持公路與遊客服務中心移動</li>
+            <li>輕井澤／熊谷→ 山林活動仍屬低至中風險，但出現足跡需立即撤退</li>
+            <li style="margin-top:0.4rem;"><a href="https://fukazawa-lab.github.io/japan-bear-map/index_en.html?utm_source=goodlucktrip" target="_blank" style="color:#93c5fd;">🧭 立即查看你地點的機率</a></li>
+          </ul>
+        </div>
+      </div>
 
-        🔹 避免遇熊<br>
-        • 不單獨、不清晨傍晚進山<br>
-        • 行走有聲音（熊鈴/講話）<br>
-        • 不丟食物、垃圾<br>
-        • 看到糞便/爪痕→折返<br><br>
+      <div class="floating-panel-body">
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-compass" aria-hidden="true"></i>
+            出發前預防
+          </h3>
+          <ul class="fp-list">
+            <li>避免單獨、清晨或傍晚進山，選擇已知路線</li>
+            <li>穿著亮色並攜帶熊鈴／講話製造聲音</li>
+            <li>垃圾、食物請密封‧帶回，不在路邊留香味</li>
+          </ul>
+        </div>
 
-        🔹 遇到熊時<br>
-        • <strong>保持冷靜，不跑</strong><br>
-        • 面對熊 <strong>慢慢後退</strong><br>
-        • 輕聲說話，不尖叫<br>
-        • 背包擋前防護<br><br>
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            發現跡象
+          </h3>
+          <ul class="fp-list">
+            <li>看到糞便、爪痕或新鮮抓痕 → 立即折返</li>
+            <li>遠離河谷和果樹圍欄，這是熊的補給點</li>
+            <li>保持人數、減少單一偏移</li>
+          </ul>
+        </div>
 
-        🔹 熊靠近時<br>
-        • 找掩蔽物、保護頭頸<br>
-        • 脫身後通報管理單位<br><br>
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-person-hiking" aria-hidden="true"></i>
+            遇到熊時
+          </h3>
+          <ul class="fp-list">
+            <li>保持冷靜、不要逃跑，慢慢後退</li>
+            <li>面向熊，輕聲說話；不尖叫</li>
+            <li>背包放在身前當護罩，提防前掌攻擊</li>
+          </ul>
+        </div>
 
-        📎 熊相關資訊 / 官方入口：<br>
-        <a href="https://www.pref.nagano.lg.jp/yasei/bear.html" target="_blank">🟡 長野縣熊資訊（含輕井澤）</a><br>
-        <a href="https://www.pref.gunma.jp/page/16709.html" target="_blank">🟡 群馬縣熊注意公告（草津）</a><br>
-        <a href="https://www.kankyo.metro.tokyo.lg.jp/nature/index.html" target="_blank">🟡 東京都自然野生動物資訊</a><br>
-        <a href="https://kumanichi.com/feed" target="_blank">📰 熊本熊新聞 RSS</a><br>
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-shield" aria-hidden="true"></i>
+            熊靠近
+          </h3>
+          <ul class="fp-list">
+            <li>尋找掩蔽與高地，保護頭頸</li>
+            <li>離開現場後立刻通報管理單位</li>
+            <li>若遭攻擊，可用隨身哨子或空罐製造聲響</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="fp-section-title">
+            <i class="fa-solid fa-link" aria-hidden="true"></i>
+            官方資訊
+          </h3>
+          <ul class="fp-list">
+            <li><a href="https://www.pref.nagano.lg.jp/yasei/bear.html" target="_blank" class="fp-reading-inline">長野縣熊資訊（含輕井澤）</a></li>
+            <li><a href="https://www.pref.gunma.jp/page/16709.html" target="_blank" class="fp-reading-inline">群馬縣熊注意公告（草津）</a></li>
+            <li><a href="https://www.kankyo.metro.tokyo.lg.jp/nature/index.html" target="_blank" class="fp-reading-inline">東京都自然野生動物資訊</a></li>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -1978,6 +2383,150 @@
       </div>
     </div>
 
+    <div class="floating-panel" id="floatingTax">
+      <div class="floating-panel-header">
+        <div class="floating-panel-title">
+          <i class="fa-solid fa-tag" aria-hidden="true"></i>
+          <span>2026 日本退稅新制（2026/11/1起）</span>
+        </div>
+        <button class="floating-panel-close" data-close="tax" aria-label="關閉退稅資訊">
+          ×
+        </button>
+      </div>
+
+      <div class="floating-panel-body">
+        <div>
+          <p class="fp-section-title">
+            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+            核心變革
+          </p>
+          <ul class="fp-list">
+            <li>🛍 買東西先含稅，不再店內退稅</li>
+            <li>📌 回國前 → 機場退稅，須排隊驗貨</li>
+            <li>📌 退稅約為消費稅 10%</li>
+            <li>📌 門檻：同店同日總額 ≥ 未稅 ¥5,000</li>
+            <li>📌 不同店家不可累積（新制度也一樣）</li>
+            <li>📌 取消一般/消耗品分類 & 消耗品 50 萬上限</li>
+          </ul>
+        </div>
+        <div>
+          <p class="fp-section-title">
+            <i class="fa-solid fa-phone" aria-hidden="true"></i>
+            退稅流程（新制一步看）
+          </p>
+          <ul class="fp-list">
+            <li>🛍 購物結帳（含稅）</li>
+            <li>📄 店家提供 QRcode／收據上顯示</li>
+            <li>🌐 登入 J-TaxRefund（首次需建立帳戶）</li>
+            <li>✈️ 回國前提早到機場 → 退稅櫃檯/KIOSK</li>
+            <li>🧳 海關驗貨（需帶實體商品）</li>
+            <li>💵 退款退至你填的帳戶/信用卡</li>
+          </ul>
+        </div>
+        <div>
+          <p class="fp-section-title">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            其他注意
+          </p>
+          <ul class="fp-list">
+            <li>🔹 不能跨店累加金額 → 需同店同日</li>
+            <li>🔹 量大商品可能被要求托運</li>
+            <li>🔹 建議回程多預留時間（排隊可能很久）</li>
+            <li>🔹 適用所有一般商品 + 消耗品（已合併制度）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="floating-panel" id="floatingChecklist">
+      <div class="floating-panel-header">
+        <div class="floating-panel-title">
+          <i class="fa-solid fa-list-check" aria-hidden="true"></i>
+          <span>日本行前 Checklist</span>
+        </div>
+        <button class="floating-panel-close" data-close="checklist" aria-label="關閉 Checklist">
+          ×
+        </button>
+      </div>
+      <div class="floating-panel-body">
+        <article class="checklist-card">
+          <div class="checklist-card-header">
+            <strong>🇯🇵 日本行前準備 Checklist</strong>
+            <span>手機友善・自動儲存</span>
+          </div>
+
+          <section class="checklist-section">
+            <h4>出發前 1–7 天</h4>
+            <div class="checklist-items">
+              <label><input type="checkbox" data-id="prep-outbound-vjw">VJW入境登錄＋QR截圖</label>
+              <label><input type="checkbox" data-id="prep-outbound-passport">護照影本備份（手機/雲端）</label>
+              <label><input type="checkbox" data-id="prep-outbound-insurance">旅遊保險（醫療+不便險）</label>
+              <label><input type="checkbox" data-id="prep-outbound-sim">eSIM / DJB / Soracom / 實體卡</label>
+              <label><input type="checkbox" data-id="prep-outbound-card">信用卡開啟國外交易</label>
+              <label><input type="checkbox" data-id="prep-outbound-maps">收藏Google地圖+離線區域</label>
+              <label><input type="checkbox" data-id="prep-outbound-docs">住宿&行程截圖備份</label>
+              <label><input type="checkbox" data-id="prep-outbound-suica">Suica/ICOCA行動卡設定</label>
+              <label><input type="checkbox" data-id="prep-outbound-emergency">緊急聯絡方式備份</label>
+            </div>
+          </section>
+
+          <section class="checklist-section">
+            <h4>行李</h4>
+            <div class="checklist-items">
+              <label><input type="checkbox" data-id="prep-luggage-plug">萬用轉接頭（建議）</label>
+              <label><input type="checkbox" data-id="prep-luggage-power">行動電源+延長線+充電線</label>
+              <label><input type="checkbox" data-id="prep-luggage-meds">常備藥包（腸胃/頭痛/過敏/OK繃）</label>
+              <label><input type="checkbox" data-id="prep-luggage-gear">口罩/防曬/雨具</label>
+              <label><input type="checkbox" data-id="prep-luggage-weather">依天氣準備衣物/雪裝</label>
+              <label><input type="checkbox" data-id="prep-luggage-space">留出購物空間🛍</label>
+            </div>
+          </section>
+
+          <section class="checklist-section">
+            <h4>出發當天</h4>
+            <div class="checklist-items">
+              <label><input type="checkbox" data-id="prep-day-passport">護照/手機/行動電源</label>
+              <label><input type="checkbox" data-id="prep-day-vjw">VJW QR 離線截圖</label>
+              <label><input type="checkbox" data-id="prep-day-ticket">電子機票&登機證</label>
+              <label><input type="checkbox" data-id="prep-day-address">日文住宿地址</label>
+              <label><input type="checkbox" data-id="prep-day-cash">現金日幣 ¥10k–30k</label>
+            </div>
+          </section>
+
+          <section class="checklist-section">
+            <h4>入境</h4>
+            <div class="checklist-items">
+              <label><input type="checkbox" data-id="prep-arrival-vjw">出示 VJW 快速通關</label>
+              <label><input type="checkbox" data-id="prep-arrival-customs">海關掃QR或人工檢查</label>
+              <label><input type="checkbox" data-id="prep-arrival-card">無VJW時備妥紙本入境卡</label>
+            </div>
+          </section>
+
+          <section class="checklist-section">
+            <h4>退稅 / 購物 (如適用)</h4>
+            <div class="checklist-items">
+              <label><input type="checkbox" data-id="prep-tax-pay">結帳先含稅，店內不退</label>
+              <label><input type="checkbox" data-id="prep-tax-min">同店/同日未稅 ¥5,000 起可退</label>
+              <label><input type="checkbox" data-id="prep-tax-jtax">購物後至 <a href="https://j-taxrefund.com" target="_blank" rel="noreferrer">J-TaxRefund</a> 建單</label>
+              <label><input type="checkbox" data-id="prep-tax-airport">機場排隊→驗貨→退稅入帳</label>
+            </div>
+          </section>
+
+          <section class="checklist-section">
+            <h4>緊急資訊</h4>
+            <div class="checklist-items">
+              <label><input type="checkbox" data-id="prep-emergency-passport">護照＋手機＋行動電源</label>
+              <label><input type="checkbox" data-id="prep-emergency-cards">雙卡/日幣備用</label>
+              <label><input type="checkbox" data-id="prep-emergency-vjw">VJW QR 在地端</label>
+              <label><input type="checkbox" data-id="prep-emergency-esim">eSIM 已開通</label>
+            </div>
+          </section>
+
+          <p class="checklist-note">每項勾選結果儲存在本機，重新整理仍會保留。</p>
+        </article>
+      </div>
+    </div>
+
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const fabToggle = document.getElementById("fabToggle");
@@ -1985,43 +2534,84 @@
         const sosPanel = document.getElementById("floatingSos");
         const bearPanel = document.getElementById("floatingBear");
         const mapPanel = document.getElementById("floatingMap");
-        // 點 FAB 展開 / 收合選單
+        const taxPanel = document.getElementById("floatingTax");
+        const checkPanel = document.getElementById("floatingCheck");
+        const checklistPanel = document.getElementById("floatingChecklist");
+        const floatingPanels = [
+          sosPanel,
+          bearPanel,
+          mapPanel,
+          taxPanel,
+          checkPanel,
+          checklistPanel,
+        ];
+
+        const closeFloatingPanels = () => {
+          floatingPanels.forEach((panel) => panel.classList.remove("is-open"));
+        };
+
+        const setMenuOpen = (isOpen) => {
+          menuPanel.classList.toggle("is-open", isOpen);
+          fabToggle.classList.toggle("is-open", isOpen);
+          if (!isOpen) {
+            closeFloatingPanels();
+          }
+        };
+
         fabToggle.addEventListener("click", function (e) {
           e.stopPropagation();
-          menuPanel.classList.toggle("is-open");
+          const currentlyOpen = menuPanel.classList.contains("is-open");
+          if (currentlyOpen) {
+            setMenuOpen(false);
+          } else {
+            closeFloatingPanels();
+            setMenuOpen(true);
+          }
         });
 
         // 點選各個 menu item
         menuPanel.addEventListener("click", function (e) {
           const item = e.target.closest(".floating-menu-item");
           if (!item) return;
+          e.preventDefault();
 
           const action = item.dataset.action;
-          menuPanel.classList.remove("is-open"); // 點了就先收起主選單
+          setMenuOpen(false); // 點了就先收起主選單
 
           switch (action) {
             case "sos": {
+              closeFloatingPanels();
               sosPanel.classList.toggle("is-open");
-              bearPanel.classList.remove("is-open");
               break;
             }
             case "bear": {
+              closeFloatingPanels();
               bearPanel.classList.toggle("is-open");
-              sosPanel.classList.remove("is-open");
-              mapPanel.classList.remove("is-open");
               break;
             }
             case "map": {
+              closeFloatingPanels();
               mapPanel.classList.toggle("is-open");
-              sosPanel.classList.remove("is-open");
-              bearPanel.classList.remove("is-open");
+              break;
+            }
+            case "tax": {
+              closeFloatingPanels();
+              taxPanel.classList.toggle("is-open");
+              break;
+            }
+            case "check": {
+              closeFloatingPanels();
+              checkPanel.classList.toggle("is-open");
+              break;
+            }
+            case "prep": {
+              closeFloatingPanels();
+              checklistPanel.classList.toggle("is-open");
               break;
             }
             case "top": {
               window.scrollTo({ top: 0, behavior: "smooth" });
-              sosPanel.classList.remove("is-open");
-              bearPanel.classList.remove("is-open");
-              mapPanel.classList.remove("is-open");
+              setMenuOpen(false);
               break;
             }
             default:
@@ -2039,6 +2629,12 @@
               bearPanel.classList.remove("is-open");
             } else if (type === "map") {
               mapPanel.classList.remove("is-open");
+            } else if (type === "tax") {
+              taxPanel.classList.remove("is-open");
+            } else if (type === "check") {
+              checkPanel.classList.remove("is-open");
+            } else if (type === "checklist") {
+              checklistPanel.classList.remove("is-open");
             }
           });
         });
@@ -2049,8 +2645,19 @@
             e.target.closest(".floating-menu") ||
             e.target.closest(".floating-panel");
           if (!insideMenu) {
-            menuPanel.classList.remove("is-open");
+            setMenuOpen(false);
           }
+        });
+
+        const checklistInputs = document.querySelectorAll(
+          "#floatingChecklist input[type='checkbox'][data-id]"
+        );
+        checklistInputs.forEach((input) => {
+          const storageKey = input.dataset.id;
+          input.checked = localStorage.getItem(storageKey) === "true";
+          input.addEventListener("change", function () {
+            localStorage.setItem(storageKey, input.checked);
+          });
         });
 
       });
