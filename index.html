@@ -302,33 +302,6 @@
         ruby { font-family: 'Zen Old Mincho', serif; }
         rt { font-family: 'Shippori Mincho', serif; font-size: 0.55em; opacity: 0.7; letter-spacing: 0.05em; color: inherit; }
 
-        .map-toggle-btn {
-            position: absolute;
-            left: 12px;
-            bottom: 12px;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: #fff;
-            color: #334155;
-            border: 1px solid #e5e7eb;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
-            cursor: pointer;
-            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-            z-index: 5;
-        }
-
-        .map-toggle-btn:hover {
-            background: #f8fafc;
-            border-color: #d1d5db;
-            color: #0f172a;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
-        }
-
         /* !IMPORTANT: 強制修正 Vocabulary 區塊易讀性 */
         .vocab-card { background-color: #ffffff !important; border: 1px solid #e5e7eb !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
         .vocab-card h4 { color: #94a3b8 !important; }
@@ -668,6 +641,18 @@
             transform: translateX(-24px);
         }
 
+        /* 最終版：強制讓日期 tab 使用主題色 */
+        button.day-tab {
+            background-color: #fff;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+        button.day-tab.is-active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #fff;
+        }
+
         @media (max-width: 600px) {
             .floating-menu {
                 right: 1rem;
@@ -826,6 +811,16 @@
             );
         };
 
+        const WeatherIcon = ({ type, size = 14, className = '' }) => {
+            switch(type) {
+            case 'sun': return <Sun size={size} className={`text-amber-600 ${className}`} />;
+            case 'cloud': return <Cloud size={size} className={`text-stone-400 ${className}`} />;
+            case 'snow': return <CloudSnow size={size} className={`text-cyan-600 ${className}`} />;
+            case 'rain': return <CloudRain size={size} className={`text-blue-600 ${className}`} />;
+            default: return <Sun size={size} className={`text-amber-600 ${className}`} />;
+            }
+        };
+
         const TripApp = () => {
             const [activeDay, setActiveDay] = useState(0);
             const [selectedEvent, setSelectedEvent] = useState(null);
@@ -834,15 +829,15 @@
             const [transitionDir, setTransitionDir] = useState("forward");
             const [slideInKey, setSlideInKey] = useState("1219");
 
-            const coords = {
+            const coords = useMemo(() => ({
                 tpe: [25.0797, 121.2342], nrt: [35.7719, 140.3929], roppongi: [35.6628, 139.7314],
                 ginza: [35.6712, 139.7665], hibiya: [35.6736, 139.7562], tokyoSt: [35.6812, 139.7671],
                 takasaki: [36.3220, 139.0125], daruma: [36.3150, 138.9760], karuizawa: [36.3435, 138.6355],
                 kusatsu: [36.6208, 138.5963], yokohama: [35.4596, 139.6433], redbrick: [35.4526, 139.6429],
                 shinyokohama: [35.5098, 139.6176]
-            };
+            }), []);
 
-            const mapRoutes = [
+            const mapRoutes = useMemo(() => [
                 { 
                     id: 'day1', 
                     path: [coords.nrt, coords.roppongi], 
@@ -902,19 +897,9 @@
                         { emoji: "🌾", label: "成田山新勝寺", coord: [35.7830, 140.3186] }
                     ]
                 }
-            ];
+            ], [coords]);
 
-            const WeatherIcon = ({ type, size = 14, className }) => {
-                switch(type) {
-                case 'sun': return <Sun size={size} className={`text-amber-600 ${className}`} />;
-                case 'cloud': return <Cloud size={size} className={`text-stone-400 ${className}`} />;
-                case 'snow': return <CloudSnow size={size} className={`text-cyan-600 ${className}`} />;
-                case 'rain': return <CloudRain size={size} className={`text-blue-600 ${className}`} />;
-                default: return <Sun size={size} className={`text-amber-600 ${className}`} />;
-                }
-            };
-
-            const schedule = [
+            const schedule = useMemo(() => [
                 {
                 date: "12/19",
                 day: "金曜日(Fri)",
@@ -934,7 +919,7 @@
                     locationQuery: "Taoyuan International Airport Terminal 1",
                     icon: Plane,
                     style: 'gaiac', // GAIAC 10 Style
-                    weather: { type: 'cloud', temp: '18°C', loc: 'TPE' },
+                    weather: { type: 'cloud', current: '18°C', high: '21°C', low: '16°C', loc: 'TPE' },
                     keywords: ["Le Labo", "Woody", "Musk"],
                     outfit: "機艙內氣壓較低且乾燥。建議穿著純棉材質，保持極簡。",
                     insights: {
@@ -960,7 +945,7 @@
                     locationQuery: "六本木駅",
                     icon: Train,
                     style: 'kon', // Kon Style
-                    weather: { type: 'rain', temp: '8°C', loc: 'Tokyo' },
+                    weather: { type: 'rain', current: '8°C', high: '11°C', low: '5°C', loc: 'Tokyo' },
                     keywords: ["現實的邊界", "紅色閃電", "都市進入"],
                     outfit: "日本電車暖氣通常開得非常強（約25度以上）。進車廂後建議立刻脫下厚外套。",
                     insights: {
@@ -986,7 +971,7 @@
                     locationQuery: "APA Hotel Roppongi Ekimae",
                     icon: Hotel,
                     style: 'harajuku', // Harajuku Style
-                    weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
+                    weather: { type: 'cloud', current: '7°C', high: '10°C', low: '4°C', loc: 'Roppongi' },
                     keywords: ["KAWAII", "CHAOS", "TOKYO POP"],
                     outfit: "在這裡，你想穿什麼就穿什麼！越誇張越好！把所有顏色都穿在身上吧！",
                     insights: {
@@ -1011,7 +996,7 @@
                     locationQuery: "Shabuzen Roppongi",
                     icon: Utensils,
                     style: 'ghoul', // Tokyo Ghoul Style
-                    weather: { type: 'cloud', temp: '7°C', loc: 'Roppongi' },
+                    weather: { type: 'cloud', current: '7°C', high: '10°C', low: '4°C', loc: 'Roppongi' },
                     keywords: ["暴食", "赫子", "A5和牛"],
                     outfit: "建議穿著深色衣服，因為吃肉的時候可能會噴濺...湯汁。",
                     insights: {
@@ -1045,7 +1030,7 @@
                     locationQuery: "Sushi Itsumi",
                     icon: Utensils,
                     style: 'ishiguro', // Ishiguro Style
-                    weather: { type: 'sun', temp: '11°C', loc: 'Tokyo' },
+                    weather: { type: 'sun', current: '11°C', high: '13°C', low: '9°C', loc: 'Tokyo' },
                     keywords: ["不可靠的敘事者", "黃昏的赤坂", "記憶的餘燼"],
                     outfit: "建議穿著「半正式休閒 (Smart Casual)」。一件剪裁合宜的大衣，或許能掩蓋內心的波瀾。",
                     insights: {
@@ -1070,7 +1055,7 @@
                     locationQuery: "Tokyo International Forum",
                     icon: ShoppingBag,
                     style: 'gintama', // Gintama Style
-                    weather: { type: 'sun', temp: '12°C', loc: 'Yurakucho' },
+                    weather: { type: 'sun', current: '12°C', high: '14°C', low: '10°C', loc: 'Yurakucho' },
                     keywords: ["萬事屋", "糖分攝取", "昭和復古"],
                     outfit: "只要不是穿著那件寫著「糖分」的T恤，穿什麼都可以。記得穿好走的鞋子，不然腳會斷掉阿魯。",
                     insights: {
@@ -1095,7 +1080,7 @@
                     locationQuery: "Hibiya Park",
                     icon: Camera,
                     style: 'sumitomo', // Sumitomo Style
-                    weather: { type: 'cloud', temp: '11°C', loc: 'Hibiya' },
+                    weather: { type: 'cloud', current: '11°C', high: '13°C', low: '9°C', loc: 'Hibiya' },
                     keywords: ["舊財閥", "丸之內", "信用第一"],
                     outfit: "建議穿著整齊清潔的服裝。這裡周圍都是頂級企業總部，休閒但不要隨便。",
                     insights: {
@@ -1120,7 +1105,7 @@
                     locationQuery: "Roppongi Keyakizaka Dori",
                     icon: Camera,
                     style: 'kusama', // Kusama Style
-                    weather: { type: 'cloud', temp: '8°C', loc: 'Roppongi' },
+                    weather: { type: 'cloud', current: '8°C', high: '10°C', low: '6°C', loc: 'Roppongi' },
                     keywords: ["東京鐵塔", "無限網", "圓點幻覺"],
                     outfit: "入夜後氣溫驟降，手套跟暖暖包這時候就派上用場了。",
                     insights: {
@@ -1156,7 +1141,7 @@
                     icon: Train,
                     style: 'tel', // Tokyo Electron Style
                     timetableUrl: "https://www.jreast.co.jp/multi/zh-CHT/",
-                    weather: { type: 'sun', temp: '10°C', loc: 'Tokyo' },
+                    weather: { type: 'sun', current: '10°C', high: '12°C', low: '7°C', loc: 'Tokyo' },
                     keywords: ["Precision", "Efficiency", "Clean"],
                     outfit: "建議穿著剪裁俐落的機能性服裝。保持清潔，減少微塵。",
                     insights: {
@@ -1182,7 +1167,7 @@
                     locationQuery: "Shorinzan Daruma-ji",
                     icon: MapPin,
                     style: 'oe', // Kenzaburo Oe Style
-                    weather: { type: 'sun', temp: '9°C', loc: 'Gunma' },
+                    weather: { type: 'sun', current: '9°C', high: '11°C', low: '6°C', loc: 'Gunma' },
                     keywords: ["存在主義", "個人的體驗", "靈魂"],
                     outfit: "這裡要爬長長的階梯！穿著樸素、耐磨的衣物，準備好接受肉體的勞動。",
                     insights: {
@@ -1208,7 +1193,7 @@
                     icon: Train,
                     style: 'ghibli', // Ghibli Style
                     timetableUrl: "https://www.kkKG.co.jp/bus/rosen-bus.html",
-                    weather: { type: 'snow', temp: '1°C', loc: 'Karuizawa' },
+                    weather: { type: 'snow', current: '1°C', high: '3°C', low: '0°C', loc: 'Karuizawa' },
                     keywords: ["森林隧道", "雪之國度", "懷舊旅程"],
                     outfit: "車程 80 分鐘山路，怕暈車的建議穿寬鬆不勒肚子的褲子。",
                     insights: {
@@ -1233,7 +1218,7 @@
                     icon: Hotel,
                     style: 'spirited', // Spirited Away Style
                     timetableUrl: "https://www.kkKG.co.jp/bus/rosen-bus.html",
-                    weather: { type: 'snow', temp: '-2°C', loc: 'Kusatsu' },
+                    weather: { type: 'snow', current: '-2°C', high: '1°C', low: '-5°C', loc: 'Kusatsu' },
                     keywords: ["千與千尋", "湯婆婆", "不可思議"],
                     outfit: "晚上看湯畑點燈『超級冷』，體感通常在零下。務必全副武裝。",
                     insights: {
@@ -1269,7 +1254,7 @@
                     locationQuery: "Karuizawa Prince Shopping Plaza",
                     icon: ShoppingBag,
                     style: 'miyake', // Miyake Style
-                    weather: { type: 'cloud', temp: '3°C', loc: 'Karuizawa' },
+                    weather: { type: 'cloud', current: '3°C', high: '6°C', low: '0°C', loc: 'Karuizawa' },
                     keywords: ["幾何結構", "PLEATS PLEASE", "空間哲學"],
                     outfit: "這 Outlet 很大且是戶外開放式，風很大。建議穿防風大衣。",
                     insights: {
@@ -1295,7 +1280,7 @@
                     locationQuery: "Karuizawa Station",
                     icon: Train,
                     style: 'sanae', // Sanae Takaichi Style
-                    weather: { type: 'cloud', temp: '10°C', loc: 'Yokohama' },
+                    weather: { type: 'cloud', current: '10°C', high: '12°C', low: '8°C', loc: 'Yokohama' },
                     keywords: ["國家安全", "經濟安保", "鐵娘子"],
                     outfit: "建議穿著深藍色或黑色套裝，展現專業與權威感。",
                     insights: {
@@ -1318,7 +1303,7 @@
                     locationQuery: "Yokohama Red Brick Warehouse",
                     icon: Camera,
                     style: 'onepiece', // One Piece Style
-                    weather: { type: 'sun', temp: '8°C', loc: 'Yokohama' },
+                    weather: { type: 'sun', current: '8°C', high: '11°C', low: '5°C', loc: 'Yokohama' },
                     keywords: ["偉大的航道", "海賊王", "紅磚要塞"],
                     outfit: "海邊的風是『會吹到頭痛』的那種。一定要戴能蓋住耳朵的帽子。",
                     insights: {
@@ -1351,7 +1336,7 @@
                     locationQuery: "Shin-Yokohama Ramen Museum",
                     icon: Utensils,
                     style: 'retro', // Retro Style
-                    weather: { type: 'rain', temp: '8°C', loc: 'Yokohama' },
+                    weather: { type: 'rain', current: '8°C', high: '10°C', low: '7°C', loc: 'Yokohama' },
                     keywords: ["昭和夕陽", "迷你碗", "制霸全國"],
                     outfit: "室內復古造景溫暖，穿脫方便的洋蔥式穿搭，避免太厚重在室內熱壞。",
                     insights: {
@@ -1378,7 +1363,7 @@
                     icon: Train,
                     style: 'sympathy', // Tokyo Sympathy Tower Style
                     timetableUrl: "https://www.jreast.co.jp/nex/time.html",
-                    weather: { type: 'rain', temp: '7°C', loc: 'Tokyo' },
+                    weather: { type: 'rain', current: '7°C', high: '9°C', low: '5°C', loc: 'Tokyo' },
                     keywords: ["準點", "直達", "補眠"],
                     outfit: "輕鬆舒適為主，避免穿太多層，機場過安檢脫脫穿穿很麻煩。",
                     insights: {
@@ -1400,7 +1385,7 @@
                     locationQuery: "Narita Airport Terminal 1",
                     icon: Plane,
                     style: 'kachidoki', // Kachidoki Bridge Style
-                    weather: { type: 'rain', temp: '6°C', loc: 'NRT' },
+                    weather: { type: 'rain', current: '6°C', high: '8°C', low: '4°C', loc: 'NRT' },
                     keywords: ["工業遺產", "鋼鐵結構", "開合橋"],
                     outfit: "回台灣會變熱，建議裡面穿短袖/薄長袖，外面穿厚外套。",
                     insights: {
@@ -1416,9 +1401,9 @@
                     }
                 ]
                 }
-            ];
+            ], []);
 
-            const dayKeys = schedule.map((day) => day.date.replace('/', ''));
+            const dayKeys = useMemo(() => schedule.map((day) => day.date.replace('/', '')), [schedule]);
 
             const currentSchedule = schedule[activeDay];
             const currentRoute = mapRoutes[activeDay]; 
@@ -1620,13 +1605,19 @@
                                         <div className="flex justify-between items-start mb-2">
                                             <div className="flex flex-col gap-1">
                                                 <div className="font-serif text-stone-400 text-sm tracking-widest">{event.time}</div>
-                                                {event.weather && (
-                                                    <div className="flex items-center text-[11px] text-stone-500 font-sans">
-                                                        <WeatherIcon type={event.weather.type} size={14} className="mr-1" />
-                                                        <span className="font-semibold">{event.weather.temp}</span>
-                                                        <span className="ml-2 text-[10px] uppercase tracking-[0.25em] text-stone-400">{event.weather.loc}</span>
+                                            {event.weather && (
+                                                <div className="flex items-start gap-2 text-[11px] text-stone-500 font-sans">
+                                                    <WeatherIcon type={event.weather.type} size={14} className="mt-0.5 text-stone-400" />
+                                                    <div className="flex flex-col leading-tight">
+                                                        <span className="font-semibold text-[12px]">{event.weather.current || event.weather.temp}</span>
+                                                        <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.25em] text-stone-400">
+                                                            {event.weather.high && <span>H {event.weather.high}</span>}
+                                                            {event.weather.low && <span>L {event.weather.low}</span>}
+                                                            <span>{event.weather.loc}</span>
+                                                        </div>
                                                     </div>
-                                                )}
+                                                </div>
+                                            )}
                                             </div>
                                             
                                             {/* Always-visible Google Maps shortcut */}
@@ -1846,6 +1837,10 @@
           <span class="icon">🐻</span>
           <span class="label">熊的情報</span>
         </button>
+        <button class="floating-menu-item" data-action="map">
+          <span class="icon">🗺️</span>
+          <span class="label">東京地鐵圖</span>
+        </button>
         <button class="floating-menu-item" data-action="top">
           <span class="icon">⬆️</span>
           <span class="label">回到最上面</span>
@@ -1957,12 +1952,36 @@
       </div>
     </div>
 
+    <div class="floating-panel" id="floatingMap">
+      <div class="floating-panel-header">
+        <div class="floating-panel-header-title">
+          <span>🗺️</span>
+          <span>東京地鐵圖</span>
+        </div>
+        <button class="floating-panel-close" data-close="map" aria-label="關閉地鐵圖">
+          ×
+        </button>
+      </div>
+
+      <div style="max-width:280px;">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/3/33/Tokyo_Metro_Map_EN.png"
+          alt="Tokyo Metro map"
+          style="width:100%;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,0.15);border:1px solid rgba(0,0,0,0.08);"
+        />
+        <p class="bear-note" style="margin-top:0.75rem;font-size:12px;line-height:1.4;">
+          可點圖放大；建議在手機上先截圖或開啟官方版以便離線查詢。
+        </p>
+      </div>
+    </div>
+
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const fabToggle = document.getElementById("fabToggle");
         const menuPanel = document.getElementById("floatingMenuPanel");
         const sosPanel = document.getElementById("floatingSos");
         const bearPanel = document.getElementById("floatingBear");
+        const mapPanel = document.getElementById("floatingMap");
         // 點 FAB 展開 / 收合選單
         fabToggle.addEventListener("click", function (e) {
           e.stopPropagation();
@@ -1986,12 +2005,20 @@
             case "bear": {
               bearPanel.classList.toggle("is-open");
               sosPanel.classList.remove("is-open");
+              mapPanel.classList.remove("is-open");
+              break;
+            }
+            case "map": {
+              mapPanel.classList.toggle("is-open");
+              sosPanel.classList.remove("is-open");
+              bearPanel.classList.remove("is-open");
               break;
             }
             case "top": {
               window.scrollTo({ top: 0, behavior: "smooth" });
               sosPanel.classList.remove("is-open");
               bearPanel.classList.remove("is-open");
+              mapPanel.classList.remove("is-open");
               break;
             }
             default:
@@ -2007,6 +2034,8 @@
               sosPanel.classList.remove("is-open");
             } else if (type === "bear") {
               bearPanel.classList.remove("is-open");
+            } else if (type === "map") {
+              mapPanel.classList.remove("is-open");
             }
           });
         });
@@ -2019,40 +2048,6 @@
           if (!insideMenu) {
             menuPanel.classList.remove("is-open");
           }
-        });
-
-        // 日期 tabs 切換 day-panel (滑入 + 淡入版)
-        const tabs = document.querySelectorAll(".day-tab");
-        const panels = document.querySelectorAll(".day-panel");
-        let currentDay = "1219";
-
-        tabs.forEach((tab) => {
-          tab.addEventListener("click", () => {
-            const targetDay = tab.dataset.day;
-            if (targetDay === currentDay) return;
-
-            tabs.forEach((t) => t.classList.remove("is-active"));
-            tab.classList.add("is-active");
-
-            const currentPanel = document.querySelector(`.day-panel[data-day="${currentDay}"]`);
-            const nextPanel = document.querySelector(`.day-panel[data-day="${targetDay}"]`);
-            if (!currentPanel || !nextPanel) return;
-
-            const forward = Number(targetDay) > Number(currentDay);
-
-            currentPanel.classList.remove("is-active");
-            currentPanel.classList.remove("slide-in-from-left", "slide-in-from-right");
-
-            nextPanel.classList.remove("slide-in-from-left", "slide-in-from-right");
-            nextPanel.classList.add(forward ? "slide-in-from-right" : "slide-in-from-left");
-            nextPanel.classList.add("is-active");
-
-            requestAnimationFrame(() => {
-              nextPanel.classList.remove("slide-in-from-right", "slide-in-from-left");
-            });
-
-            currentDay = targetDay;
-          });
         });
 
       });
