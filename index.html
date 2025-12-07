@@ -913,7 +913,10 @@
         const DailyMapView = ({ route, dayIndex }) => {
             const mapRef = useRef(null);
             const mapInstanceRef = useRef(null);
+            const defaultBoundsRef = useRef(null);
             const [interactive, setInteractive] = useState(false);
+            const [activeLandmarkKey, setActiveLandmarkKey] = useState(null);
+            const [boundsReady, setBoundsReady] = useState(false);
 
             const haversineKm = (a, b) => {
                 const toRad = (deg) => (deg * Math.PI) / 180;
@@ -961,43 +964,78 @@
                 }
 
                 const map = mapInstanceRef.current;
+                const refreshMapSize = () => setTimeout(() => { map.invalidateSize(); }, 100);
+
                 map.eachLayer((layer) => {
                     if (layer instanceof L.Polyline || layer instanceof L.Marker || layer instanceof L.CircleMarker) { map.removeLayer(layer); }
                 });
 
+                if (!route || route.path.length === 0) {
+                    defaultBoundsRef.current = null;
+                    setBoundsReady(false);
+                    setActiveLandmarkKey(null);
+                    refreshMapSize();
+                    return;
+                }
+
+                setActiveLandmarkKey(null);
                 const colors = ['#0f172a', '#44403c', '#064e3b', '#4c1d95', '#0c4a6e'];
                 const color = colors[dayIndex % colors.length];
 
-                if (route && route.path.length > 0) {
-                    L.polyline(route.path, { color: color, weight: 2.5, opacity: 0.8, dashArray: '6, 8', lineCap: 'square' }).addTo(map);
-                    if (route.stops) {
-                        route.stops.forEach(stop => {
-                            L.circleMarker(stop.coord, { radius: 4, fillColor: '#fff', color: color, weight: 2, fillOpacity: 1 })
-                            .bindTooltip(stop.name, { permanent: true, direction: 'bottom', offset: [0, 6], className: 'map-label' })
-                            .addTo(map);
-                        });
-                    }
-                    if (route.landmarks) {
-                        route.landmarks.forEach((spot) => {
-                            const icon = L.divIcon({
-                                className: 'custom-div-icon',
-                                html: `<div style="font-size:18px;">${spot.emoji}</div>`
-                            });
-                            L.marker(spot.coord, { icon })
-                                .bindTooltip(spot.label, { direction: 'top', offset: [0, -8], className: 'map-label' })
-                                .addTo(map);
-                        });
-                    }
-                    const bounds = L.latLngBounds(route.path.concat(route.landmarks?.map(l => l.coord) || []));
-                    map.fitBounds(bounds, { padding: [60, 60] });
+                L.polyline(route.path, { color: color, weight: 2.5, opacity: 0.8, dashArray: '6, 8', lineCap: 'square' }).addTo(map);
+                if (route.stops) {
+                    route.stops.forEach(stop => {
+                        L.circleMarker(stop.coord, { radius: 4, fillColor: '#fff', color: color, weight: 2, fillOpacity: 1 })
+                        .bindTooltip(stop.name, { permanent: true, direction: 'bottom', offset: [0, 6], className: 'map-label' })
+                        .addTo(map);
+                    });
                 }
-                setTimeout(() => { map.invalidateSize(); }, 100);
+                if (route.landmarks) {
+                    route.landmarks.forEach((spot) => {
+                        const icon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: `<div style="font-size:18px;">${spot.emoji}</div>`
+                        });
+                        L.marker(spot.coord, { icon })
+                            .bindTooltip(spot.label, { direction: 'top', offset: [0, -8], className: 'map-label' })
+                            .addTo(map);
+                    });
+                }
+                const bounds = L.latLngBounds(route.path.concat(route.landmarks?.map(l => l.coord) || []));
+                if (bounds && bounds.isValid()) {
+                    defaultBoundsRef.current = bounds;
+                    map.fitBounds(bounds, { padding: [60, 60] });
+                    setBoundsReady(true);
+                } else {
+                    defaultBoundsRef.current = null;
+                    setBoundsReady(false);
+                }
+
+                refreshMapSize();
             }, [route]);
 
             useEffect(() => {
                 setMapInteractivity(mapInstanceRef.current, interactive);
                 setTimeout(() => { mapInstanceRef.current?.invalidateSize(); }, 80);
             }, [interactive]);
+
+            const handleLandmarkClick = (spot, key) => {
+                const map = mapInstanceRef.current;
+                if (!map) return;
+                setActiveLandmarkKey(key);
+                map.flyTo(spot.coord, 15, { duration: 0.9 });
+            };
+
+            const handleOverviewClick = () => {
+                const map = mapInstanceRef.current;
+                if (!map || !defaultBoundsRef.current) return;
+                setActiveLandmarkKey(null);
+                map.fitBounds(defaultBoundsRef.current, { padding: [60, 60], duration: 0.9 });
+            };
+
+            const landmarkItems = route?.landmarks || [];
+            const hasLandmarks = landmarkItems.length > 0;
+            const overviewEnabled = boundsReady && Boolean(defaultBoundsRef.current);
 
             return (
                 <div className="space-y-3">
@@ -1023,15 +1061,36 @@
                             </div>
                         </div>
                         <div className="sm:col-span-2 bg-white border border-stone-200 px-3 py-2 rounded">
-                            <div className="text-[10px] uppercase tracking-[0.15em] text-stone-400 mb-1">Nearby Landmarks</div>
+                            <div className="flex items-center justify-between mb-2 text-[10px] uppercase tracking-[0.15em] text-stone-400">
+                                <span>Nearby Landmarks</span>
+                                <button
+                                    type="button"
+                                    onClick={handleOverviewClick}
+                                    disabled={!overviewEnabled}
+                                    className={`text-[10px] font-semibold tracking-[0.3em] uppercase transition-colors ${overviewEnabled ? 'text-stone-600 hover:text-stone-900' : 'text-stone-300 cursor-not-allowed'}`}
+                                >
+                                    Overview
+                                </button>
+                            </div>
                             <div className="flex flex-wrap gap-1.5">
-                                {(route?.landmarks || []).map((spot, idx) => (
-                                    <span key={idx} className="inline-flex items-center gap-1 bg-stone-50 border border-stone-200 px-2 py-1 rounded-full text-[11px] font-semibold text-stone-700">
-                                        <span>{spot.emoji}</span>
-                                        <span className="leading-none">{spot.label}</span>
-                                    </span>
-                                ))}
-                                {(!route?.landmarks || route.landmarks.length === 0) && (
+                                {hasLandmarks ? (
+                                    landmarkItems.map((spot, idx) => {
+                                        const landmarkKey = `${spot.label}-${idx}`;
+                                        const isActive = activeLandmarkKey === landmarkKey;
+                                        return (
+                                            <button
+                                                key={landmarkKey}
+                                                type="button"
+                                                onClick={() => handleLandmarkClick(spot, landmarkKey)}
+                                                aria-pressed={isActive}
+                                                className={`inline-flex items-center gap-1 border px-2 py-1 rounded-full text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-300 ${isActive ? 'bg-stone-200 border-stone-400 text-stone-900' : 'bg-stone-50 border-stone-200 text-stone-700'}`}
+                                            >
+                                                <span>{spot.emoji}</span>
+                                                <span className="leading-none">{spot.label}</span>
+                                            </button>
+                                        );
+                                    })
+                                ) : (
                                     <span className="text-stone-400 text-[11px]">No nearby notes added.</span>
                                 )}
                             </div>
