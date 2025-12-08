@@ -1318,11 +1318,8 @@
             const [currentDayKey, setCurrentDayKey] = useState("intro");
             const [transitionDir, setTransitionDir] = useState("forward");
             const [slideInKey, setSlideInKey] = useState("intro");
-            const [clipboardSupported, setClipboardSupported] = useState(false);
             const tabsRef = useRef(null);
-            useEffect(() => {
-                setClipboardSupported(Boolean(navigator.clipboard));
-            }, []);
+            const clipboardSupported = typeof navigator !== 'undefined' && Boolean(navigator.clipboard);
 
             const coords = useMemo(() => ({
                 tpe: [25.0797, 121.2342], nrt: [35.7719, 140.3929], roppongi: [35.6628, 139.7314],
@@ -1499,7 +1496,9 @@
                         travel: "這裡要求提前 5 分鐘到場報到，一到位就會先確認烤盤溫度與餐位。",
                         creative: "觀察主廚烤肉時的節奏，像拆解一個鏡頭，掌握火候即可複製。",
                         business: "包廂需 3 日前預訂，可指定熟度與酒款，常為商務或影視團體使用。",
-                        shopping: "離開時可問服務生推薦的調味鹽包，這裡的店家會幫你封存金屬罐裝。"
+                        shopping: "離開時可問服務生推薦的調味鹽包，這裡的店家會幫你封存金屬罐裝。",
+                        pairing: "推薦與一瓶輕盈的玫瑰香氣清酒同步入口，可中和肉香。",
+                        closing: "23:30 後不接受新客，建議整隊人員都準備好再出發。"
                     }
                     },
                     { 
@@ -1541,9 +1540,11 @@
                     keywords: ["左門", "鶏だし", "深夜食堂", "Nakameguro"],
                     outfit: "一件毛線外套或輕便羽絨，讓雞湯溫度貼在皮膚上。",
                     insights: {
-                        travel: "進門前會確認座位數量，由於座位有限會採輪替制，請準備候位。",
-                        creative: "將黑輪與蔬菜分層放入雞湯中，蓋上蓋子燜煮約 3 分鐘可保持彈性。",
-                        local: "常客會點同一組組合，可以向店員要分享的秘製紫蘇沾醬。"
+                        travel: "巷弄只有一盞燈，23:40 左右出現在巷口，服務生會回頭點頭示意內場空位。",
+                        creative: "先喝一瓢清湯，再依次加入黑輪、蛋與白蘿蔔，讓鹹度逐步攀升而不搶走底層雞香。",
+                        local: "這裡幾乎只收現金，老客常會把自己的竹籤放在桌邊，依序排成整齊的線，尊重這份默契才能快速換位。",
+                        pairing: "小杯梅酒或義式柚醋放在旁邊，喝上一口再入口，能把濃郁的雞湯拉回清爽。",
+                        ritual: "喝到底部時把剩湯淋在桌角準備的白飯上，湯飯是深夜食堂裡的安定結尾。"
                     }
                     }
                 ]
@@ -1571,10 +1572,11 @@
                     keywords: ["KINKA", "Izakaya", "新海誠", "Ginza"],
                     outfit: "輕盈的和風襯衫搭配雙釦長褲，像踏入動畫裡的都市便利店。",
                     insights: {
-                        travel: "午餐時段人潮緊湊，記得先把票券預約好。",
-                        local: "雖然在銀座，但這裡的 Izakaya 氣氛如下町的深夜食堂。",
-                        creative: "除了固定套餐，還能加點當日限定炙燒壽司，師傅會說明漬汁調配。",
-                        business: "午餐套餐可加購清酒搭配，服務生會建議搭配順序。"
+                        travel: "抵達前 5 分鐘到櫃檯前報到，銀座午餐板座位只有 12 席，早到才能在開場時被領進一樓。",
+                        local: "廚師每天畫出當季漁獲的黑板，搭配英文小卡片，問一句就能知道今天推薦哪種魚。",
+                        creative: "觀看師傅炙燒時，留意他會先塗一層薄鹽漬，再炙到表面微焦，這樣味道層次才會像新海誠的夜空漸層。",
+                        pairing: "主廚會建議用氣泡清酒或柚子蘇打作為中繼，讓一貫一貫的炙燒都能重現光影反射。",
+                        timing: "11:30 開始到 12:10 之間會連續出餐，留意桌邊服務會指引你何時留白，避免把最後一貫趕掉。"
                     },
                     vocabulary: [
                         { term: "轉轉貝", reading: "かいがら", meaning: "螺鈿貝", desc: "細緻的日本傳統裝飾，也常見於 KINKA 餐具。"},
@@ -1672,9 +1674,11 @@
                     keywords: ["左門", "中目黒", "孤獨的美食獵人", "鶏だし"],
                     outfit: "保暖但輕盈的狩獵夾克，讓你在巷弄裡移動時依舊保持靈活。",
                     insights: {
-                        travel: "23:30 之後才有少數空位，先在巷口等待並向門口招呼確認。",
-                        creative: "取湯時先用小瓢舀出一份，確保鹹度適中，再逐一放入食材。",
-                        local: "長桌常見老獵人低聲排隊，跟著他們的節奏可以快速切換入座。"
+                        travel: "從中目黑站 1 號出口出來沿河步行 5 分鐘，玄關只有一扇木門，店員會以低聲呼喚，遲到會直接跳過你那晚的席次。",
+                        creative: "嚐湯前先讓它在小瓢裡靜置 10 秒，慎重地加入黑輪，這樣食材能吸飽雞高湯的獨立層次。",
+                        local: "吧台上從來不開手機，常客以低語交換剛煮好的分量，保持安靜能讓你被迅速請入下一輪。",
+                        pairing: "夜晚的柚子醋在這裡是必點，喝一小口再入口，讓果香把煙燻感拉回清爽狀態。",
+                        ritual: "結束時請將竹籤立在木板中央，老闆會以這個信號安排下一位，這是與店家的默契。"
                     }
                     }
                 ]
@@ -2047,15 +2051,15 @@
                 });
             };
 
-            const shareUrl = useCallback(() => {
+            const shareUrl = () => {
                 if (!navigator.clipboard) {
                     window.alert("Clipboard unavailable; copy the link manually.");
                     return;
                 }
                 navigator.clipboard.writeText(window.location.href);
-            }, []);
+            };
 
-            const goToTab = useCallback((key) => {
+            const goToTab = (key) => {
                 if (key === currentDayKey) return;
                 if (!tabOrder.includes(key)) return;
                 const currentIndex = tabOrder.indexOf(currentDayKey);
@@ -2067,7 +2071,7 @@
                     setActiveDayIndex(targetIndex - 1);
                 }
                 setSlideInKey(key);
-            }, [currentDayKey, tabOrder]);
+            };
 
             const getTypeColor = (type) => {
                 switch (type) {
