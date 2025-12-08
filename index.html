@@ -80,6 +80,79 @@
         }
         @keyframes kon-glitch { 0% { background-position: 0% 0%; } 100% { background-position: 100% 0%; } }
 
+        .style-naked {
+            background-color: #0f0b0c !important;
+            background-image: radial-gradient(circle at 25% 25%, rgba(237, 200, 98, 0.6), transparent 35%), radial-gradient(circle at 75% 45%, rgba(211, 67, 111, 0.5), transparent 40%);
+            color: #fef0de !important;
+            font-family: 'Share Tech Mono', monospace !important;
+            border: 2px solid #d97706 !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+        }
+        .style-naked h3 {
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #fef0de !important;
+        }
+        .style-naked p,
+        .style-naked span,
+        .style-naked div {
+            color: #fef0de !important;
+        }
+
+        .style-samon {
+            background-color: #1f2937 !important;
+            background-image: linear-gradient(120deg, rgba(255, 193, 7, 0.2), rgba(255, 71, 71, 0.1));
+            border: 2px solid rgba(249, 115, 22, 0.8) !important;
+            color: #fff7ed !important;
+            font-family: 'Kaisei Decol', serif !important;
+            box-shadow: 0 20px 30px rgba(15, 23, 42, 0.5) inset;
+        }
+        .style-samon h3 {
+            color: #fee2e2 !important;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+        }
+        .style-samon p,
+        .style-samon span,
+        .style-samon div {
+            color: #fee2e2 !important;
+        }
+
+        .style-newsea {
+            background-color: #fdf2f8 !important;
+            background-image: linear-gradient(160deg, rgba(14, 165, 233, 0.15), transparent 60%), radial-gradient(circle at top right, rgba(59, 130, 246, 0.3), transparent 40%);
+            border: 2px solid rgba(14, 165, 233, 0.6) !important;
+            color: #0f172a !important;
+            font-family: 'Zen Old Mincho', serif !important;
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.25);
+        }
+        .style-newsea h3 {
+            color: #0f172a !important;
+            letter-spacing: 0.18em;
+        }
+        .style-newsea p,
+        .style-newsea span,
+        .style-newsea div {
+            color: #0f172a !important;
+        }
+
+        .style-hunter {
+            background-color: #0f172a !important;
+            background-image: linear-gradient(140deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.6)), radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.2), transparent 50%);
+            border: 1px solid rgba(248, 250, 252, 0.25) !important;
+            color: #f8fafc !important;
+            font-family: 'Shippori Mincho', serif !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+        .style-hunter h3 {
+            letter-spacing: 0.15em;
+            color: #f8fafc !important;
+        }
+        .style-hunter p,
+        .style-hunter span,
+        .style-hunter div {
+            color: #e2e8f0 !important;
+        }
+
         /* 🟡 草間彌生 (Kusama) */
         .style-kusama {
             background-color: #fbbf24 !important;
@@ -838,6 +911,10 @@
             cursor: grabbing;
         }
 
+        .public-checklist {
+            background: linear-gradient(180deg, #ffffff, #f9f8f6);
+        }
+
         /* 基本狀態：先看不到、待命中 */
         .day-panel {
             position: absolute;
@@ -1235,14 +1312,17 @@
             location: "東京紀行 2025",
             theme: { main: "text-cyan-900", sub: "text-cyan-500", btn: "bg-cyan-700" }
         };
-
         const TripApp = () => {
             const [activeDayIndex, setActiveDayIndex] = useState(0);
             const [selectedEvent, setSelectedEvent] = useState(null);
             const [currentDayKey, setCurrentDayKey] = useState("intro");
             const [transitionDir, setTransitionDir] = useState("forward");
             const [slideInKey, setSlideInKey] = useState("intro");
+            const [clipboardSupported, setClipboardSupported] = useState(false);
             const tabsRef = useRef(null);
+            useEffect(() => {
+                setClipboardSupported(Boolean(navigator.clipboard));
+            }, []);
 
             const coords = useMemo(() => ({
                 tpe: [25.0797, 121.2342], nrt: [35.7719, 140.3929], roppongi: [35.6628, 139.7314],
@@ -1402,6 +1482,27 @@
                     ]
                     },
                     { 
+                    time: "21:00", 
+                    type: "food", 
+                    title: "燒肉 矢澤 YAZAWA", 
+                    desc: "肉香與夜色的雙重放映", 
+                    preview: "燈光像《The Naked Director》的片頭一樣暴露，火花與鏡頭鏡面交錯。",
+                    details: "彷彿走進「The Naked Director」的製片現場，服務生是最沉著的執行製片人，桌邊的火焰從一場 AV 帝王的鏡頭拉近而來。切片肌理與金屬框景相互映照，純粹呈現大胆、直接的夜色詩句。", 
+                    locationQuery: "Yakiniku Yazawa Roppongi",
+                    mapUrl: "https://maps.app.goo.gl/hz7RyFyP2v2Cah7B9",
+                    icon: Utensils,
+                    style: 'naked',
+                    weather: { type: 'cloud', current: '7°C', high: '10°C', low: '4°C', loc: 'Roppongi' },
+                    keywords: ["矢澤", "燒肉", "Naked Director", "Roppongi"],
+                    outfit: "深色皮革外套 + 薄荷銀飾，抵擋煙霧又保留銳利感。",
+                    insights: {
+                        travel: "這裡要求提前 5 分鐘到場報到，一到位就會先確認烤盤溫度與餐位。",
+                        creative: "觀察主廚烤肉時的節奏，像拆解一個鏡頭，掌握火候即可複製。",
+                        business: "包廂需 3 日前預訂，可指定熟度與酒款，常為商務或影視團體使用。",
+                        shopping: "離開時可問服務生推薦的調味鹽包，這裡的店家會幫你封存金屬罐裝。"
+                    }
+                    },
+                    { 
                     time: "21:30", 
                     type: "food", 
                     title: "Shabuzen 六本木", 
@@ -1424,6 +1525,26 @@
                         { term: "食べ放題", reading: "たべほうだい", meaning: "吃到飽", desc: "「放」是釋放，「題」在此指範圍。" },
                         { term: "喰種", reading: "グール", meaning: "喰種", desc: "以人類為食的亞人種。但在這裡，我們吃的是牛。" }
                     ]
+                    },
+                    {
+                    time: "23:45", 
+                    type: "food", 
+                    title: "宵夜候選 · 左門 鶏だしおでん さもん", 
+                    desc: "深夜食堂的溫柔湯頭", 
+                    preview: "中目黑巷子裡的橘黃燈光像《深夜食堂》的開場彈奏，雞湯緩緩倒下。",
+                    details: "這家以鶏だし為靈魂的おでん店，是《深夜食堂》裡的朝日，黑輪和蔬菜被溫柔熬煮，湯頭香氣帶著熟悉的母親味道。牆上只有熟客書寫的留言，沒有其它浮誇的風格。",
+                    locationQuery: "鶏だしおでん さもん 中目黒店",
+                    mapUrl: "https://maps.app.goo.gl/imxKLsVw4dpeMmRw6",
+                    icon: Utensils,
+                    style: 'samon',
+                    weather: { type: 'cloud', current: '6°C', high: '9°C', low: '4°C', loc: 'Nakameguro' },
+                    keywords: ["左門", "鶏だし", "深夜食堂", "Nakameguro"],
+                    outfit: "一件毛線外套或輕便羽絨，讓雞湯溫度貼在皮膚上。",
+                    insights: {
+                        travel: "進門前會確認座位數量，由於座位有限會採輪替制，請準備候位。",
+                        creative: "將黑輪與蔬菜分層放入雞湯中，蓋上蓋子燜煮約 3 分鐘可保持彈性。",
+                        local: "常客會點同一組組合，可以向店員要分享的秘製紫蘇沾醬。"
+                    }
                     }
                 ]
                 },
@@ -1436,28 +1557,28 @@
                 theme: { main: "text-stone-800", sub: "text-stone-500", btn: "bg-stone-700" },
                 events: [
                     { 
-                    time: "12:00", 
+                    time: "11:30", 
                     type: "food", 
-                    title: "鮨・Itsumi", 
-                    desc: "赤坂的隱藏版 Omakase", 
-                    preview: "昭和巷弄的靜謐吧台，握出未來的味道。",
-                    details: "「記憶，就像這貫壽司的餘韻，模糊卻真實。」在石黑一雄的筆下，每一口食物都是通往過去的鑰匙。赤坂這間隱密的壽司店，師傅安靜地捏製著壽司，彷彿在修復著某段失落的時光。醋飯的溫度、魚料的熟成，都是為了那一瞬間的完美而存在，然後消逝，只留下回憶。",
-                    locationQuery: "Sushi Itsumi",
+                    title: "KINKA Sushi Bar Izakaya", 
+                    desc: "新海誠畫面般的午餐：光與醬油", 
+                    preview: "像《你的名字。》裡穿梭的光影，鮮魚在此閃爍著漸層色調，配上清酒微醺的鋼琴。",
+                    details: "這裡的午餐是 KINKA 的限定舞台，炙燒鮪魚和透明湯汁在光線中反射出新海誠標誌性的天際線。天花板上的光柵緩步變化，餐桌旁彷彿就是動畫中那道穿越時空的階梯。", 
+                    locationQuery: "KINKA Sushi Bar Izakaya",
+                    mapUrl: "https://maps.app.goo.gl/fMxfeNCCXC86yBHY8",
                     icon: Utensils,
-                    style: 'ishiguro', // Ishiguro Style
+                    style: 'newsea',
                     weather: { type: 'sun', current: '11°C', high: '13°C', low: '9°C', loc: 'Tokyo' },
-                    keywords: ["不可靠的敘事者", "黃昏的赤坂", "記憶的餘燼"],
-                    outfit: "建議穿著「半正式休閒 (Smart Casual)」。一件剪裁合宜的大衣，或許能掩蓋內心的波瀾。",
+                    keywords: ["KINKA", "Izakaya", "新海誠", "Ginza"],
+                    outfit: "輕盈的和風襯衫搭配雙釦長褲，像踏入動畫裡的都市便利店。",
                     insights: {
-                        travel: "吃 Omakase 切記「不要噴香水」。師傅上菜後建議 3 秒內入口，溫度最完美。",
-                        local: "「午餐吃 Omakase 是東京人的省錢智慧！一樣的魚料，價格只要晚餐的一半。」",
-                        creative: "壽司師傅捏製壽司的手勢如同舞蹈，追求的是「空氣感」。",
-                        business: "【坪效極大化】板前壽司店僅有約 10 個座位，卻能創造驚人營收。秘訣在於「無菜單」模式讓庫存耗損降至最低。",
-                        shopping: "【高級茶葉】許多壽司店使用的「粉茶」或「綠茶」品質極佳，部分店家會販售自家使用的茶葉包。"
+                        travel: "午餐時段人潮緊湊，記得先把票券預約好。",
+                        local: "雖然在銀座，但這裡的 Izakaya 氣氛如下町的深夜食堂。",
+                        creative: "除了固定套餐，還能加點當日限定炙燒壽司，師傅會說明漬汁調配。",
+                        business: "午餐套餐可加購清酒搭配，服務生會建議搭配順序。"
                     },
                     vocabulary: [
-                        { term: "お任せ", reading: "おまかせ", meaning: "信任主廚", desc: "源自「任せる」，代表信任師傅的專業。" },
-                        { term: "名残", reading: "なごり", meaning: "餘韻", desc: "事物離去後留下的痕跡或氣氛。壽司入口後的餘韻，是品嚐的重點。" }
+                        { term: "轉轉貝", reading: "かいがら", meaning: "螺鈿貝", desc: "細緻的日本傳統裝飾，也常見於 KINKA 餐具。"},
+                        { term: "一献", reading: "いっこん", meaning: "一杯酒", desc: "在新海誠的世界裡，每杯酒都有光的折射。"}
                     ]
                     },
                     { 
@@ -1534,6 +1655,27 @@
                         { term: "水玉", reading: "みずたま", meaning: "圓點", desc: "草間彌生創作的核心元素。" },
                         { term: "無限", reading: "むげん", meaning: "無限", desc: "沒有盡頭的增殖與擴散。" }
                     ]
+                    }
+                    ,
+                    {
+                    time: "23:30",
+                    type: "food",
+                    title: "宵夜候選 · 左門 鶏だしおでん さもん (中目黒)",
+                    desc: "孤獨的美食獵人｜鶏だし黑輪與清湯",
+                    preview: "在被霓虹割裂的夜裡，孤身獵人低聲等待一鍋雞湯沸騰。",
+                    details: "中目黑巷內無聲，只有燈光如獵物般移動，湯頭靠著慢火蒸騰後被慎重撈起。黑輪、蛋與蔬菜一一下鍋，熬出酒香與雞香交錯的獵物節奏。",
+                    locationQuery: "鶏だしおでん さもん 中目黒店",
+                    mapUrl: "https://maps.app.goo.gl/imxKLsVw4dpeMmRw6",
+                    icon: Utensils,
+                    style: 'hunter',
+                    weather: { type: 'cloud', current: '7°C', high: '9°C', low: '5°C', loc: 'Nakameguro' },
+                    keywords: ["左門", "中目黒", "孤獨的美食獵人", "鶏だし"],
+                    outfit: "保暖但輕盈的狩獵夾克，讓你在巷弄裡移動時依舊保持靈活。",
+                    insights: {
+                        travel: "23:30 之後才有少數空位，先在巷口等待並向門口招呼確認。",
+                        creative: "取湯時先用小瓢舀出一份，確保鹹度適中，再逐一放入食材。",
+                        local: "長桌常見老獵人低聲排隊，跟著他們的節奏可以快速切換入座。"
+                    }
                     }
                 ]
                 },
@@ -1845,6 +1987,74 @@
                 tab?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
             }, [currentDayKey]);
 
+            const paidEvents = useMemo(() => {
+                return schedule.flatMap((day, dayIndex) => 
+                    day.events
+                        .map((event, index) => ({ ...event, dayKey: dayKeys[dayIndex], key: `${dayKeys[dayIndex]}-${index}` }))
+                        .filter((event) => event.price)
+                );
+            }, [schedule, dayKeys]);
+
+            const decodeSharedChecks = useCallback(() => {
+                const params = new URLSearchParams(window.location.search);
+                const encoded = params.get('sharedChecks');
+                if (!encoded) return null;
+                try {
+                    const decoded = atob(encoded);
+                    return JSON.parse(decoded);
+                } catch (error) {
+                    return null;
+                }
+            }, []);
+
+            const [sharedChecks, setSharedChecks] = useState(() => {
+                const persisted = decodeSharedChecks();
+                if (persisted) return persisted;
+                try {
+                    return JSON.parse(localStorage.getItem('sharedPaidChecks') || '{}');
+                } catch {
+                    return {};
+                }
+            });
+
+            useEffect(() => {
+                localStorage.setItem('sharedPaidChecks', JSON.stringify(sharedChecks));
+            }, [sharedChecks]);
+
+            const updateUrlWithChecks = useCallback((nextState) => {
+                try {
+                    const encoded = btoa(JSON.stringify(nextState));
+                    const params = new URLSearchParams(window.location.search);
+                    params.set('sharedChecks', encoded);
+                    const newUrl = `${window.location.pathname}?${params.toString()}`;
+                    window.history.replaceState(null, '', newUrl);
+                } catch {
+                    // ignore
+                }
+            }, []);
+
+            useEffect(() => {
+                const params = new URLSearchParams(window.location.search);
+                if (params.has('sharedChecks')) return;
+                updateUrlWithChecks(sharedChecks);
+            }, [sharedChecks, updateUrlWithChecks]);
+
+            const toggleSharedCheck = (key) => {
+                setSharedChecks((prev) => {
+                    const next = { ...prev, [key]: !prev[key] };
+                    updateUrlWithChecks(next);
+                    return next;
+                });
+            };
+
+            const shareUrl = useCallback(() => {
+                if (!navigator.clipboard) {
+                    window.alert("Clipboard unavailable; copy the link manually.");
+                    return;
+                }
+                navigator.clipboard.writeText(window.location.href);
+            }, []);
+
             const goToTab = useCallback((key) => {
                 if (key === currentDayKey) return;
                 if (!tabOrder.includes(key)) return;
@@ -1880,6 +2090,21 @@
                 case 'shop': return 'bg-pink-50 border-pink-200 hover:bg-pink-100';
                 default: return 'bg-white border-slate-200 hover:bg-slate-50';
                 }
+            };
+
+            const buildMapUrl = (event, fallback = "Tokyo, Japan") => {
+                if (!event) {
+                    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fallback)}`;
+                }
+                if (event.mapUrl) {
+                    return event.mapUrl;
+                }
+                const query = event.locationQuery || event.title || fallback;
+                const normalized = String(query);
+                if (normalized.startsWith('http')) {
+                    return normalized;
+                }
+                return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(normalized)}`;
             };
 
             const getStyleClass = (style) => style ? `style-${style}` : '';
@@ -2034,6 +2259,7 @@
                                 <div className="space-y-12">
                                 {day.events.map((event, index) => {
                                     const preview = event.preview || event.desc;
+                                    const mapHref = buildMapUrl(event, day.location);
                                     return (
                                     <div 
                                         key={index} 
@@ -2064,7 +2290,7 @@
                                             {/* Always-visible Google Maps shortcut */}
                                             <div className="flex items-center">
                                                 <a
-                                                    href={`https://www.google.com/maps/search/?api=1&query=${event.locationQuery}`}
+                                                    href={mapHref}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     onClick={(e) => e.stopPropagation()}
@@ -2114,12 +2340,62 @@
                             </div>
                         );
                         })}
+                </div>
+                
+                {/* Public Paid Checklist */}
+                <div className="public-checklist mx-auto mt-8 max-w-2xl bg-white border border-stone-200 rounded-2xl shadow-lg p-5">
+                    <div className="flex items-center justify-between mb-3">
+                        <div>
+                            <div className="text-[10px] uppercase tracking-[0.3em] text-stone-400">公開 Check</div>
+                            <h4 className="font-display text-lg text-stone-800 mt-1">Paid itinerary checklist</h4>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={shareUrl}
+                            disabled={!clipboardSupported}
+                            className={`px-3 py-2 text-xs uppercase tracking-[0.25em] font-bold text-stone-600 border border-stone-300 rounded-full transition ${clipboardSupported ? 'hover:bg-stone-100' : 'opacity-40 cursor-not-allowed'}`}
+                        >
+                            Copy link
+                        </button>
                     </div>
-                    
-                    <div className="mt-12 text-center pb-12 opacity-40 font-serif">
-                        <p className="text-[10px] tracking-[0.3em] uppercase text-stone-500">Tokyo Chronicles 2025</p>
+                    <p className="text-[11px] text-stone-500 mb-4">
+                        The state is encoded in the URL so collaborators can open the same link and toggle these together.
+                    </p>
+                    {!clipboardSupported && (
+                        <p className="text-[11px] text-stone-400 mb-4">
+                            Clipboard not supported on this device; copy the URL manually from the address bar.
+                        </p>
+                    )}
+                    <div className="space-y-3">
+                        {paidEvents.map((event) => (
+                            <label
+                                key={event.key}
+                                className="flex items-center justify-between gap-3 p-3 border border-stone-100 rounded-xl hover:border-stone-300 transition"
+                            >
+                                <div>
+                                    <div className="text-sm font-semibold">{event.title}</div>
+                                    <div className="text-[11px] text-stone-500">
+                                        {event.dayKey} · {event.price}
+                                    </div>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={Boolean(sharedChecks[event.key])}
+                                    onChange={() => toggleSharedCheck(event.key)}
+                                    className="h-4 w-4 accent-stone-800"
+                                />
+                            </label>
+                        ))}
+                        {paidEvents.length === 0 && (
+                            <p className="text-[11px] text-stone-400">No paid items found yet.</p>
+                        )}
                     </div>
                 </div>
+
+                <div className="mt-12 text-center pb-12 opacity-40 font-serif">
+                    <p className="text-[10px] tracking-[0.3em] uppercase text-stone-500">Tokyo Chronicles 2025</p>
+                </div>
+            </div>
 
                 {/* Detail Modal */}
                 {selectedEvent && (
@@ -2242,9 +2518,9 @@
                         </div>
                         
                         <div className={modalFooterClass}>
-                             <a 
-                                href={`https://www.google.com/maps/search/?api=1&query=${selectedEvent.locationQuery}`} 
-                                target="_blank" 
+                            <a
+                                href={buildMapUrl(selectedEvent, heroSchedule.location)}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className={mapLinkClass}
                             >
