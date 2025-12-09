@@ -864,14 +864,21 @@
 
         /* 日期列 */
         .day-tabs {
-            display: flex;
-            gap: 10px;
-            padding: 10px 0 14px;
-            flex-wrap: nowrap;
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: 96px;
+            gap: 12px;
+            padding: 12px 8px 16px;
             font-family: 'Zen Old Mincho', serif;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            justify-content: start;
+            background: linear-gradient(135deg, rgba(255,255,255,0.45), rgba(255,255,255,0.25));
+            border: 1px solid rgba(120, 113, 108, 0.25);
+            border-radius: 14px;
+            box-shadow: 0 8px 28px -12px rgba(0,0,0,0.2);
+            backdrop-filter: blur(12px) saturate(130%);
         }
 
         .day-tabs::-webkit-scrollbar {
@@ -880,23 +887,45 @@
 
         /* 日期按鈕 */
         .day-tab {
-            flex: 0 0 auto;
-            padding: 9px 16px;
-            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            min-width: 96px;
+            aspect-ratio: 1 / 1;
+            padding: 0;
+            border-radius: 8px;
             font-family: 'Zen Old Mincho', serif;
             font-weight: 700;
             letter-spacing: 0.08em;
-            background: #fff;
-            border: 1px solid var(--day-color, var(--accent-color));
-            color: var(--day-color, var(--accent-color));
+            background: linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.36));
+            border: 1px solid color-mix(in srgb, var(--day-color, #4b5563) 28%, transparent);
+            color: var(--day-color, #1f2937);
             cursor: pointer;
-            transition: 0.3s ease;
+            transition: 0.25s ease;
+            text-align: center;
+            box-shadow: 0 10px 28px -16px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px) saturate(140%);
         }
 
         .day-tab.is-active {
-            background: var(--day-color, var(--accent-color));
-            color: #fff;
+            background: color-mix(in srgb, var(--day-color, #1f2937) 28%, #ffffff 72%);
+            color: #0f172a;
+            box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255,255,255,0.15);
         }
+
+        .day-tab:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.32), rgba(255,255,255,0.46));
+            color: var(--day-color, #111827);
+        }
+
+        /* 每天的低彩度主題色 */
+        .day-tab[data-day="intro"] { --day-color: #4b5563; }
+        .day-tab[data-day="1219"] { --day-color: #475569; }
+        .day-tab[data-day="1220"] { --day-color: #57534e; }
+        .day-tab[data-day="1221"] { --day-color: #4b6b64; }
+        .day-tab[data-day="1222"] { --day-color: #5b5475; }
+        .day-tab[data-day="1223"] { --day-color: #4b5f74; }
 
         .day-panel-container {
             position: relative;
@@ -945,14 +974,14 @@
 
         /* 最終版：強制讓日期 tab 使用主題色 */
         button.day-tab {
-            background-color: #fff;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
+            background-color: rgba(255,255,255,0.32);
+            border: 1px solid var(--day-color, #4b5563);
+            color: var(--day-color, #1f2937);
         }
         button.day-tab.is-active {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            color: #fff;
+            background-color: color-mix(in srgb, var(--day-color, #1f2937) 28%, #ffffff 72%);
+            border-color: var(--day-color, #1f2937);
+            color: #0f172a;
         }
 
         /* 🪟 Intro Windows 95 Screen */
@@ -2442,28 +2471,10 @@
                 
                 {/* Public Paid Checklist */}
                 <div className="public-checklist mx-auto mt-8 max-w-2xl bg-white border border-stone-200 rounded-2xl shadow-lg p-5">
-                    <div className="flex items-center justify-between mb-3">
-                        <div>
-                            <div className="text-[10px] uppercase tracking-[0.3em] text-stone-400">公開 Check</div>
-                            <h4 className="font-display text-lg text-stone-800 mt-1">Paid itinerary checklist</h4>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={shareUrl}
-                            disabled={!clipboardSupported}
-                            className={`px-3 py-2 text-xs uppercase tracking-[0.25em] font-bold text-stone-600 border border-stone-300 rounded-full transition ${clipboardSupported ? 'hover:bg-stone-100' : 'opacity-40 cursor-not-allowed'}`}
-                        >
-                            Copy link
-                        </button>
+                    <div className="mb-3">
+                        <div className="text-[10px] uppercase tracking-[0.3em] text-stone-400">公開 Check</div>
+                        <h4 className="font-display text-lg text-stone-800 mt-1">Paid itinerary checklist</h4>
                     </div>
-                    <p className="text-[11px] text-stone-500 mb-4">
-                        The state is encoded in the URL so collaborators can open the same link and toggle these together.
-                    </p>
-                    {!clipboardSupported && (
-                        <p className="text-[11px] text-stone-400 mb-4">
-                            Clipboard not supported on this device; copy the URL manually from the address bar.
-                        </p>
-                    )}
                     <div className="space-y-3">
                         {paidEvents.map((event) => (
                             <label
