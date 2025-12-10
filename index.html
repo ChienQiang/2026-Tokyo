@@ -363,6 +363,28 @@
         .style-ishiguro h3 { font-style: italic; font-weight: 600; font-size: 2.2rem; border-bottom: 1px solid #d4cbb8; margin-bottom: 20px; padding-bottom: 10px; color: #1c1917 !important; }
         .style-ishiguro p { font-size: 1.1em; line-height: 1.8; color: #44403c !important; font-weight: 600; }
 
+        /* 📚 村上春樹（高易讀版） */
+        .style-haruki {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            font-family: 'Cormorant Garamond', serif !important;
+            border: 1px solid #e5e7eb !important;
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+            line-height: 1.85;
+            font-size: 16px;
+        }
+        .style-haruki h3 {
+            letter-spacing: 0.08em;
+            text-transform: none;
+            color: #0f172a !important;
+            text-shadow: none;
+            font-weight: 800;
+        }
+        .style-haruki p,
+        .style-haruki span,
+        .style-haruki div {
+            color: #111827 !important;
+        }
         /* 🌈 Style 12: 原宿 (Harajuku) */
         .style-harajuku {
             background-color: #ffccff !important; color: #330066 !important; font-family: 'Dela Gothic One', cursive !important;
@@ -1450,6 +1472,21 @@
             location: "東京紀行 2025",
             theme: { main: "text-cyan-900", sub: "text-cyan-500", btn: "bg-cyan-700" }
         };
+        const tabPalette = {
+            'bg-sky-800': { bg: 'rgba(7,89,133,0.12)', border: 'rgba(7,89,133,0.35)', fg: '#075985', activeBg: '#075985', activeBorder: '#0c4a6e', activeFg: '#f8fafc' },
+            'bg-sky-700': { bg: 'rgba(3,105,161,0.12)', border: 'rgba(3,105,161,0.35)', fg: '#0369a1', activeBg: '#0369a1', activeBorder: '#075985', activeFg: '#f8fafc' },
+            'bg-emerald-800': { bg: 'rgba(6,95,70,0.12)', border: 'rgba(6,95,70,0.32)', fg: '#065f46', activeBg: '#065f46', activeBorder: '#064e3b', activeFg: '#ecfdf3' },
+            'bg-emerald-700': { bg: 'rgba(4,120,87,0.12)', border: 'rgba(4,120,87,0.32)', fg: '#047857', activeBg: '#047857', activeBorder: '#065f46', activeFg: '#ecfdf3' },
+            'bg-rose-800': { bg: 'rgba(159,18,57,0.12)', border: 'rgba(159,18,57,0.32)', fg: '#9f1239', activeBg: '#9f1239', activeBorder: '#881337', activeFg: '#fff1f2' },
+            'bg-amber-700': { bg: 'rgba(180,83,9,0.14)', border: 'rgba(180,83,9,0.36)', fg: '#b45309', activeBg: '#b45309', activeBorder: '#92400e', activeFg: '#fffbeb' },
+            'bg-slate-800': { bg: 'rgba(30,41,59,0.12)', border: 'rgba(30,41,59,0.32)', fg: '#1e293b', activeBg: '#1e293b', activeBorder: '#0f172a', activeFg: '#f8fafc' },
+            'bg-stone-700': { bg: 'rgba(68,64,60,0.14)', border: 'rgba(68,64,60,0.36)', fg: '#44403c', activeBg: '#44403c', activeBorder: '#292524', activeFg: '#fefce8' },
+            'bg-purple-700': { bg: 'rgba(109,40,217,0.12)', border: 'rgba(109,40,217,0.32)', fg: '#6d28d9', activeBg: '#6d28d9', activeBorder: '#581c87', activeFg: '#f5f3ff' },
+            default: { bg: 'rgba(51,65,85,0.12)', border: 'rgba(51,65,85,0.32)', fg: '#334155', activeBg: '#334155', activeBorder: '#1f2937', activeFg: '#f8fafc' }
+        };
+
+        const getTabColors = (btnClass) => tabPalette[btnClass] || tabPalette.default;
+
         const TripApp = () => {
             const [activeDayIndex, setActiveDayIndex] = useState(0);
             const [selectedEvent, setSelectedEvent] = useState(null);
@@ -1460,14 +1497,81 @@
             const clipboardSupported = typeof navigator !== 'undefined' && Boolean(navigator.clipboard);
 
             const coords = useMemo(() => ({
-                tpe: [25.0797, 121.2342], nrt: [35.7719, 140.3929], roppongi: [35.6628, 139.7314],
-                ginza: [35.6712, 139.7665], hibiya: [35.6736, 139.7562], tokyoSt: [35.6812, 139.7671],
-                marunouchi: [35.6764, 139.7649], takasaki: [36.3220, 139.0125], daruma: [36.3150, 138.9760], karuizawa: [36.3435, 138.6355],
-                kusatsu: [36.6208, 138.5963], yokohama: [35.4596, 139.6433], redbrick: [35.4526, 139.6429],
+                tpe: [25.0797, 121.2342],
+                cts: [42.7752, 141.6923],
+                sapporo: [43.0687, 141.3507],
+                odori: [43.0619, 141.3565],
+                otaru: [43.1907, 140.9947],
+                ishiya: [43.0895, 141.3175],
+                nijo: [43.0607, 141.3545],
+                nrt: [35.7719, 140.3929],
+                roppongi: [35.6628, 139.7314],
+                ginza: [35.6712, 139.7665],
+                hibiya: [35.6736, 139.7562],
+                tokyoSt: [35.6812, 139.7671],
+                marunouchi: [35.6764, 139.7649],
+                takasaki: [36.3220, 139.0125],
+                daruma: [36.3150, 138.9760],
+                karuizawa: [36.3435, 138.6355],
+                kusatsu: [36.6208, 138.5963],
+                yokohama: [35.4596, 139.6433],
+                redbrick: [35.4526, 139.6429],
                 shinyokohama: [35.5098, 139.6176]
             }), []);
 
             const mapRoutes = useMemo(() => [
+                {
+                    id: 'day-sap-arrival',
+                    path: [coords.tpe, coords.cts, coords.sapporo],
+                    stops: [
+                        { name: "TPE", coord: coords.tpe, landmark: "" },
+                        { name: "CTS", coord: coords.cts, landmark: "" },
+                        { name: "札幌", coord: coords.sapporo, landmark: "" }
+                    ],
+                    landmarks: [
+                        { emoji: "🛫", label: "桃園 T1", coord: coords.tpe },
+                        { emoji: "❄️", label: "新千歲機場", coord: coords.cts },
+                        { emoji: "🎄", label: "札幌聖誕市集", coord: coords.odori }
+                    ]
+                },
+                {
+                    id: 'day-sap-otaru',
+                    path: [coords.sapporo, coords.otaru, coords.sapporo],
+                    stops: [
+                        { name: "札幌", coord: coords.sapporo, landmark: "" },
+                        { name: "小樽", coord: coords.otaru, landmark: "" }
+                    ],
+                    landmarks: [
+                        { emoji: "🏮", label: "小樽運河", coord: [43.1974, 141.0020] },
+                        { emoji: "🍰", label: "LeTAO", coord: [43.1950, 141.0028] },
+                        { emoji: "🎼", label: "音樂盒堂", coord: [43.1899, 141.0002] }
+                    ]
+                },
+                {
+                    id: 'day-sap-ishiya',
+                    path: [coords.sapporo, coords.ishiya, coords.sapporo],
+                    stops: [
+                        { name: "札幌", coord: coords.sapporo, landmark: "" },
+                        { name: "白色戀人工廠", coord: coords.ishiya, landmark: "" }
+                    ],
+                    landmarks: [
+                        { emoji: "🍫", label: "ISHIYA 工廠", coord: coords.ishiya },
+                        { emoji: "🦀", label: "毛蟹鍋晚餐", coord: coords.sapporo },
+                        { emoji: "🐟", label: "二条市場", coord: coords.nijo }
+                    ]
+                },
+                {
+                    id: 'day-sap-return',
+                    path: [coords.sapporo, coords.cts],
+                    stops: [
+                        { name: "札幌", coord: coords.sapporo, landmark: "" },
+                        { name: "CTS", coord: coords.cts, landmark: "" }
+                    ],
+                    landmarks: [
+                        { emoji: "🛫", label: "新千歲機場", coord: coords.cts },
+                        { emoji: "🍫", label: "Royce' 巧克力世界", coord: [42.7874, 141.6779] }
+                    ]
+                },
                 { 
                     id: 'day1', 
                     path: [coords.nrt, coords.roppongi], 
@@ -1536,6 +1640,288 @@
             ], [coords]);
 
             const schedule = useMemo(() => [
+                {
+                date: "12/15",
+                day: "月曜日(Mon)",
+                title: "第二曲 · 北緯43°序章",
+                subtitle: "Red-eye into the snowfield",
+                location: "台北 → 札幌",
+                theme: { main: "text-sky-900", sub: "text-sky-600", btn: "bg-sky-800" },
+                events: [
+                    { 
+                    time: "02:40", 
+                    endTime: "07:30", 
+                    type: "flight", 
+                    title: "亞航早班機", 
+                    desc: "台北飛新千歲，未含行李", 
+                    preview: "凌晨跑道像黑膠序曲，機身切進北國冷空氣。",
+                    details: "02:40 起飛、07:30 抵達的新千歲，票價約 NT$7,473（未含行李）。紅眼航班，睡眠靠眼罩與頸枕，抵達後直接衝雪國日光。",
+                    locationQuery: "Taoyuan to New Chitose Airport",
+                    style: 'haruki',
+                    price: "NT$7,473 (未含行李)",
+                    keywords: ["早班機", "加購托運"],
+                    insights: {
+                        travel: "提早訂機場接駁或查 JR Pass，可直接銜接進札幌。",
+                        trap: "凌晨到機場的交通提前排好，計程車與機場捷運首班時間要對好。",
+                        creative: "把耳機播村上春樹的爵士歌單，讓起飛前的喧囂變成序章的底噪。",
+                        shopping: "若帶機上水壺，過安檢後再灌熱水，紅眼航班能省下機上冷水的不適。"
+                    }
+                    },
+                    { 
+                    time: "06:15", 
+                    endTime: "11:00", 
+                    type: "flight", 
+                    title: "長榮後援航班", 
+                    desc: "備用：06:15 起飛、11:00 抵達", 
+                    preview: "換日線上的 B 面，稍晚出發保留睡眠。",
+                    details: "長榮 06:15 起飛、11:00 抵達，票價約 NT$11,688。較舒適的備案，適合想多睡一點的版本。出發前 48 小時確認要哪個航班並同步接駁時間。",
+                    locationQuery: "Taoyuan to New Chitose Airport",
+                    style: 'haruki',
+                    price: "NT$11,688",
+                    keywords: ["備用航班", "睡好再上"],
+                    insights: {
+                        travel: "兩個航班擇一即可，別忘了更新 JR 車票或接駁預約。",
+                        creative: "較晚起飛的機窗光線更柔和，適合補眠與拍雲海。",
+                        business: "長榮這時段常有商務客，值機提早可換到較安靜的座位。"
+                    }
+                    },
+                    { 
+                    time: "12:30", 
+                    type: "food", 
+                    title: "飯店寄行李＋附近午餐", 
+                    desc: "先卸重，再用熱湯暖手", 
+                    preview: "大雪街角先卸行李，蒸氣麵湯把冬天鎖住。",
+                    details: "12:30 抵達札幌後先寄放行李，找最近的湯咖哩、拉麵或定食暖身。這段時間也能確認晚上的聖誕市集路線與集合點。",
+                    locationQuery: "Sapporo Station lunch",
+                    style: 'haruki',
+                    keywords: ["寄行李", "午餐"],
+                    insights: {
+                        local: "札幌車站周邊美食多，避開正午尖峰能更快入座。",
+                        travel: "寄物櫃以 500/600 日圓硬幣為主，先準備零錢避免排隊找零。",
+                        creative: "拍一張行李票與餐券的並排照，像旅行故事的第一頁。",
+                        shopping: "想補雪用手套、暖暖包，可先在藥妝店比價再決定是否去免稅店補貨。"
+                    }
+                    },
+                    { 
+                    time: "15:00", 
+                    type: "hotel", 
+                    title: "Check-in · 休息或電器百貨巡迴", 
+                    desc: "入住後短暫修整", 
+                    preview: "暖氣的霧氣與電器燈箱交織，像中場調音。",
+                    details: "15:00 正式 check-in，先暖身補眠。若精神允許，可到 Bic Camera / Yodobashi 逛逛補齊轉接頭、暖暖包與雪地小物。",
+                    locationQuery: "Sapporo Station hotels",
+                    style: 'haruki',
+                    keywords: ["check-in", "Bic Camera", "暖暖包"],
+                    insights: {
+                        shopping: "北海道冬天的防滑貼、暖暖包在車站百貨都能補貨。",
+                        travel: "先把護照、錢包集中小包，Check-in 時只拿證件，其他留在寄物袋，手不會凍到。",
+                        trap: "房間暖氣強，入內先開窗換氣 5 分鐘，避免太乾燥導致喉嚨痛。"
+                    }
+                    },
+                    { 
+                    time: "17:00", 
+                    type: "activity", 
+                    title: "札幌車站聖誕市集", 
+                    desc: "晚餐就在市集解決", 
+                    preview: "大通公園亮起燈海，香料酒與烤腸是進場密碼。",
+                    details: "17:00 從飯店出發，往札幌車站與大通公園聖誕市集。熱紅酒、香腸或熱巧克力當作晚餐，記得穿好手套，邊逛邊吃保暖。",
+                    locationQuery: "Sapporo Christmas Market Odori",
+                    style: 'haruki',
+                    keywords: ["聖誕市集", "熱紅酒", "戶外夜市"],
+                    insights: {
+                        travel: "市集多為露天，雪後地面濕滑，鞋底防滑貼或冰爪提前裝好。",
+                        creative: "把熱紅酒杯放在燈串前拍一張，燈光散景會像彈跳的音符。",
+                        shopping: "保溫杯可以現場請攤位加熱紅酒，喝完帶走也不佔手。",
+                        local: "大通公園附近便利店 17:00 後人潮多，想買暖暖包記得提早。"
+                    }
+                    }
+                ]
+                },
+                {
+                date: "12/16",
+                day: "火曜日(Tue)",
+                title: "第二曲 · 小樽琥珀日",
+                subtitle: "Canal glass & custard clouds",
+                location: "札幌 → 小樽 → 札幌",
+                theme: { main: "text-emerald-900", sub: "text-emerald-600", btn: "bg-emerald-800" },
+                events: [
+                    { 
+                    time: "09:00", 
+                    type: "transport", 
+                    title: "前往小樽", 
+                    desc: "JR 快速或區間約 35 分鐘", 
+                    preview: "窗外雪光閃動，鐵道貼著海線前進。",
+                    details: "早上從札幌搭 JR 前往小樽，車程約 35–45 分鐘。站在右側欣賞海線雪景，抵達後先把行李寄物櫃。",
+                    locationQuery: "Sapporo Station to Otaru",
+                    style: 'haruki',
+                    keywords: ["JR", "海線", "寄物櫃"],
+                    insights: {
+                        travel: "小樽站出站右側就有寄物櫃，冬天要先塞好帽子手套再出站。",
+                        local: "車廂右側靠窗能看到海線與港口，左側是山景，挑位時可依偏好選側。",
+                        creative: "海線與雪交錯時，拍一段 10 秒車窗影片，回程剪成琥珀色的過場。",
+                        trap: "月台積雪時階梯容易濕滑，下車別急著奔跑，先確認腳底防滑。"
+                    }
+                    },
+                    { 
+                    time: "10:30", 
+                    type: "activity", 
+                    title: "小樽運河 · 甜點散步", 
+                    desc: "運河、玻璃工房、LeTAO", 
+                    preview: "雪中的煤油燈與甜點香氣，是北國的浪漫配方。",
+                    details: "沿運河散步，順路逛北一硝子與音樂盒堂，午餐與甜點可選 LeTAO/六花亭。下雪時記得邊走邊進店取暖，買好伴手禮再回札幌。",
+                    locationQuery: "Otaru Canal",
+                    style: 'haruki',
+                    keywords: ["運河", "玻璃", "甜點"],
+                    insights: {
+                        shopping: "LeTAO 起司蛋糕可外帶回札幌冷藏，玻璃/音樂盒外箱較大，留意背包空間。",
+                        travel: "運河邊風很大，拍照時先把手套收進口袋避免被風吹走。",
+                        creative: "玻璃工房的燈光打在雪地會反出琥珀色，記得多拍低角度倒影。",
+                        local: "咖啡館常附暖氣座位，點一杯熱拿鐵就能舒服解凍再出發。"
+                    }
+                    },
+                    { 
+                    time: "17:00", 
+                    type: "transport", 
+                    title: "返回札幌 · 晚餐自由", 
+                    desc: "回札幌後自由覓食或逛狸小路", 
+                    preview: "黃昏鐵道折返，晚餐交給夜市或拉麵巷。",
+                    details: "傍晚搭 JR 回札幌，視體力決定要在札幌站/狸小路/薄野覓食。若想排隊名店請提前鎖定時間。",
+                    locationQuery: "Otaru to Sapporo",
+                    style: 'haruki',
+                    keywords: ["狸小路", "札幌拉麵"],
+                    insights: {
+                        local: "札幌站地下街暖氣強，逛街時外套可以脫下來拎著，省體力。",
+                        travel: "回程 JR 夕陽時段座位吃緊，若想坐到靠窗可提前排自由席。",
+                        creative: "傍晚的列車窗會映出自己的倒影，把運河照片疊在一起拍，像雙重曝光。",
+                        shopping: "想排拉麵共和國或狸小路甜點，先線上取號（如有）再到現場等待。"
+                    }
+                    }
+                ]
+                },
+                {
+                date: "12/17",
+                day: "水曜日(Wed)",
+                title: "第二曲 · 巧克力煙囪午後",
+                subtitle: "ISHIYA steam + city cafes",
+                location: "札幌市區",
+                theme: { main: "text-rose-900", sub: "text-rose-600", btn: "bg-rose-800" },
+                events: [
+                    { 
+                    time: "10:00", 
+                    type: "transport", 
+                    title: "出發前往白色戀人工廠", 
+                    desc: "地鐵東西線前往宮之澤", 
+                    preview: "列車穿進積雪，巧克力香氣在前方。",
+                    details: "10:00 從札幌站搭地鐵東西線到宮之澤，再轉公車或步行至 ISHIYA 工廠，車程約 30–40 分鐘。記得提前查好開館時段。",
+                    locationQuery: "Miyanosawa Station",
+                    style: 'haruki',
+                    keywords: ["地鐵", "宮之澤"],
+                    insights: {
+                        travel: "工廠門票建議事先線上預約，冬天現場排隊會很冷。",
+                        local: "宮之澤站出口外就有便利店，可先補手套或暖暖包再走到公車站。",
+                        creative: "地鐵東西線的列車配色與雪景很搭，拍車廂與窗外白霧的對比感。"
+                    }
+                    },
+                    { 
+                    time: "10:50", 
+                    type: "activity", 
+                    title: "白色戀人巧克力工廠", 
+                    desc: "預計 10:50 抵達", 
+                    preview: "甜點流水線、餅乾香氣是今日 BGM。",
+                    details: "10:50 抵達後參觀製程、拍照，別錯過限量霜淇淋與烘焙體驗。紀念品可寄送或壓在行李底層。",
+                    locationQuery: "ISHIYA CO., LTD. Miyanosawa Factory",
+                    style: 'haruki',
+                    keywords: ["ISHIYA", "伴手禮"],
+                    insights: {
+                        shopping: "霜淇淋適合現場吃，禮盒則建議最後出場前再購買。",
+                        creative: "觀察輸送帶上餅乾整齊排列的節奏，拍成延時影片像機械版樂譜。",
+                        travel: "館內暖氣足，外套可先寄物或綁在背包，逛展手不會過熱。",
+                        trap: "烘焙體驗名額有限，現場滿席時可以先逛花園再回到報到處詢問候補。"
+                    }
+                    },
+                    { 
+                    time: "14:00", 
+                    type: "activity", 
+                    title: "市區咖啡廳 / 魚市場候選", 
+                    desc: "午後彈性行程", 
+                    preview: "咖啡香或魚腥味，隨心切換。",
+                    details: "午後可選擇網紅咖啡廳取暖，或到二条市場、場外市場逛逛。依當日天氣與體力決定。",
+                    locationQuery: "Sapporo Cafe or Nijo Market",
+                    style: 'haruki',
+                    keywords: ["咖啡", "市場"],
+                    insights: {
+                        local: "熱門咖啡店常有候位表，可先登記再去附近晃晃。",
+                        travel: "二条市場下午後生食選項會減少，想吃海鮮丼請在 15:00 前抵達。",
+                        creative: "挑一間窗邊咖啡座，拍下窗外飄雪與桌上咖啡杯的對焦切換，當作今日的靜物練習。",
+                        shopping: "市場內海鮮伴手禮多可真空包裝，但記得回台攜帶規定；咖啡店豆子可請研磨成手沖粉方便攜帶。"
+                    }
+                    },
+                    { 
+                    time: "19:00", 
+                    type: "food", 
+                    title: "札幌車站附近毛蟹鍋", 
+                    desc: "晚餐預訂名店", 
+                    preview: "毛蟹上桌，蒸氣把冬夜封住。",
+                    details: "晚上預約札幌站周邊毛蟹鍋名店，行前一天確認訂位。建議提前抵達避免排隊，完食後可以順路採買伴手禮。",
+                    locationQuery: "Sapporo Station crab hot pot",
+                    style: 'haruki',
+                    keywords: ["毛蟹鍋", "預訂"],
+                    insights: {
+                        travel: "北海道海鮮店多半只保留 10–15 分鐘座位，務必準時。",
+                        local: "札幌站周邊有些店現場排隊需先抽號碼，抵達先確認規則避免白等。",
+                        creative: "點一份蟹腳前先拍蒸氣升起的瞬間，蒸氣會在 Haruki 卡片裡像文字的行間空白。",
+                        trap: "雪靴進店前多半要換拖鞋，襪子記得保持乾淨且無破洞。"
+                    }
+                    }
+                ]
+                },
+                {
+                date: "12/18",
+                day: "木曜日(Thu)",
+                title: "第二曲 · 雪線謝幕",
+                subtitle: "Pack light, fly warm",
+                location: "札幌 → 新千歲 → 台北",
+                theme: { main: "text-amber-900", sub: "text-amber-600", btn: "bg-amber-700" },
+                events: [
+                    { 
+                    time: "10:00", 
+                    type: "transport", 
+                    title: "Check-out 前往機場", 
+                    desc: "Della Chen 帶隊移動", 
+                    preview: "行李鎖好暖暖包，雪路向機場延伸。",
+                    details: "10:00 退房出發，搭 JR 快速/巴士前往新千歲。跟 Della Chen 會合，留好至少 2 小時餘裕辦理退稅與托運。",
+                    locationQuery: "Sapporo Station to CTS",
+                    style: 'haruki',
+                    keywords: ["退房", "新千歲"],
+                    insights: {
+                        travel: "雪天移動預留緩衝，月台風強，手套與帽子別塞太深。",
+                        local: "JR 快速 Airport 平日尖峰仍會滿座，提早 20 分鐘排隊較容易坐到。",
+                        trap: "行李放月台時切記不要靠近黃線，雪融後地面濕滑容易滑落。",
+                        creative: "在出發前拍下房卡、手套、車票並排的平躺照，當成北海道章節的封底。"
+                    }
+                    },
+                    { 
+                    time: "14:00", 
+                    endTime: "17:55", 
+                    type: "flight", 
+                    title: "亞航回程", 
+                    desc: "14:00 起飛、17:55 抵達", 
+                    preview: "午後班機帶著冬夜的味道返台。",
+                    details: "亞航回程班機 14:00 起飛、17:55 抵達，票價約 NT$3,444（未含行李）。登機前把厚外套收好，機上空調偏乾記得補水。",
+                    locationQuery: "New Chitose Airport",
+                    style: 'haruki',
+                    price: "NT$3,444 (未含行李)",
+                    keywords: ["返程", "行李加購"],
+                    insights: {
+                        travel: "機場內有 Royce' 巧克力世界與 Doraemon Waku Waku Sky Park，可視時間快閃。",
+                        shopping: "Royce' 生巧需冷藏，記得最後買並索取保冷袋；Doraemon 商店小物可當伴手禮。",
+                        creative: "登機前找一個大面玻璃窗拍雪地跑道與機翼，當作雪線謝幕的定格畫面。",
+                        trap: "安檢前先把暖暖包、行動電源集中，北海道冬季安檢常要求逐一確認。"
+                    },
+                    flightInfo: { departure: "14:00", arrival: "17:55", terminal: "CTS" }
+                    }
+                ]
+                },
                 {
                 date: "12/19",
                 day: "金曜日(Fri)",
@@ -2269,6 +2655,14 @@
 
             const dayKeys = useMemo(() => schedule.map((day) => day.date.replace('/', '')), [schedule]);
             const tabOrder = useMemo(() => ['intro', ...dayKeys], [dayKeys]);
+            const tabItems = useMemo(() => {
+                const items = schedule.map((day, index) => {
+                    const weekSymbol = day.day ? day.day.trim().charAt(0) : '';
+                    const label = weekSymbol ? `${day.date} ${weekSymbol}` : day.date;
+                    return { key: dayKeys[index], label, palette: getTabColors(day.theme?.btn) };
+                });
+                return [{ key: 'intro', label: '序曲 Intro', palette: getTabColors(introHero.theme.btn) }, ...items];
+            }, [schedule, dayKeys]);
             const panelRef = useRef(null);
 
             const heroSchedule = currentDayKey === 'intro' ? introHero : schedule[activeDayIndex];
@@ -2474,48 +2868,24 @@
                 {/* Date Selector */}
                 <div className="px-4 -mt-8 mb-8 relative z-20 animate-in max-w-2xl mx-auto">
                     <div ref={tabsRef} className="bg-white/80 backdrop-blur-sm rounded-none shadow-sm p-2 overflow-x-auto no-scrollbar border border-stone-200 day-tabs">
-                        <button
-                            className={`day-tab ${currentDayKey === 'intro' ? 'is-active' : ''}`}
-                            data-day="intro"
-                            onClick={() => goToTab('intro')}
-                        >
-                            序曲 Intro
-                        </button>
-                        <button
-                            className={`day-tab ${currentDayKey === '1219' ? 'is-active' : ''}`}
-                            data-day="1219"
-                            onClick={() => goToTab('1219')}
-                        >
-                            12/19 金
-                        </button>
-                        <button
-                            className={`day-tab ${currentDayKey === '1220' ? 'is-active' : ''}`}
-                            data-day="1220"
-                            onClick={() => goToTab('1220')}
-                        >
-                            12/20 土
-                        </button>
-                        <button
-                            className={`day-tab ${currentDayKey === '1221' ? 'is-active' : ''}`}
-                            data-day="1221"
-                            onClick={() => goToTab('1221')}
-                        >
-                            12/21 日
-                        </button>
-                        <button
-                            className={`day-tab ${currentDayKey === '1222' ? 'is-active' : ''}`}
-                            data-day="1222"
-                            onClick={() => goToTab('1222')}
-                        >
-                            12/22 月
-                        </button>
-                        <button
-                            className={`day-tab ${currentDayKey === '1223' ? 'is-active' : ''}`}
-                            data-day="1223"
-                            onClick={() => goToTab('1223')}
-                        >
-                            12/23 火
-                        </button>
+                        {tabItems.map((tab) => (
+                            <button
+                                key={tab.key}
+                                className={`day-tab ${currentDayKey === tab.key ? 'is-active' : ''}`}
+                                data-day={tab.key}
+                                onClick={() => goToTab(tab.key)}
+                                style={{
+                                    '--day-bg': tab.palette.bg,
+                                    '--day-border': tab.palette.border,
+                                    '--day-fg': tab.palette.fg,
+                                    '--day-active-bg': tab.palette.activeBg,
+                                    '--day-active-border': tab.palette.activeBorder,
+                                    '--day-active-fg': tab.palette.activeFg
+                                }}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
