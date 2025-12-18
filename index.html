@@ -1069,6 +1069,14 @@
             --day-active-border: #2c506d;
             --day-active-fg: #f4f8fc;
         }
+        .day-tab[data-day="map"] {
+            --day-bg: #e0f2fe;
+            --day-border: #bfdbfe;
+            --day-fg: #0ea5e9;
+            --day-active-bg: #0284c7;
+            --day-active-border: #0369a1;
+            --day-active-fg: #f8fafc;
+        }
 
         .day-panel-container {
             position: relative;
@@ -1471,6 +1479,14 @@
             subtitle: "Press Start to launch the Tokyo Chronicles",
             location: "東京紀行 2025",
             theme: { main: "text-cyan-900", sub: "text-cyan-500", btn: "bg-cyan-700" }
+        };
+        const mapHero = {
+            date: "MAP",
+            day: "Map",
+            title: "行程總覽地圖",
+            subtitle: "Google My Maps／嵌入版",
+            location: "Tokyo &周邊移動",
+            theme: { main: "text-sky-900", sub: "text-sky-600", btn: "bg-sky-700" }
         };
         const tabPalette = {
             'bg-sky-800': { bg: 'rgba(7,89,133,0.12)', border: 'rgba(7,89,133,0.35)', fg: '#075985', activeBg: '#075985', activeBorder: '#0c4a6e', activeFg: '#f8fafc' },
@@ -2350,20 +2366,24 @@
             ], []);
 
             const dayKeys = useMemo(() => schedule.map((day) => day.date.replace('/', '')), [schedule]);
-            const tabOrder = useMemo(() => ['intro', ...dayKeys], [dayKeys]);
+            const tabOrder = useMemo(() => ['intro', ...dayKeys, 'map'], [dayKeys]);
             const tabItems = useMemo(() => {
                 const items = schedule.map((day, index) => {
                     const weekSymbol = day.day ? day.day.trim().charAt(0) : '';
                     const label = weekSymbol ? `${day.date} ${weekSymbol}` : day.date;
                     return { key: dayKeys[index], label, palette: getTabColors(day.theme?.btn) };
                 });
-                return [{ key: 'intro', label: '序曲 Intro', palette: getTabColors(introHero.theme.btn) }, ...items];
+                return [
+                    { key: 'intro', label: '序曲 Intro', palette: getTabColors(introHero.theme.btn) },
+                    ...items,
+                    { key: 'map', label: '行程地圖 Map', palette: getTabColors(mapHero.theme.btn) }
+                ];
             }, [schedule, dayKeys]);
             const panelRef = useRef(null);
 
-            const heroSchedule = currentDayKey === 'intro' ? introHero : schedule[activeDayIndex];
-            const heroDateNumber = currentDayKey === 'intro' ? '序曲' : heroSchedule.date.split('/')[1];
-            const heroDateLabel = currentDayKey === 'intro' ? 'Intro' : 'Dec';
+            const heroSchedule = currentDayKey === 'intro' ? introHero : currentDayKey === 'map' ? mapHero : schedule[activeDayIndex];
+            const heroDateNumber = currentDayKey === 'intro' ? '序曲' : currentDayKey === 'map' ? 'MAP' : heroSchedule.date.split('/')[1];
+            const heroDateLabel = currentDayKey === 'intro' ? 'Intro' : currentDayKey === 'map' ? 'MyMaps' : 'Dec';
             const getPanelClass = (panelKey) => {
                 const isActivePanel = currentDayKey === panelKey;
                 const slideClass = isActivePanel && slideInKey === panelKey
@@ -2494,7 +2514,7 @@
                 const direction = targetIndex > currentIndex ? 'forward' : 'backward';
                 setTransitionDir(direction);
                 setCurrentDayKey(key);
-                if (targetIndex > 0) {
+                if (targetIndex > 0 && key !== 'map') {
                     setActiveDayIndex(targetIndex - 1);
                 }
                 setSlideInKey(key);
@@ -2624,11 +2644,11 @@
                     <div className="day-panel-container swipe-enabled pb-16" ref={panelRef}>
                         <div className={getPanelClass('intro')} data-day="intro">
                             <div className="space-y-4">
-                                <div className="intro-screen">
-                                    <div className="w95-window">
-                                        <div className="w95-titlebar">
-                                            <span>Welcome</span>
-                                            <span className="w95-title-dots">
+                        <div className="intro-screen">
+                            <div className="w95-window">
+                                <div className="w95-titlebar">
+                                    <span>Welcome</span>
+                                    <span className="w95-title-dots">
                                                 <span></span>
                                                 <span></span>
                                                 <span></span>
@@ -2650,16 +2670,55 @@
                                                 Launch Chronology
                                             </button>
                                         </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
-                        {schedule.map((day, dayIndex) => {
-                        const dayKey = dayKeys[dayIndex];
-                        const route = mapRoutes[dayIndex];
-                        return (
-                            <div 
-                                key={dayKey} 
+                    </div>
+                    <div className={getPanelClass('map')} data-day="map">
+                        <div className="space-y-6">
+                            <div className="bg-white border border-stone-200 rounded-xl shadow-sm p-4 sm:p-5">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div>
+                                        <div className="text-[10px] uppercase tracking-[0.3em] text-stone-400">Google My Maps</div>
+                                        <h3 className="font-display text-xl text-stone-800 mt-1">行程總覽地圖</h3>
+                                    </div>
+                                    <a
+                                        href="https://www.google.com/maps/d/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[11px] px-3 py-2 border border-stone-300 rounded-full uppercase tracking-[0.2em] text-stone-600 hover:bg-stone-100 transition"
+                                    >
+                                        開啟 My Maps
+                                    </a>
+                                </div>
+                                <p className="text-sm text-stone-600 leading-relaxed">
+                                    將行程點位匯入 My Maps 後，可分享或嵌入下方 iframe。若尚未建立，先在 My Maps 新建地圖，匯入 CSV 並取得分享/嵌入連結。
+                                </p>
+                            </div>
+                            <div className="bg-white border border-stone-200 rounded-xl shadow-sm p-3 sm:p-4">
+                                <div className="aspect-[16/9] w-full overflow-hidden rounded-lg border border-stone-100">
+                                    <iframe
+                                        src="https://www.google.com/maps/d/embed?mid=YOUR_MAP_ID&ehbc=2E312F"
+                                        width="100%"
+                                        height="420"
+                                        style={{ border: 0 }}
+                                        loading="lazy"
+                                        allowFullScreen
+                                        title="Tokyo My Maps"
+                                    ></iframe>
+                                </div>
+                                <div className="mt-3 text-[12px] text-stone-500 leading-relaxed">
+                                    提示：將 <code>YOUR_MAP_ID</code> 換成你的 My Maps ID。手機嵌入時可提高高度（例如 520px），並保留外層圓角/陰影。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {schedule.map((day, dayIndex) => {
+                    const dayKey = dayKeys[dayIndex];
+                    const route = mapRoutes[dayIndex];
+                    return (
+                        <div 
+                            key={dayKey} 
                                 className={getPanelClass(dayKey)}
                                 data-day={dayKey}
                             >
