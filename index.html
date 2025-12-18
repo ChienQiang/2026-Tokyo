@@ -1503,12 +1503,51 @@
 
         const getTabColors = (btnClass) => tabPalette[btnClass] || tabPalette.default;
 
+        const buildMapEmbedUrl = (id) => {
+            if (!id) return '';
+            return `https://www.google.com/maps/d/embed?mid=${encodeURIComponent(id)}&ehbc=2E312F`;
+        };
+
+        const extractMapIdFromInput = (raw) => {
+            if (!raw) return '';
+            const trimmed = String(raw).trim();
+            try {
+                const asUrl = new URL(trimmed);
+                const mid = asUrl.searchParams.get('mid');
+                if (mid) return mid;
+            } catch (err) {
+                // not a URL, fall through
+            }
+            const midMatch = trimmed.match(/mid=([A-Za-z0-9_-]+)/);
+            if (midMatch?.[1]) return midMatch[1];
+            if (/^[A-Za-z0-9_-]{10,}$/.test(trimmed)) return trimmed;
+            return '';
+        };
+
+        const defaultMapId = '1olF2urPMmrNyKdk9J9ckl1h-wDKkZKU';
+
         const TripApp = () => {
             const [activeDayIndex, setActiveDayIndex] = useState(0);
             const [selectedEvent, setSelectedEvent] = useState(null);
             const [currentDayKey, setCurrentDayKey] = useState("intro");
             const [transitionDir, setTransitionDir] = useState("forward");
             const [slideInKey, setSlideInKey] = useState("intro");
+            const [mapId, setMapId] = useState(() => {
+                if (typeof window === 'undefined') return defaultMapId;
+                const params = new URLSearchParams(window.location.search);
+                const fromQuery = extractMapIdFromInput(params.get('mapId'));
+                if (fromQuery) return fromQuery;
+                try {
+                    const fromStorage = extractMapIdFromInput(localStorage.getItem('tokyoMapId'));
+                    if (fromStorage) return fromStorage;
+                } catch (err) {
+                    // ignore
+                }
+                return defaultMapId;
+            });
+            const [mapInput, setMapInput] = useState('');
+            const [mapError, setMapError] = useState('');
+            const mapEmbedUrl = useMemo(() => buildMapEmbedUrl(mapId), [mapId]);
             const tabsRef = useRef(null);
             const clipboardSupported = typeof navigator !== 'undefined' && Boolean(navigator.clipboard);
 
@@ -1873,6 +1912,26 @@
                         creative: "觀察每件作品的『評審語』與展台角度，這是把日常物件提升為敘事的教科書。",
                         business: "Good Design Award 獲獎後，品牌能用紅圈 Logo 打在包裝上，對銷售與信任度有立竿見影的效果。",
                         history: "Good Design 源自 1957 年的『G-Mark』計畫，紅圈自此成為日本生活美學的官方符號。"
+                    }
+                    },
+                    { 
+                    time: "16:00", 
+                    type: "shop", 
+                    title: "有樂町 Bic Camera 取貨廚餘機", 
+                    desc: "16:00 後到店取貨（已付）", 
+                    preview: "先領貨再逛，16:00 後直接到服務櫃檯領廚餘機。",
+                    details: "16:00 後到 Bic Camera 有樂町店服務櫃檯取廚餘機，憑訂單/取貨證明核對身分後即可領取。領完可順便補其他小物或退稅結帳。",
+                    locationQuery: "ビックカメラ 有楽町店",
+                    mapUrl: "https://maps.app.goo.gl/BAcw3B9uJrBiTQyM7",
+                    style: 'bluebottle',
+                    price: "已付",
+                    weather: { type: 'cloud', current: '10°C', high: '12°C', low: '8°C', loc: 'Yurakucho' },
+                    keywords: ["Bic Camera", "取貨", "廚餘機"],
+                    insights: {
+                        travel: "提前在 1F 服務櫃檯報取貨，準備訂單編號與證件；週末人多時先抽號碼。",
+                        shopping: "領貨後若需退稅，記得把收據/發票一起處理；可順便買耗材或轉接頭。",
+                        timing: "16:00 後到店即可；若已在附近逛街，可先報到等待叫號。",
+                        trap: "服務檯尖峰會排隊，建議提前 5–10 分鐘到。"
                     }
                     },
                     { 
@@ -2404,6 +2463,29 @@
                 tab?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
             }, [currentDayKey]);
 
+            useEffect(() => {
+                if (typeof window === 'undefined') return;
+                const params = new URLSearchParams(window.location.search);
+                if (mapId) {
+                    params.set('mapId', mapId);
+                    try {
+                        localStorage.setItem('tokyoMapId', mapId);
+                    } catch (err) {
+                        // ignore
+                    }
+                } else {
+                    params.delete('mapId');
+                    try {
+                        localStorage.removeItem('tokyoMapId');
+                    } catch (err) {
+                        // ignore
+                    }
+                }
+                const nextQuery = params.toString();
+                const nextUrl = nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname;
+                window.history.replaceState(null, '', nextUrl);
+            }, [mapId]);
+
             const paidEvents = useMemo(() => {
                 return schedule.flatMap((day, dayIndex) => 
                     day.events
@@ -2504,6 +2586,23 @@
                     return;
                 }
                 navigator.clipboard.writeText(text);
+            };
+
+            const handleSaveMapId = () => {
+                const normalized = extractMapIdFromInput(mapInput);
+                if (!normalized) {
+                    setMapError("請貼上 Google My Maps 的分享連結或 mid 參數");
+                    return;
+                }
+                setMapError('');
+                setMapId(normalized);
+                setMapInput('');
+            };
+
+            const handleClearMapId = () => {
+                setMapId('');
+                setMapError('');
+                setMapInput('');
             };
 
             const goToTab = (key) => {
@@ -2682,33 +2781,74 @@
                                         <div className="text-[10px] uppercase tracking-[0.3em] text-stone-400">Google My Maps</div>
                                         <h3 className="font-display text-xl text-stone-800 mt-1">行程總覽地圖</h3>
                                     </div>
-                                    <a
-                                        href="https://www.google.com/maps/d/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-[11px] px-3 py-2 border border-stone-300 rounded-full uppercase tracking-[0.2em] text-stone-600 hover:bg-stone-100 transition"
-                                    >
-                                        開啟 My Maps
-                                    </a>
+                                    {mapEmbedUrl && (
+                                        <a
+                                            href={mapEmbedUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[11px] px-3 py-2 border border-stone-300 rounded-full uppercase tracking-[0.2em] text-stone-600 hover:bg-stone-100 transition"
+                                        >
+                                            新分頁開啟
+                                        </a>
+                                    )}
                                 </div>
                                 <p className="text-sm text-stone-600 leading-relaxed">
-                                    將行程點位匯入 My Maps 後，可分享或嵌入下方 iframe。若尚未建立，先在 My Maps 新建地圖，匯入 CSV 並取得分享/嵌入連結。
+                                    Google 目前會在缺少 ID 時顯示「That’s an error」頁面。貼上你的 My Maps 分享連結或 mid= 參數即可修正並儲存於本機／網址。
+                                </p>
+                                <div className="mt-3 flex flex-col sm:flex-row gap-2">
+                                    <input
+                                        type="text"
+                                        value={mapInput}
+                                        onChange={(e) => setMapInput(e.target.value)}
+                                        placeholder="貼上 My Maps 連結或 mid=XXXXXXXX"
+                                        className="flex-1 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleSaveMapId}
+                                        className="px-3 py-2 text-xs font-bold uppercase tracking-[0.25em] rounded-lg bg-sky-800 text-white hover:bg-sky-900 transition"
+                                    >
+                                        更新地圖
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleClearMapId}
+                                        className="px-3 py-2 text-xs font-bold uppercase tracking-[0.25em] rounded-lg border border-stone-300 text-stone-600 hover:bg-stone-100 transition"
+                                    >
+                                        清除
+                                    </button>
+                                </div>
+                                {mapError && (
+                                    <p className="text-xs text-rose-600 mt-2">{mapError}</p>
+                                )}
+                                <p className="text-[11px] text-stone-500 mt-2 leading-relaxed">
+                                    1) 在 My Maps 按「分享」→ 複製連結。2) 若連結包含 <code className="bg-stone-100 px-1 rounded">mid=XXXXX</code>，只要那段即可。3) 連結會儲存到 URL 的 <code className="bg-stone-100 px-1 rounded">mapId</code> 參數。
                                 </p>
                             </div>
                             <div className="bg-white border border-stone-200 rounded-xl shadow-sm p-3 sm:p-4">
-                                <div className="aspect-[16/9] w-full overflow-hidden rounded-lg border border-stone-100">
-                                    <iframe
-                                        src="https://www.google.com/maps/d/embed?mid=YOUR_MAP_ID&ehbc=2E312F"
-                                        width="100%"
-                                        height="420"
-                                        style={{ border: 0 }}
-                                        loading="lazy"
-                                        allowFullScreen
-                                        title="Tokyo My Maps"
-                                    ></iframe>
-                                </div>
+                                {mapEmbedUrl ? (
+                                    <div className="aspect-[16/9] w-full overflow-hidden rounded-lg border border-stone-100">
+                                        <iframe
+                                            key={mapEmbedUrl}
+                                            src={mapEmbedUrl}
+                                            width="100%"
+                                            height="420"
+                                            style={{ border: 0 }}
+                                            loading="lazy"
+                                            allowFullScreen
+                                            title="Tokyo My Maps"
+                                        ></iframe>
+                                    </div>
+                                ) : (
+                                    <div className="aspect-[16/9] w-full overflow-hidden rounded-lg border border-dashed border-stone-300 bg-stone-50 flex flex-col items-center justify-center text-stone-500 text-sm gap-2 px-4 text-center">
+                                        <span className="font-semibold">尚未設定 My Maps ID</span>
+                                        <span className="text-xs text-stone-400">
+                                            貼上分享連結後即會顯示，不再看到「That’s an error」頁面。
+                                        </span>
+                                    </div>
+                                )}
                                 <div className="mt-3 text-[12px] text-stone-500 leading-relaxed">
-                                    提示：將 <code>YOUR_MAP_ID</code> 換成你的 My Maps ID。手機嵌入時可提高高度（例如 520px），並保留外層圓角/陰影。
+                                    範例：<code className="bg-stone-100 px-1 rounded">https://www.google.com/maps/d/u/0/edit?mid=1AbCdEfGhIJkLmNoP</code> → 只需填入 <code className="bg-stone-100 px-1 rounded">1AbCdEfGhIJkLmNoP</code>。
                                 </div>
                             </div>
                         </div>
