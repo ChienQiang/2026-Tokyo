@@ -1503,6 +1503,8 @@
                 hibiya: [35.6736, 139.7562],
                 tokyoSt: [35.6812, 139.7671],
                 marunouchi: [35.6764, 139.7649],
+                yurakucho: [35.6753, 139.7631],
+                akasaka: [35.6762, 139.7369],
                 takasaki: [36.3220, 139.0125],
                 daruma: [36.3150, 138.9760],
                 karuizawa: [36.3435, 138.6355],
@@ -1526,11 +1528,12 @@
                 },
                 { 
                     id: 'day2', 
-                    path: [coords.roppongi, coords.ginza, coords.hibiya, coords.marunouchi, coords.roppongi], 
+                    path: [coords.roppongi, coords.ginza, coords.hibiya, coords.yurakucho, coords.marunouchi, coords.roppongi], 
                     stops: [
                         { name: "六本木", coord: coords.roppongi, landmark: "" },
                         { name: "銀座", coord: coords.ginza, landmark: "" },
                         { name: "日比谷", coord: coords.hibiya, landmark: "" },
+                        { name: "有楽町", coord: coords.yurakucho, landmark: "" },
                         { name: "丸の内", coord: coords.marunouchi, landmark: "" }
                     ],
                     landmarks: [
@@ -1539,6 +1542,8 @@
                         { emoji: "🌿", label: "日比谷公園", coord: [35.6750, 139.7570] },
                         { emoji: "🎬", label: "TOHO Hibiya 戲院街", coord: [35.6744, 139.7584] },
                         { emoji: "🍜", label: "有樂町 高架下美食", coord: [35.6731, 139.7633] },
+                        { emoji: "🛒", label: "Bic Camera 有楽町店", coord: coords.yurakucho },
+                        { emoji: "🛒", label: "Bic Camera 赤坂見附(備案)", coord: coords.akasaka },
                         { emoji: "⭕", label: "Good Design Marunouchi", coord: [35.6764, 139.7649] }
                     ]
                 },
@@ -1589,6 +1594,16 @@
                 location: "台北 → 東京 → 六本木",
                 theme: { main: "text-slate-900", sub: "text-slate-600", btn: "bg-slate-800" },
                 events: [
+                    {
+                    time: "行前",
+                    type: "shop",
+                    title: "國際電話卡上網卡",
+                    desc: "2人共1張，華南黑卡匯款",
+                    preview: "開機即上線，台北先備好門號與流量。",
+                    details: "12/16 已刷華南黑卡購買國際電話卡上網卡 1 張，兩人共用。出發前確認 QR 與 APN，抵達後直接插卡或啟用即可，避免落地找網路。",
+                    price: "$1197",
+                    style: 'bluebottle'
+                    },
                     { 
                     time: "14:30", 
                     endTime: "19:00", 
@@ -1601,6 +1616,7 @@
                     icon: Plane,
                     style: 'gaiac', // GAIAC 10 Style
                     weather: { type: 'cloud', current: '18°C', high: '21°C', low: '16°C', loc: 'TPE' },
+                    price: "$18000（2人來回，匯款）",
                     keywords: ["Le Labo", "Woody", "Musk"],
                     outfit: "機艙內氣壓較低且乾燥。建議穿著純棉材質，保持極簡。",
                     insights: {
@@ -1647,7 +1663,7 @@
                     title: "APA 六本木飯店", 
                     desc: "都市叢林中的棲身之所", 
                     preview: "霓虹與狹縫房間交錯的夜基地，光影交纏的棲身所。",
-                    price: "$3086", 
+                    price: "$7414（2晚，華南黑卡 12/16 扣款）", 
                     details: "歡迎來到原宿...啊不，是六本木！APA 飯店就是都市裡的怪獸大廈。這裡混雜著商務客、觀光客與夜生活的人群。極度狹窄的空間與極度鮮豔的社長看板，構成了一種強烈的視覺衝擊。這就是東京，擁擠、混亂，卻充滿能量。",
                     locationQuery: "APA Hotel Roppongi Ekimae",
                     icon: Hotel,
@@ -1844,6 +1860,26 @@
                     }
                     },
                     { 
+                    time: "16:30", 
+                    type: "shop", 
+                    title: "Bic Camera 有樂町店 · 快閃補貨", 
+                    desc: "退稅 3C／旅用小物一次收齊", 
+                    preview: "白色燈箱與滿牆日文字，像走進資訊洪流的補給站。", 
+                    details: "丸之內散步後切到有樂町站前的 Bic Camera。轉接頭、行動電源、暖暖包、相機電池、SIM/eSIM 都能一次補齊，帶護照現場可辦免稅。高樓層有藥妝、家電與旅充配件，記得查價比台灣是否划算。", 
+                    locationQuery: "ビックカメラ 有楽町店",
+                    mapUrl: "https://maps.app.goo.gl/BAcw3B9uJrBiTQyM7",
+                    style: 'bluebottle',
+                    weather: { type: 'cloud', current: '10°C', high: '12°C', low: '8°C', loc: 'Yurakucho' },
+                    keywords: ["Bic Camera", "有樂町", "退稅", "3C"],
+                    insights: {
+                        travel: "免稅需護照＋當天同店滿 ¥5,000（未稅），可刷卡；部分特價品不能免稅，結帳前先問清楚。",
+                        shopping: "轉接頭/行動電源/暖暖包通常在 1F 入口區，3C 專區樓層貼有「特價」紅標；買相機電池時記得確認型號。",
+                        local: "週末傍晚觀光客多，電梯常排隊，想快速逛可直接走手扶梯到目標樓層。",
+                        backup: "人太多時可改備案：ビックカメラ 赤坂見附駅店（https://maps.app.goo.gl/Lf7SX9AQxHpK3yvL9）。地鐵銀座線/丸之內線直達，規模較小但補貨效率高。",
+                        creative: "把收據、免稅單與剛買的轉接頭排成一張扁平構圖，作為東京補給站的記錄。"
+                    }
+                    },
+                    { 
                     time: "17:30", 
                     type: "activity", 
                     title: "六本木聖誕燈飾", 
@@ -2000,10 +2036,11 @@
                     { 
                     time: "16:58", 
                     type: "hotel", 
-                    title: "草津飯店 Check-in（待定）", 
-                    desc: "神隱少女的湯屋候選", 
-                    preview: "湯畑蒸氣當作門簾，入住哪一間都像穿越一層溫暖的霧。",
-                    details: "飯店仍待確認，但 16:58 抵達草津後先完成 Check-in，放好行李再去湯畑逛溫泉街。夜晚燈火通明時，彷彿通往神靈世界的入口。紅色的橋樑、升騰的白煙、穿著浴衣穿梭的人群——不論住哪裡，都別忘了呼吸，過橋時要憋氣喔，免得被湯婆婆發現。",
+                    title: "草津飯店 Check-in", 
+                    desc: "神隱少女的湯屋", 
+                    preview: "湯畑蒸氣當作門簾，入住那一刻就像穿越一層溫暖的霧。",
+                    details: "16:58 抵達草津後直奔飯店完成 Check-in，放好行李再去湯畑逛溫泉街。夜晚燈火通明時，彷彿通往神靈世界的入口。紅色的橋樑、升騰的白煙、穿著浴衣穿梭的人群——入住後別忘了呼吸，過橋時要憋氣喔，免得被湯婆婆發現。",
+                    price: "$6847（12/16 扣款，含早晚餐）",
                     locationQuery: "Kusatsu Onsen", 
                     icon: Hotel,
                     style: 'spirited', // Spirited Away Style
@@ -2115,7 +2152,7 @@
                     style: 'handmaiden',
                     weather: { type: 'cloud', current: '9°C', high: '12°C', low: '6°C', loc: 'Yokohama' },
                     keywords: ["下女的誘惑", "下女誘罪", "病態美", "行李寄放", "馬車道", "高樓夜景"],
-                    price: "$1454",
+                    price: "$1904（已扣款）",
                     insights: {
                         travel: "馬車道站 4 號出口步行約 3 分鐘，Lobby 右側有寄物室；夜晚櫃檯常排隊，先寄放再上樓最省時。",
                         local: "高樓層面海的房型夜景極佳，但寄物不分房號，記得拿寄物牌以防遺失。",
@@ -2415,6 +2452,40 @@
                 navigator.clipboard.writeText(window.location.href);
             };
 
+            const buildDayShareText = (day) => {
+                const header = `${day.date} · ${day.location}`;
+                const lines = day.events.map((event) => {
+                    const timeRange = event.endTime ? `${event.time}-${event.endTime}` : event.time;
+                    const desc = event.desc ? `：${event.desc}` : '';
+                    return `- ${timeRange} ${event.title}${desc}`;
+                });
+                return [header, ...lines].join('\n');
+            };
+
+            const buildAllScheduleText = () => {
+                return schedule.map(buildDayShareText).join('\n\n');
+            };
+
+            const copyDaySchedule = (dayIndex) => {
+                const day = schedule[dayIndex];
+                if (!day) return;
+                const text = buildDayShareText(day);
+                if (!navigator.clipboard) {
+                    window.alert(text);
+                    return;
+                }
+                navigator.clipboard.writeText(text);
+            };
+
+            const copyAllSchedules = () => {
+                const text = buildAllScheduleText();
+                if (!navigator.clipboard) {
+                    window.alert(text);
+                    return;
+                }
+                navigator.clipboard.writeText(text);
+            };
+
             const goToTab = (key) => {
                 if (key === currentDayKey) return;
                 if (!tabOrder.includes(key)) return;
@@ -2575,7 +2646,7 @@
                                                     </li>
                                                 ))}
                                             </ul>
-                                            <button className="w95-button" type="button">
+                                            <button className="w95-button" type="button" onClick={copyAllSchedules}>
                                                 Launch Chronology
                                             </button>
                                         </div>
@@ -2593,6 +2664,16 @@
                                 data-day={dayKey}
                             >
                                 <div className="space-y-12">
+                                <div className="flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => copyDaySchedule(dayIndex)}
+                                        disabled={!clipboardSupported}
+                                        className={`text-[11px] uppercase tracking-[0.2em] font-semibold px-3 py-2 rounded-full border transition ${clipboardSupported ? 'border-stone-300 text-stone-600 hover:bg-stone-100' : 'border-stone-200 text-stone-300 cursor-not-allowed'}`}
+                                    >
+                                        複製當日行程
+                                    </button>
+                                </div>
                                 {day.events.map((event, index) => {
                                     const preview = event.preview || event.desc;
                                     const mapHref = buildMapUrl(event, day.location);
