@@ -1545,8 +1545,6 @@
                 }
                 return defaultMapId;
             });
-            const [mapInput, setMapInput] = useState('');
-            const [mapError, setMapError] = useState('');
             const mapEmbedUrl = useMemo(() => buildMapEmbedUrl(mapId), [mapId]);
             const tabsRef = useRef(null);
             const clipboardSupported = typeof navigator !== 'undefined' && Boolean(navigator.clipboard);
@@ -1921,6 +1919,23 @@
                     desc: "16:00 後到店取貨（已付）", 
                     preview: "先領貨再逛，16:00 後直接到服務櫃檯領廚餘機。",
                     details: "16:00 後到 Bic Camera 有樂町店服務櫃檯取廚餘機，憑訂單/取貨證明核對身分後即可領取。領完可順便補其他小物或退稅結帳。",
+                    pickupNotice: {
+                        title: "Bic Camera 線上預約通知",
+                        content: [
+                            "非常感謝您申請使用Bic Camera的線上預約服務。",
+                            "產品準備就緒後，我們會立即透過電子郵件通知您，請稍等片刻。",
+                            "*此郵件僅供轉發，我們無法回覆您的郵件。",
+                            "【產品詳情】島田：食物垃圾減量烘乾機 PPC-11WH（白色 / 暖風烘乾）",
+                            "價格：34,690日圓（含稅），積分率：10%，數量：1 件",
+                            "預約店：Bic Camera有樂町店（03-5221-1111），營業時間：上午10:00 - 晚上10:00",
+                            "預約參觀日期：2025年12月20日（週六）下午4:00至休館時間｜預約編號：4650134900",
+                            "*截至2025年12月18日晚上9:55的銷售價格和積分率。接待點卡號：2890694895529"
+                        ],
+                        link: {
+                            href: "https://www.biccamera.com/bc/i/shop/shoplist/shop014.jsp",
+                            label: "Bic Camera 有樂町店 官方資訊"
+                        }
+                    },
                     locationQuery: "ビックカメラ 有楽町店",
                     mapUrl: "https://maps.app.goo.gl/BAcw3B9uJrBiTQyM7",
                     style: 'bluebottle',
@@ -2588,23 +2603,6 @@
                 navigator.clipboard.writeText(text);
             };
 
-            const handleSaveMapId = () => {
-                const normalized = extractMapIdFromInput(mapInput);
-                if (!normalized) {
-                    setMapError("請貼上 Google My Maps 的分享連結或 mid 參數");
-                    return;
-                }
-                setMapError('');
-                setMapId(normalized);
-                setMapInput('');
-            };
-
-            const handleClearMapId = () => {
-                setMapId('');
-                setMapError('');
-                setMapInput('');
-            };
-
             const goToTab = (key) => {
                 if (key === currentDayKey) return;
                 if (!tabOrder.includes(key)) return;
@@ -2795,34 +2793,8 @@
                                 <p className="text-sm text-stone-600 leading-relaxed">
                                     Google 目前會在缺少 ID 時顯示「That’s an error」頁面。貼上你的 My Maps 分享連結或 mid= 參數即可修正並儲存於本機／網址。
                                 </p>
-                                <div className="mt-3 flex flex-col sm:flex-row gap-2">
-                                    <input
-                                        type="text"
-                                        value={mapInput}
-                                        onChange={(e) => setMapInput(e.target.value)}
-                                        placeholder="貼上 My Maps 連結或 mid=XXXXXXXX"
-                                        className="flex-1 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={handleSaveMapId}
-                                        className="px-3 py-2 text-xs font-bold uppercase tracking-[0.25em] rounded-lg bg-sky-800 text-white hover:bg-sky-900 transition"
-                                    >
-                                        更新地圖
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleClearMapId}
-                                        className="px-3 py-2 text-xs font-bold uppercase tracking-[0.25em] rounded-lg border border-stone-300 text-stone-600 hover:bg-stone-100 transition"
-                                    >
-                                        清除
-                                    </button>
-                                </div>
-                                {mapError && (
-                                    <p className="text-xs text-rose-600 mt-2">{mapError}</p>
-                                )}
-                                <p className="text-[11px] text-stone-500 mt-2 leading-relaxed">
-                                    1) 在 My Maps 按「分享」→ 複製連結。2) 若連結包含 <code className="bg-stone-100 px-1 rounded">mid=XXXXX</code>，只要那段即可。3) 連結會儲存到 URL 的 <code className="bg-stone-100 px-1 rounded">mapId</code> 參數。
+                                <p className="text-sm text-stone-500 mt-3 leading-relaxed">
+                                    本頁嵌入的 My Maps 會根據網址內的 <code className="bg-stone-100 px-1 rounded">mapId</code> 參數或先前儲存的資料載入，如需更換地圖可直接在網址列加上新的 <code>mapId=...</code>。
                                 </p>
                             </div>
                             <div className="bg-white border border-stone-200 rounded-xl shadow-sm p-3 sm:p-4">
@@ -2933,6 +2905,25 @@
                                                 </span>
                                             ))}
                                         </div>
+                                        {event.pickupNotice && (
+                                            <div className="border border-stone-200 rounded-2xl bg-stone-50 p-3 text-[13px] text-stone-600 space-y-1 leading-relaxed">
+                                                <p className="font-semibold text-sm text-stone-700">{event.pickupNotice.title}</p>
+                                                {event.pickupNotice.content.map((line, idx) => (
+                                                    <p key={idx}>{line}</p>
+                                                ))}
+                                                {event.pickupNotice.link && (
+                                                    <a
+                                                        href={event.pickupNotice.link.href}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-stone-800 font-semibold underline hover:text-stone-900 transition"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        {event.pickupNotice.link.label}
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                     );
                                 })}
